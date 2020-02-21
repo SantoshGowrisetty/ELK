@@ -1,0 +1,76 @@
+#Install Logstash:
+$sudo apt-get install logstash
+#Here we are going to generate SSL certificate key to secure log transfer from file beat client. Modify the “hosts” file before creating #the SSL certificate.
+#make sure /etc/hosts is updated as 'ipaddress elk-server'
+#in my case /etc/hosts contains [10.0.2.15  u1]
+$cd /etc/logstash
+$mkdir ssl
+#Generate SSL certificate. Change elk-server to your server name in the below command.
+$sudo openssl req -subj '/CN=u1/' -x509 -days 3650 -batch -nodes -newkey rsa:2048 -keyout ssl/logstash-forwarder.key -out ssl/logstash-forwarder.crt
+#Create following files inside “/etc/logstash/conf.d”
+#sudo vim filebeat-input.conf
+Add the following lines to it.
+
+input {
+  beats {
+    port => 5443
+    type => syslog
+    ssl => true
+    ssl_certificate => "/etc/logstash/ssl/logstash-forwarder.crt"
+    ssl_key => "/etc/logstash/ssl/logstash-forwarder.key"
+  }
+}
+#Save and close the file and create a new configuration file
+$sudo vim syslog-filter.conf
+Add the following contents to it.
+
+filter {
+  if [type] == "syslog" {
+    grok {
+      match => { "message" => "%{SYSLOGTIMESTAMP:syslog_timestamp} %{SYSLOGHOST:syslog_hostname} %{DATA:syslog_program}(?:\[%{POSINT:syslog_pid}\])?: %{GREEDYDATA:syslog_message}" }
+      add_field => [ "received_at", "%{@timestamp}" ]
+      add_field => [ "received_from", "%{host}" ]
+    }
+    date {
+      match => [ "syslog_timestamp", "MMM  d HH:mm:ss", "MMM dd HH:mm:ss" ]
+    }
+  }
+}
+#Save and exit the file. Create elasticsearch output file.
+$sudo vim output-elasticsearch.conf
+Add the following lines to it.
+
+output {
+  elasticsearch { hosts => ["localhost:9200"]
+    hosts => "localhost:9200"
+    manage_template => false
+    index => "%{[@metadata][beat]}-%{+YYYY.MM.dd}"
+    document_type => "%{[@metadata][type]}"
+  }
+}
+#Let’s enable Logstash on boot and start the service:
+$sudo systemctl enable logstash.service
+$sudo systemctl start logstash.service
+
+#or start logstash using the below way
+/usr/share/logstash/bin/logstash --path.settings /etc/logstash
+
+#look for following output
+Sending Logstash logs to /var/log/logstash which is now configured via log4j2.properties
+[2019-09-18T18:40:19,350][INFO ][logstash.runner          ] Starting Logstash {"logstash.version"=>"6.8.3"}
+[2019-09-18T18:40:26,139][WARN ][logstash.outputs.elasticsearch] You are using a deprecated config setting "document_type" set in elasticsearch. Deprecated settings will continue to work, but are scheduled for removal from logstash in the future. Document types are being deprecated in Elasticsearch 6.0, and removed entirely in 7.0. You should avoid this feature If you have any questions about this, please visit the #logstash channel on freenode irc. {:name=>"document_type", :plugin=><LogStash::Outputs::ElasticSearch index=>"%{[@metadata][beat]}-%{+YYYY.MM.dd}", manage_template=>false, id=>"d79f4434d48dd0c92845c6f8b1d77891ba02f9b6bfc8c00a6fc359e9c01e8224", hosts=>[//localhost:9200], document_type=>"%{[@metadata][type]}", enable_metric=>true, codec=><LogStash::Codecs::Plain id=>"plain_1e3ee44e-6904-4f63-be78-d2e1c1f4f8b4", enable_metric=>true, charset=>"UTF-8">, workers=>1, template_name=>"logstash", template_overwrite=>false, doc_as_upsert=>false, script_type=>"inline", script_lang=>"painless", script_var_name=>"event", scripted_upsert=>false, retry_initial_interval=>2, retry_max_interval=>64, retry_on_conflict=>1, ilm_enabled=>false, ilm_rollover_alias=>"logstash", ilm_pattern=>"{now/d}-000001", ilm_policy=>"logstash-policy", action=>"index", ssl_certificate_verification=>true, sniffing=>false, sniffing_delay=>5, timeout=>60, pool_max=>1000, pool_max_per_route=>100, resurrect_delay=>5, validate_after_inactivity=>10000, http_compression=>false>}
+[2019-09-18T18:40:26,280][INFO ][logstash.pipeline        ] Starting pipeline {:pipeline_id=>"main", "pipeline.workers"=>2, "pipeline.batch.size"=>125, "pipeline.batch.delay"=>50}
+[2019-09-18T18:40:26,681][INFO ][logstash.outputs.elasticsearch] Elasticsearch pool URLs updated {:changes=>{:removed=>[], :added=>[http://localhost:9200/]}}
+[2019-09-18T18:40:26,879][WARN ][logstash.outputs.elasticsearch] Restored connection to ES instance {:url=>"http://localhost:9200/"}
+[2019-09-18T18:40:26,940][INFO ][logstash.outputs.elasticsearch] ES Output version determined {:es_version=>6}
+[2019-09-18T18:40:26,943][WARN ][logstash.outputs.elasticsearch] Detected a 6.x and above cluster: the `type` event field won't be used to determine the document _type {:es_version=>6}
+[2019-09-18T18:40:26,994][INFO ][logstash.outputs.elasticsearch] New Elasticsearch output {:class=>"LogStash::Outputs::ElasticSearch", :hosts=>["//localhost:9200"]}
+[2019-09-18T18:40:27,508][INFO ][logstash.inputs.beats    ] Beats inputs: Starting input listener {:address=>"0.0.0.0:5443"}
+[2019-09-18T18:40:27,539][INFO ][logstash.pipeline        ] Pipeline started successfully {:pipeline_id=>"main", :thread=>"#<Thread:0x7e47bd7e run>"}
+[2019-09-18T18:40:27,657][INFO ][logstash.agent           ] Pipelines running {:count=>1, :running_pipelines=>[:main], :non_running_pipelines=>[]}
+[2019-09-18T18:40:27,692][INFO ][org.logstash.beats.Server] Starting server on port: 5443
+[2019-09-18T18:40:27,960][INFO ][logstash.agent           ] Successfully started Logstash API endpoint {:port=>9600}
+
+
+#Installing and Configuring Filebeat on Client servers (on a different machine)
+

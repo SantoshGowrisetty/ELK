@@ -1,0 +1,112 @@
+#Add Mappings to ecommerce Index
+#type string is removed in newer versions of ES
+4.
+PUT /ecommerce
+{
+     "mappings": {
+       "product": {
+          "properties": {
+             "name": {
+                "type": "text"
+         },
+         "price": {
+           "type": "double"
+         },
+         "description": {
+            "type": "text"
+         },
+         "status": {
+            "type": "text"
+         },
+         "quantity": {
+           "type": "integer"
+         },
+         "categories": {
+            "type": "nested",
+            "properties": {
+              "name": {
+                "type": "text"
+          }
+         }
+        },
+        "tags": {
+           "type": "text"
+         }
+}
+}
+}
+}
+=============================================
+#Adding Documents
+5.
+PUT /ecommerce/product/1001
+{
+  "name": "Test Frameowrk",
+  "price": "30.00",
+  "description": "For processing data",
+  "status": "active",
+  "quantity": 1,
+  "categories": [
+    {"name": "Software"}],
+    "tags": ["Test framework","logstash","nagios"]
+}
+
+#to verify if this worked
+#Click on 'Management>Index Patterns> and create an index pattern'. [Just enter your index name]
+#Now click on 'discover' and in search(on top) ,search for a document
+
+=============================================
+#Replacing a document
+#using put to update the value(will find and replace based on ID or insert new document)
+6.
+PUT /ecommerce/product/1001
+{
+  "name": "Test Frameowrk",
+  "price": "300.00",
+  "description": "For processing data",
+  "status": "active",
+  "quantity": 1,
+  "categories": [
+    {"name": "Software"}],
+    "tags": ["Test framework","logstash","nagios"]
+}
+
+#check from discover kibana
+
+
+tags:
+    Test framework, logstash, nagios
+name:
+    Test Frameowrk
+price:
+    300
+description:
+    For processing data
+status:
+    active
+quantity:
+    1
+categories:
+    { "name": "Software" }
+_id:
+    1001
+_type:
+    product
+_index:
+    ecommerce
+_score:
+    0.288 
+
+===========================================
+#Updating documents
+#here we would want to update specific fields instead of passing in all fields or a complete document
+7.
+POST /ecommerce/product/1001/_update
+{
+  "doc": {
+    "price": 500.00
+  }
+}
+
+#check from discover kibana
+
