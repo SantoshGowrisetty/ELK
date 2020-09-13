@@ -1,2 +1,0 @@
-# ELK
-ElasticSearch Logstash Kibana
