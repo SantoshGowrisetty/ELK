@@ -1,0 +1,44 @@
+#Installing Kibana now and modify Kibana settings
+$sudo apt-get install kibana
+$sudo vim /etc/kibana/kibana.yml
+#Uncomment following lines:
+server.port: 5601
+server.host: "localhost"
+elasticsearch.hosts: "http://localhost:9200"
+$sudo systemctl enable kibana.service
+$sudo systemctl start kibana.service
+$service kibana status
+
+#Configuring Nginx as Reverse Proxy for Kibana
+#let’s install Nginx, configure it, and start the service. 
+$sudo apt-get install nginx apache2-utils
+#Configure Virtual host:
+$sudo vim /etc/nginx/sites-available/default
+#Add the following configuration to file:
+server {
+    listen 80;
+ 
+    server_name u1;
+ 
+    auth_basic "Restricted Access";
+    auth_basic_user_file /etc/nginx/.elkusersecret;
+ 
+    location / {
+        proxy_pass http://localhost:5601;
+        proxy_http_version 1.1;
+        proxy_set_header Upgrade $http_upgrade;
+        proxy_set_header Connection 'upgrade';
+        proxy_set_header Host $host;
+        proxy_cache_bypass $http_upgrade;
+    }
+}
+#Create user and password file for web browser authentication:
+$sudo htpasswd -c /etc/nginx/.elkusersecret elk
+#set password
+#Check Nginx Configurations:
+$sudo nginx -t
+#Enable Nginx on system boot and restart the service:
+$sudo systemctl enable nginx.service
+$sudo systemctl restart nginx.service
+$service nginx status
+
