@@ -14,12 +14,16 @@
 #
 # Use a descriptive name for your cluster:
 #
+#cluster.name: my-application
+#updated v1
 cluster.name: mycluster
 #
 # ------------------------------------ Node ------------------------------------
 #
 # Use a descriptive name for the node:
 #
+#node.name: node-1
+#updated v1
 node.name: data1
 #
 # Add custom attributes to the node:
@@ -30,15 +34,12 @@ node.name: data1
 #
 # Path to directory where to store the data (separate multiple locations by comma):
 #
-path.data: /var/lib/elasticsearch
+#path.data: /path/to/data
 #
 # Path to log files:
 #
-path.logs: /var/log/elasticsearch
+#path.logs: /path/to/logs
 #
-#path to logs
-path.repo: /usr/local/mybackup
-
 # ----------------------------------- Memory -----------------------------------
 #
 # Lock the memory on startup:
@@ -55,16 +56,19 @@ path.repo: /usr/local/mybackup
 #
 # Set the bind address to a specific IP (IPv4 or IPv6):
 #
-network.host: 192.168.56.105
+#network.host: 192.168.0.1
+#updated v1
+network.host: 192.168.251.48
 #
 # Set a custom port for HTTP:
 #
+#http.port: 9200
+#updated v1(Rest API /HTTP endpoint)
 http.port: 9200
+#added v1
 transport.port: 9300
 node.master: false
 node.data: true
-
-#
 # For more information, consult the network module documentation.
 #
 # --------------------------------- Discovery ----------------------------------
@@ -72,12 +76,15 @@ node.data: true
 # Pass an initial list of hosts to perform discovery when new node is started:
 # The default list of hosts is ["127.0.0.1", "[::1]"]
 #
-discovery.zen.ping.unicast.hosts: ["192.168.56.104"]
+#discovery.zen.ping.unicast.hosts: ["host1", "host2"]
 #
 # Prevent the "split brain" by configuring the majority of nodes (total number of master-eligible nodes / 2 + 1):
 #
-#discovery.zen.minimum_master_nodes:1 
-#
+#discovery.zen.minimum_master_nodes: 
+#updated v1
+discovery.zen.ping.unicast.hosts: ["192.168.251.47"]
+discovery.zen.minimum_master_nodes: 1
+
 # For more information, consult the zen discovery module documentation.
 #
 # ---------------------------------- Gateway -----------------------------------
