@@ -1,0 +1,53 @@
+#Deleting a Document
+#By default its possible deleting a document by ID but you can also delete a document using a plugin
+#'delete by query'
+8.
+DELETE /ecommerce/product/1003
+
+#Performing operations in Batches
+#Using _bulk API expects a single line with action ie create,update or delete
+#It uses '/n' for new lines
+
+POST /ecommerce/product/_bulk
+{"index": {"_id":"1004"}}
+{"name": "why ES is Awesome","price":"100.00","description":"This book is all about ES!","status":"active","quantity":12,"categories":[{"name":"Software"}],"tags":["ES","programming"]}
+{"index": {"_id":"1005"}}
+{"name": "cashewnuts","price":"100.00","description":"spicy cashewnuts","status":"active","quantity":120,"categories":[{"name":"Food"}],"tags":["snacks"]}
+{"index": {"_id":"1006"}}
+{"name": "why elasticsearch is Awesome","price":"100.00","description":"This book is all about elasticsearch!","status":"active","quantity":12,"categories":[{"name":"Software"}],"tags":["elasticsearch","programming"]}
+
+POST /ecommerce/product/_bulk
+{"delete" : {"_id" : "1"}}
+{"update" : {"_id" : "1006"}}
+{"doc" : {"quantity" : 11}}
+
+#check from discover kibana if quantity was updated
+#Also check via 
+GET /ecommerce/product/1
+#shows no document with id as 1 was found
+{
+  "_index" : "ecommerce",
+  "_type" : "product",
+  "_id" : "1",
+  "found" : false
+}
+
+#Notes
+#All actions are performed in sequence,so if any action fails, rest will still be processed.
+POST /ecommerce/product/_bulk
+POST /ecommerce/_bulk
+POST /_bulk
+
+example:
+POST /_bulk
+{"update" : {"_id" : "1006", "_index" : "ecommerce", "_type" : "product"}}
+{"doc" : {"quantity" : 10}}
+
+========================
+#Retrieving documents using ID
+
+9.
+GET /ecommerce/product/1006
+_source : shows the document itself
+
+================================

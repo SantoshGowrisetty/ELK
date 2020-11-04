@@ -1,0 +1,94 @@
+#Embedding boolean logic in querying
+13.
+GET /ecommerce/product/_search?q=name:(cashewnuts AND peanuts)
+GET /ecommerce/product/_search?q=name:(cashewnuts OR Framework)
+#look for score value if value was higher in any case
+GET /ecommerce/product/_search?q=(name:(cashewnuts OR Framework) AND status:active)
+
+#using boolean operators
+#prefix + (terms must be present) prefix -(terms must not be present)
+GET /ecommerce/product/_search?q=name:+cashewnuts -peanuts
+
+==========================
+
+#using phrases while querying
+14.
+#Note** remember default boolean operator is OR
+GET /ecommerce/product/_search?q=name:"Test Framework"
+#order of terms does matter when searching using phrase
+#ES analyzer is used to search for phrase 
+GET /_analyze?analyzer=standard&text=Test Framework
+#this will show what was used by analyzer when tokenizing and list of tokens
+================================
+
+#Querying using DSL (Domain specific language)
+#using must or must_not(to exclude) which contribute to documents to relevancy scores
+15.
+GET /ecommerce/product/_search
+{
+  "query": {
+    "bool": {
+      "must": [
+        {"match": {"name": "cashewnuts"}},
+        {"match": {"name": "Test Frameowrk"}}
+        ]
+    }
+  }
+}
+
+---------
+GET /ecommerce/product/_search
+{
+  "query": {
+    "bool": {
+      "must": [
+        {"match": {"name": "cashewnuts"}}
+        ],
+      "must_not": [
+        {"match": {"name": "Test Frameowrk"}}
+        ]
+    }
+  }
+}
+========================================
+#using bool with should clauses(to increase relevancy scores)
+#where should clause behave like logical operators
+16.
+GET /ecommerce/product/_search
+{
+  "query": {
+    "bool": {
+      "must": [
+        {"match": {"name": "Test*"}}
+        ],
+      "should": [
+        {"match": {"name": "Test Frameowrk"}}
+        ]
+    }
+  }
+}
+
+Another example
+GET /ecommerce/product/_search
+{
+  "query": {
+    "bool": {
+      "must": [
+        {"match": {"tags": "framework"}}
+        ],
+      "should": [
+        {"match": {"name": "Test Frameowrk"}}
+        ]
+    }
+  }
+}
+
+==========================================
+#function_score query
+	providing function to modify the score of documents ,returned by a query
+        useful for boosting newly added documents or boosting documents based on popularity
+#boosting query
+	to reduce the score of documents that match
+        positive query: typical query
+        negative query: have lower score and by how much low
+=========================================

@@ -1,0 +1,7 @@
+Instance 1:
+/usr/share/logstash/bin/logstash --path.settings /etc/logstash/ -f /root/data/logstash_cars.config
+[uses path.data as specified in /etc/logstash/logstash.yml]
+
+Instance 2:
+mkdir /var/lib/logstash_temp
+/usr/share/logstash/bin/logstash --path.settings /etc/logstash/ -f /root/data/logstash_bank.config --path.data /var/lib/logstash_temp

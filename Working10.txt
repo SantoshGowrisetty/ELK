@@ -1,0 +1,87 @@
+#If ES in a cluster
+#Setup NFS for your cluster to handle backup & restore
+#on node1
+apt-get install nfs-kernel-server
+apt-get install nfs-common
+
+#on node2
+apt-get install nfs-common
+
+#on node3
+apt-get install nfs-common
+
+#Now on node1
+service nfs-kernel-server start
+
+#create a directory
+mkdir /mydata
+chown -R elasticsearch:elasticsearch /mydata
+
+#for NFS setup
+create and edit a file
+vi /etc/exports
+/mydata      *(rw,sync,no_root_squash)
+:wq
+
+exportfs -a
+
+#on all nodes check
+showmount -e 192.168.56.104
+
+#on all nodes mount ur path to this shared path
+
+Note** create directory /usr/local/mybackup on all nodes,which will be mounted and thus used to store snapshots
+#creating mount point
+mount -t nfs 192.168.56.104:/mydata /usr/local/mybackup
+
+#stop elasticsearch on all nodes
+systemctl stop elasticsearch.service
+
+#stop kibana on node wherver its running
+systemctl stop kibana.service
+
+#update or add in /etc/elasticsearch/elasticsearch.yml
+path.repo: /usr/local/mybackup
+
+#restart elasticsearch & Kibana
+===================================
+#creating backup
+#register the repository
+
+PUT /_snapshot/demobackup
+{
+   "type": "fs",
+   "settings": {
+       "compress": true,
+       "location": "/usr/local/mybackup"
+    }
+}
+
+GET _snapshot/_all
+
+POST /ecomtest/product/_bulk
+{"index": {"_id":"1004"}}
+{"name": "why ES is Awesome","price":"100.00","description":"This book is all about ES!","status":"active","quantity":12,"categories":[{"name":"Software"}],"tags":["ES","programming"]}
+{"index": {"_id":"1005"}}
+{"name": "cashewnuts","price":"100.00","description":"spicy cashewnuts","status":"active","quantity":120,"categories":[{"name":"Food"}],"tags":["snacks"]}
+{"index": {"_id":"1006"}}
+{"name": "why elasticsearch is Awesome","price":"100.00","description":"This book is all about elasticsearch!","status":"active","quantity":12,"categories":[{"name":"Software"}],"tags":["elasticsearch","programming"]}
+
+GET /ecomtest/_search
+
+PUT /_snapshot/demobackup/snaphot-one?wait_for_completion=true
+
+get /_cat/indices
+
+DELETE /ecomtest
+
+POST /_snapshot/demobackup/snaphot-one/_restore
+{"indices":"ecomtest"}
+
+#check if index is back
+
+#Also check your mounted path if it has snapshots
+For example:
+root@e1:~# ls /mydata
+incompatible-snapshots  index-0  index.latest  indices  meta-xNjRxXMJRGqHoOv7eZD1OA.dat  snap-xNjRxXMJRGqHoOv7eZD1OA.dat
+============================

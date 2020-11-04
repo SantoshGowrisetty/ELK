@@ -1,0 +1,220 @@
+Working with Templates/Policies
+=============
+Index templates define settings and mappings that you can automatically apply when creating new indices. Elasticsea
+rch applies templates to new indices based on an index pattern that matches the index name.
+
+Index templates are only applied during index creation. Changes to index templates do not affect existing indices. 
+
+PUT _template/template_1a
+{
+  "index_patterns": ["te*", "bar*"],
+  "settings": {
+    "number_of_shards": 5
+  },
+  "mappings": {
+    "_doc": {
+      "_source": {
+        "enabled": false
+      },
+      "properties": {
+        "host_name": {
+          "type": "keyword"
+        },
+        "created_at": {
+          "type": "date",
+          "format": "EEE MMM dd HH:mm:ss Z yyyy"
+        }
+      }
+    }
+  }
+}
+
+
+#the {index} placeholder in the alias name will be replaced with the actual index name that the template gets applied to, during index creation.
+
+PUT _template/template_1b
+{
+    "index_patterns" : ["tes*"],
+    "settings" : {
+        "number_of_shards" : 1
+    },
+    "aliases" : {
+        "alias1" : {},
+        "alias2" : {
+            "filter" : {
+                "term" : {"user" : "aj" }
+            },
+            "routing" : "aj"
+        },
+        "{index}-alias" : {} 
+    }
+}
+
+#Testing
+GET /_template
+GET /_template/temp*
+
+#Creating policy to manage life cycle of index
+
+PUT _ilm/policy/my_policy_newv1
+{
+  "policy": {
+    "phases": {
+      "hot": {
+        "actions": {
+          "rollover": {
+            "max_size": "25GB" 
+          }
+        }
+      },
+      "delete": {
+        "min_age": "30d",
+        "actions": {
+          "delete": {} 
+        }
+      }
+    }
+  }
+}
+
+#updating template to use a policy
+
+PUT _template/template_1b
+{
+  "index_patterns": ["tes*"], 
+  "settings": {
+    "number_of_shards": 1,
+    "number_of_replicas": 1,
+    "index.lifecycle.name": "my_policy_newv1", 
+    "index.lifecycle.rollover_alias": "test-alias"
+  }
+}
+
+#creating an index now
+PUT test-001a
+{
+  "aliases": {
+    "test-alias":{
+      "is_write_index": true 
+    }
+  }
+}
+
+For Polocy other commands:
+GET <index>/_ilm/explain
+GET /_ilm/status
+POST <index>/_ilm/retry
+POST <index>/_ilm/remove
+POST _ilm/move/<index>
+DELETE _ilm/policy/<policy_id>
+
+=================
+Working with Search templates
+POST _scripts/template_c
+{
+    "script": {
+        "lang": "mustache",
+        "source": {
+            "query": {
+                "match": {
+                         "name": "{{give a name of index}}"
+                     }
+                
+            }}
+        }
+    }
+
+GET _scripts/template_c
+
+GET _search/template
+{
+    "id": "template_c", 
+    "params": {
+        "give a name of index": "Test Frame"
+    }
+}
+DELETE _scripts/template_c
+
+POST _scripts/template_d
+{
+    "script": {
+        "lang": "mustache",
+        "source": {
+
+  "query": {
+    "bool": {
+      "must": [
+        {"match": 
+            {"tags": "{{tagdetails}}"
+            }
+        }
+        ],
+      "should": [
+        {"match": 
+            {"name": "{{Test Framework}}"
+              
+            }
+          
+        }
+        ]
+    }
+  }
+}
+}
+}
+GET _search/template
+{
+    "id": "template_d", 
+    "params": {
+        "tagdetails": "tool",
+        "Test Framework": "Test"
+    }
+}
+
+GET _render/template/template_d
+{
+  "params": {
+    "statuses" : {
+        "status": [ "pending", "published" ]
+  }
+}
+}
+GET _search/template
+{
+  "id": "template_d",
+  "params": {
+            "status": [ "pending", "published" ],
+        "explain": true
+  }
+}
+
+GET _search/template
+{
+  "id": "template_d",
+  "params": {
+            "status": [ "pending", "published" ],
+        "profile": true
+  }
+}
+
+GET ecommerce/_search
+{
+    "profile": true,
+    "query": {
+      "match": {
+        "tags": "tool"}
+      
+        
+    }
+} 
+
+GET /ecommerce1/_search
+GET ecommerce1/_product/1001/_explain
+{
+    
+    "query": {
+      "match": {
+        "name": "Test Frameowrk"}
+      
+        
+    }
