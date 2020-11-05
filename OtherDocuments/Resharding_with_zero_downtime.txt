@@ -1,0 +1,63 @@
+Resharding with zero downtime :
+
+Typical resharding 
+Create new index with new number of shards
+Migrate documents via bulk operations (read all documents in old index and index (copy) them into new index
+
+Problems : 
+
+Having a live system , where documents are changing in original index.
+
+There is no exact snapshot of the data and it is not possible to catchup with changes being made.
+
+Switch from old index to new index has to be atomic and everything available in old index
+     has to be available in new index so that queries continue to work without interruption.
+
+What happens if a mistake was done, how to roll back or what if new index is slower?
+
+Solution : Availability during resharding is maintained using ‘index generation’.
+When a index a document, a special field called “index generation” is written which is same for all documents. (versioning the writes)
+State can be maintained and synchronized using zookeeper.
+
+Initialization Phase
+Increment generation to gen-2 and confirm that generation has been updated across all the components writing to the index
+(can use zookeeper to coordinate this). 
+From this point forward, all new docs or changed docs are gen-2. This allows us to bound the documents that are at gen-1 or less.
+Do a scan on the source index and bulk import gen-1 (or less) docs to the target index. 
+Can use scrolling for this, because it’s the most efficient way of retrieving a large number of documents from an index.
+Keep in mind that scrolling can disallow merged segments from being claimed back by the filesystem, since the scroll is still using them.
+To avoid that, we can rely on a bucket number that is available on every document we index. 
+The bucket number is assigned when the document is created and is a hash of the ID modulo the total number of buckets (use 64k). 
+This allows us to partition the document set into a random and uniformly distributed set of buckets, which we add as a parameter to 
+scrolling—in effect, preventing scrolling over the entire index at once.
+
+This can also give us way to make the operation recoverable in case of faults. 
+Since bulk import at large size could take days, there can be occasional problems that called for pause, recovery, or rollback.
+
+Now we can stop and start it scrolling without having to go back to the beginning of the index because we’re importing bucket by bucket 
+and tracking which bucket we’re on (in Zookeeper). 
+This lets us automate dealing with crashes during the migration and pause migrations for any reason.
+We can also turn off index refreshing on the target index to make migrations faster, since it’s not serving any requests.
+
+Double Publishing and Cleanup Phase
+Once all gen-1 docs are confirmed to be in the target index, we flip the switch (in Zookeeper), directing all writers to start writing 
+to the target index while still writing to the source index.
+
+Increment generation to gen-3.
+Now we know that anything that changes from this point forward is gen 3 AND
+All gen-3 changes are written to both the source and the target index AND
+Anything that’s gen-1 (or lower) has been migrated to the target index AND
+Only gen-2 docs need to be reconciled between the source and target index AND
+gen-2 docs are a bounded set (i.e., their count will either stay the same or decrease, but never increase)
+
+Query the source index for gen-2 docs and write them to the target index, at which point they’ll become gen-3.
+We still have double writing on, so they’ll get written to both indexes.Query the source index for gen-2 docs and write them to the 
+target index, at which point they’ll become gen-3.
+This process continues until there are no more gen-2 docs in the source index.
+At completion of the last step, we know that the target index is completely up to date with the source index.
+
+Closing Phase
+Change the index alias, which is an atomic operation. Now all queries are served by the target index.
+Turn off double writing.
+Close the source index, freeing up resources.
+Maintain the source index on disk for a full day, just in case.  
