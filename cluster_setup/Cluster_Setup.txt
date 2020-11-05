@@ -117,6 +117,12 @@ on node3:
 $curl ce1:9200/_cat/nodes
 $curl ce1:9200/_cat/nodes?v
 
+[elk@ce1 ~]$ curl ce1:9200/_cat/nodes?v
+ip             heap.percent ram.percent cpu load_1m load_5m load_15m node.role master name
+192.168.251.49           17          43   5    0.12    0.36     0.23 di        -      data2
+192.168.251.47           15          43   1    0.40    0.50     0.30 mi        *      master
+192.168.251.48           16          43   6    0.12    0.39     0.25 di        -      data1
+
 #optional----
 #make sure ElasticSearch works seamlessly, enable it on boot and Start ElasticSearch.
 $sudo systemctl enable elasticsearch.service
