@@ -1,0 +1,19 @@
+#Installing Kibana now and modify Kibana settings
+$sudo vim /etc/kibana/kibana.yml
+#Uncomment following lines:
+server.port: 5601
+server.host: "ipaddress of master node of es cluster"
+elasticsearch.hosts: "http://ipaddressof masternode:9200"
+
+#start kibana
+
+#optional (if installed using rpm)
+$sudo systemctl enable kibana.service
+$sudo systemctl start kibana.service
+$service kibana status
+#optional 
+
+connect to kibana: hostname:5601>Dev tools
+GET /_cat/nodes?v
+GET /_nodes/_all
+GET /_nodes/_local
