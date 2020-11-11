@@ -72,8 +72,6 @@ PUT /ecommerce/product/1001
 }
 
 #check from discover kibana
-
-
 tags:
     Test framework, logstash, nagios
 name:

@@ -1,5 +1,5 @@
 #Installing Kibana now and modify Kibana settings
-$sudo vim /etc/kibana/kibana.yml
+$sudo vim /usr/local/kibana/kibana.yml
 #Uncomment following lines:
 server.port: 5601
 server.host: "ipaddress of master node of es cluster"
