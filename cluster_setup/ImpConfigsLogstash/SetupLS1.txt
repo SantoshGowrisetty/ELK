@@ -78,18 +78,13 @@ output {
   }
 }
 
-#Let’s enable Logstash on boot and start the service:
-$sudo systemctl enable logstash.service
-$sudo systemctl start logstash.service
- 
-OR
-# start logstash using the below way
 #if starting as a non-root user
 #remember to
 
 sudo chown -R elk:elk /var/lib/logstash
 sudo chown -R elk:elk /var/log/logstash
 
+#by starting logstash in this way, we will have logstash ready to take input from a beat,filter it and push it to elasticsearch,as per our conf files in '/etc/logstash/conf.d'
 /usr/share/logstash/bin/logstash --path.settings /etc/logstash
 
 #look for following output
@@ -112,7 +107,7 @@ Sending Logstash logs to /var/log/logstash which is now configured via log4j2.pr
 [2020-11-16T22:28:01,798][INFO ][org.logstash.beats.Server] Starting server on port: 5443
 [2020-11-16T22:28:02,463][INFO ][logstash.agent           ] Successfully started Logstash API endpoint {:port=>9600}
 
-
+-----------------------------
 #Installing and Configuring Filebeat on Client servers (on a different machine)
  
 

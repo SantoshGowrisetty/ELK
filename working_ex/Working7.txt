@@ -1,17 +1,135 @@
-#Setting up beats(packetbeat) to send information to logstash > then to ES
-#Setting up beats(packetbeat) to send information directly to ES
+#Creating new index with mappings specifying Analyzer
+Example 1:
+PUT /newdata
+{
+     "mappings": {
+       "product": {
+          "properties": {
+             "name": {
+                "type": "text"
+         },
+         "price": {
+           "type": "double"
+         },
+         "description": {
+            "type": "text"
+         },
+         "status": {
+            "type": "text"
+         },
+         "quantity": {
+           "type": "integer"
+         },
+         "categories": {
+            "type": "nested",
+            "properties": {
+              "name": {
+                "type": "text"
+          }
+         }
+        },
+        "tags": {
+           "type": "text",
+           "analyzer": "english"
+         }
+}
+}
+}
+}
+===============
+Example 2:
+PUT /newproducts
+{
+     "mappings": {
+       "product": {
+          "properties": {
+             "name": {
+                "type": "text"
+         },
+         "price": {
+           "type": "double"
+         },
+         "description": {
+            "type": "text",
+            "analyzer": "standard"
+         },
+         "status": {
+            "type": "text"
+         },
+         "quantity": {
+           "type": "integer"
+         },
+         "categories": {
+            "type": "nested",
+            "properties": {
+              "name": {
+                "type": "text"
+                        },
+           "quantity": {
+              "type":"integer"}
+         }
+        },
+        "tags": {
+           "type": "text",
+           "analyzer": "standard"
+         }
+}
+}
+==============
+POST /newproducts/product/_bulk
+{"index": {"_id":"10"}}
+{"name": "why ES is Awesome","price":"100.00","description":"This book is all about the ES!","status":"active","quantity":12,"categories":[{"name":"Software","quantity":200}],"tags":["ES the search store","programming JAVA"]}
+{"index": {"_id":"11"}}
+{"name": "why logstash","price":"100.00","description":"processing THE LOGS and sending to ES","status":"active","quantity":120,"categories":[{"name":"Book","quantity":20}],"tags":["LOG PROCESSING","BEAT PROCESSING"]}
+{"index": {"_id":"3"}}
+{"name": "why elasticsearch is Awesome","price":"100.00","description":"This book is A book which is all about elasticsearch!","status":"active","quantity":12,"categories":[{"name":"Software"}],"tags":["elasticsearch","programming","SEARCHING INdexes"]}
+==================
 
-$apt-get install packetbeat
+#Test Query
+1.
+GET /newproducts/_search
+{
+  "query": {
+    "bool": {
+      "should": [{
+        "match": {
+          "name": {
+            "query": "Test Framework"
+                      }
+        }
+      }],
+      "must": [{
+        "match": {
+          "description": {
+            "query": "and",
+            "analyzer": "standard"
+          }
+        }
+      }]
+    }
+  }
+}
 
-$vi /etc/packetbeat/packetbeat.yml
-
-#edit the contents 
-
-#remember to download packetbeat.yml and relevant templates
-
-$cd /usr/share/packetbeat/bin
-
-$./packetbeat -e -c /etc/packetbeat/packetbeat.yml -d "publish"
-
-#refer to myconfigs folder in this git link to see a customized packetbeat.yml
-
+2.Due to english analyzer at run time which avoids stop words such as and doesnt show anything"
+GET /newproducts/_search
+{
+  "query": {
+    "bool": {
+      "should": [{
+        "match": {
+          "name": {
+            "query": "Test Framework"
+                      }
+        }
+      }],
+      "must": [{
+        "match": {
+          "description": {
+            "query": "and",
+            "analyzer": "english"
+          }
+        }
+      }]
+    }
+  }
+}
