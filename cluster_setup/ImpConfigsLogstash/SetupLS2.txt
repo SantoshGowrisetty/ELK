@@ -93,6 +93,7 @@ input for logstash-simple-conf created
           "host" => "ce4"
 }
 
+#going forward we will create conf files that have input + filter (with or without plugins)+ output and run logstash pipeline refering to specific file
 
 #Option 3
 #We can start logstash as a service

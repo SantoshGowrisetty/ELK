@@ -1,0 +1,30 @@
+#Download sample dataset from here 'filename'
+
+#create a conf file
+input {
+	file {
+	path => "filepath.csv"
+	start_position =>"beginning"
+	sincedb_path = "/dev/null"
+	}
+}
+filter {
+	csv {
+	    separator => ","
+	    columns => ["Country","1980",          "2010"]
+	    }
+	mutate {convert => ["1980", "float"]}
+
+
+	mutate {convert => ["2010", "float"]}
+}
+output {
+	elasticsearch {
+	hosts => " "
+	index => "population"
+	}
+	stdout {}
+}
+
+./logstash -f /path_to_conf_file
+	
