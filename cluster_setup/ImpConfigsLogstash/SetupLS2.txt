@@ -3,7 +3,8 @@ refering to a specific config file which controls input-filter-output of
 logstash pipeline
 
 #in addition to previously created files, 
-for example:
+
+
 create a 'logstash-simple.conf' file
 vi /etc/logstash/conf.d/logstash-simple.conf
 
@@ -14,6 +15,8 @@ input {
 output {
         stdout {}
 }
+
+#the file can be found in 'myconfigs/conf.d/'
 
 #Option1
 #run logstash from command line refering to conf file
@@ -66,7 +69,7 @@ hello world
           "host" => "u1"
 }
 
-#Option 2(notice here it refers to all conf files in '/etc/logstash/conf.d'
+#Option 2(notice here,all conf files in '/etc/logstash/conf.d' will be applicable for logstash
 
 [elk@ce4 ~]$ /usr/share/logstash/bin/logstash --path.settings /etc/logstash 
 Sending Logstash logs to /var/log/logstash which is now configured via log4j2.properties

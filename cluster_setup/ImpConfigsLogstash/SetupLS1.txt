@@ -18,14 +18,15 @@ enabled=1
 autorefresh=1
 type=rpm-md
 
-#if installing ES using this method
+#if installing ES using this method and if not already done
 sudo yum install elasticsearch
 
 #& then editing sudo vi /etc/elasticsearch/elasticsearch.yml
 
-#if installing Kibana using this method
+#if installing Kibana using this method and if not already done
 sudo yum install kibana
 
+LOGSTASH SETUP:
 #To install logstash
 sudo yum install logstash
 
@@ -34,9 +35,11 @@ $sudo mkdir ssl
 #Generate SSL certificate. Change value of CN to your es-server name in the below command.(for example: ce1 since ES is running on ce1 as being one of the nodes of ES cluster)
 $sudo openssl req -subj '/CN=ce1/' -x509 -days 3650 -batch -nodes -newkey rsa:2048 -keyout ssl/logstash-forwarder.key -out ssl/logstash-forwarder.crt
 
+#the files described below can be found in 'myconfigs/conf.d/'
+
 #Create following files inside “/etc/logstash/conf.d”
 #sudo vim filebeat-input.conf
-Add the following lines to it.
+Add the following lines to it to configure input
 
 input {
   beats {
@@ -50,7 +53,7 @@ input {
 #Save and close the file and create a new configuration file
 
 $sudo vim syslog-filter.conf
-Add the following contents to it(here we are using GROK plugin)
+Add the following contents to it(here we are using GROK plugin) to filter/transform data
 
 filter {
   if [type] == "syslog" {
@@ -67,7 +70,7 @@ filter {
 #Save and exit the file. Create elasticsearch output file.
 
 $sudo vim output-elasticsearch.conf
-Add the following lines to it.
+Add the following lines to it to route output
 
 output {
   elasticsearch { hosts => ["ce1:9200"]
@@ -78,9 +81,9 @@ output {
   }
 }
 
+
 #if starting as a non-root user
 #remember to
-
 sudo chown -R elk:elk /var/lib/logstash
 sudo chown -R elk:elk /var/log/logstash
 
@@ -108,7 +111,3 @@ Sending Logstash logs to /var/log/logstash which is now configured via log4j2.pr
 [2020-11-16T22:28:02,463][INFO ][logstash.agent           ] Successfully started Logstash API endpoint {:port=>9600}
 
 -----------------------------
-#Installing and Configuring Filebeat on Client servers (on a different machine)
- 
-
-
