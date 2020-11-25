@@ -1,4 +1,4 @@
-#Download sample dataset from here 'filename'
+#'Download sample dataset (population*.csv) from provided link
 
 #create a conf file
 input {
@@ -54,6 +54,26 @@ output {
 	}
 	stdout {}
 }
+#the conf file for this test can be found 'myconfigs/conf.d/logstash_populcsv.conf'
+#start logstash pointing to conf file 
 
-./logstash -f /path_to_conf_file
+
+#login to kibana and check if index is created
+Management>Create Index pattern>population
+Management>Index Management > check for your index (population) and how many primaries,replicas and documents.
+
+DevTools>
+#list all indexes
+
+GET /_cat/indices?v
+
+#check shard allocation
+GET /_cat/shards/population?pretty=true
+
+#details of shards
+GET /_cluster/health/population?level=shards
+
+#try a scenario from
+working_ex/ScenarioTesting/ES-Scenario1.txt 
+
 	
