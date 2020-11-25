@@ -1,0 +1,6 @@
+Running ES as a service:
+https://www.elastic.co/guide/en/elasticsearch/reference/7.8/starting-elasticsearch.html
+
+Securing ES using elasticsearch-keystore-tool
+https://www.elastic.co/guide/en/elasticsearch/reference/7.8/secure-settings.html
+

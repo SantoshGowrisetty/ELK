@@ -1,0 +1,138 @@
+#Setup atleast 3 nodes (say hostnames:ce1,ce2,ce3 (centos7.x)
+#Make sure they can ping each other, Java is installated,ssh each other (passwordless) for root user and dedicated user(say elk)
+#Make sure firewalld is turned off /allow connection to each other
+
+======================
+#Steps for node1,node2,node3
+
+#Download the following(from elasticsearch web) on node
+
+[elk@ce1 ~]$ ls /home/elk/Downloads/
+elasticsearch-6.8.13.tar.gz              kibana-7.8.0-linux-x86_64.tar.gz
+elasticsearch-7.8.0-linux-x86_64.tar.gz  logstash-6.8.13.tar.gz
+kibana-6.8.13-linux-x86_64.tar.gz        logstash-7.8.0.tar.gz
+
+#Login as root
+sudo su
+
+#change path to /usr/local
+cd /usr/local
+
+#untar elasticsearch and kibana for now
+tar -xvf /home/elk/Downloads/elasticsearch-6.8.13.tar.gz
+tar -xvf /home/elk/Downloads/elasticsearch-7.8.0-linux-x86_64.tar.gz
+tar -xvf /home/elk/Downloads/kibana-6.8.13-linux-x86_64.tar.gz
+tar -xvf /home/elk/Downloads/kibana-7.8.0-linux-x86_64.tar.gz
+
+#create softlinks pointing to desired version to work on (for ex: to elasticsearch-6.8 and kibana-6.8)
+ln -s elasticsearch-6.8.13.tar.gz elasticsearch
+ln -s kibana-6.8.13-linux-x86_64.tar.gz kibana
+
+#Note** later we can unlink and make our links pointing to newer versions
+
+#change ownership to elk user
+chown -R elk:elk elasticsearch*
+chown -R elk:elk kibana*
+
+#now our path to elasticsearch is /usr/local/elasticsearch
+#now our path to kibana is /usr/local/kibana
+
+#change back to elk user
+su - elk
+
+#update .bashrc for elk user
+vi .bashrc
+
+export ELASTICSEARCH_HOME=/usr/local/elasticsearch
+export PATH=$PATH:$ELASTICSEARCH_HOME/bin
+export KIBANA_HOME=/usr/local/kibana
+export PATH=$PATH:$KIBANA_HOME/bin
+
+source .bashrc
+
+=================================
+Editing config files: (Config files ie elasticsearch.yml as should exist on each node is given under ImpConfigs folder)
+
+#To setup cluster
+#update /etc/elasticsearch/elasticsearch.yml in each node
+
+####ON MASTER NODE#####
+#on node1(ce1)
+
+cluster.name: mycluster
+node.name: master
+#which network interfaces ES binds to
+network.host:ipaddress of node1 (by default set to _local_)
+             (we can set to an array (_local_,_site_)
+#2 ports: 9300-Transport network how ES talks to other nodes in cluster
+          9200-REST API or HTTP end point
+
+http.port: 9200
+transport.port: 9300
+
+#add 2 more properties
+node.master: true
+node.data: false
+
+######ON DATANODES#####
+#on node2(ce2)
+cluster.name: mycluster
+node.name: data1
+
+#which network interfaces ES binds to
+network.host:ipaddress of node2 (by default set to _local_)
+             (we can set to an array [_local_,_site_]
+#2 ports: 9300-Transport network how ES talks to other nodes in cluster
+          9200-REST API or HTTP end point
+http.port: 9200
+transport.port: 9300
+
+#add 2 more properties
+node.master: false
+node.data: true
+
+#discovery settings
+--an Array of nodes to which this node can connect to ,to get information about cluster.
+--typically best practise to list all master eligible nodes here
+discovery.zen.ping.unicast.hosts:["ipaddress of master"]
+#the below setting tells how many master nodes must exist for the cluster,in order to avoid split-brain
+discovery.zen.minimum_master_nodes: set majority quorum value(for now we can set to 1)
+
+#######ON OTHER DATANODES#####
+(SAME CONFIG AS NODE 2 with one change)
+network.host: ipaddress of node3
+
+Note** Before starting elasticsearch or enabling elasticsearch on boot,refer "setup_errors.txt" file
+#once important configurations have been done
+
+on node1:
+[elk@ce1 ~]$elasticsearch<enter>
+on node2:
+[elk@ce2 ~]$elasticsearch<enter>
+on node3:
+[elk@ce3 ~]$elasticsearch<enter>
+
+
+#Test the status
+$curl ce1:9200/_cat/nodes
+$curl ce1:9200/_cat/nodes?v
+
+[elk@ce1 ~]$ curl ce1:9200/_cat/nodes?v
+ip             heap.percent ram.percent cpu load_1m load_5m load_15m node.role master name
+192.168.251.49           17          43   5    0.12    0.36     0.23 di        -      data2
+192.168.251.47           15          43   1    0.40    0.50     0.30 mi        *      master
+192.168.251.48           16          43   6    0.12    0.39     0.25 di        -      data1
+
+#optional----
+#make sure ElasticSearch works seamlessly, enable it on boot and Start ElasticSearch.
+$sudo systemctl enable elasticsearch.service
+$sudo systemctl start elasticsearch.service
+$sudo service elasticsearch status
+#optional----
+
+refer:
+node1startup.log
+node2startup.log
+node3startup.log
+
+

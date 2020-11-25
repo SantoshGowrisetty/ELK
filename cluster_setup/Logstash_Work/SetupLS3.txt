@@ -1,0 +1,77 @@
+#using logstash to send csv file to ES and create index automatically
+#Download dataset from "https://www.kaggle.com/mirosval/personal-cars-classifieds"
+$mkdir data
+
+$cd data
+
+$unzip classified-ads-for-cars.zip
+
+$mv classified-ads-for-cars.csv cars.csv
+
+$vi logstash_cars.config
+
+#paste this content 
+input {
+     file {
+      path => "/root/data/cars.csv"
+      start_position => "beginning"
+      sincedb_path => "/dev/null"
+      }
+}
+filter {
+     csv {
+         separator => ","
+         columns => ["maker","model","mileage","manufacture_year","engine_displacement","engine_power","body_type","color_slug","stk_year","transmission","door_count","seat_count","fuel_type","date_created","date_last_seen","price_eur"]
+     }
+     mutate {convert => ["mileage","integer"]}
+     mutate {convert => ["price_eur","float"]}
+     mutate {convert => ["engine_power","integer"]}
+     mutate {convert => ["door_count","integer"]}
+     mutate {convert => ["seat_count","integer"]}
+}
+output {
+     elasticsearch {
+          hosts => "localhost"
+          index => "cars"
+          document_type => "sold_cars"
+      }
+      stdout {}
+}
+
+#note** Make sure elasticsearch & kibana service is running already
+
+#start logstash pointing to this config file
+$/usr/share/logstash/bin/logstash --path.settings /etc/logstash/ -f /root/data/logstash_cars.config
+
+#testing while data is being pushed into ES
+
+17.
+GET /cars
+
+GET /cars/_search
+{
+  "query": {
+     "match_all": {}
+  }
+}
+
+GET /cars/_count
+
+#once data is loaded and index is created
+
+#Management>Index patterns> create index pattern for 'cars' index
+
+#Test from Discover
+
+#Use Visualization > Create a visualization
+--choose pie-chart --choose index cars [click] --click on split slices --choose aggregations & 'Terms' --field : maker.keyword --Order By : metric:Count
+--Size: 10 > click on play
+#save the chart: Top Ten Vehicles Quantity
+#create a dashboard and add your visualization & save
+#Use Visualization > Create a visualization
+--choose Data-table --choose index cars [click] --click on split rows --choose aggregations & 'Terms' --field : maker.keyword --Order By : metric:Count
+--choose Data-table --choose index cars [click] --click on split rows --choose aggregations & 'Terms' --field : model.keyword --Order By : metric:Count
+--Size: 5 > click on play
+#save the chart: Top Five Manufacturers
+==========================
+
