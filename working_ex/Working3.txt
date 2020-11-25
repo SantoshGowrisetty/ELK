@@ -16,6 +16,26 @@ POST /ecommerce/product/_bulk
 {"index": {"_id":"1006"}}
 {"name": "why elasticsearch is Awesome","price":"100.00","description":"This book is all about elasticsearch!","status":"active","quantity":12,"categories":[{"name":"Software"}],"tags":["elasticsearch","programming"]}
 
+PUT /ecommerce/product/_bulk
+{"index": {"_id":"711"}}
+{"name": "why ESS is Awesome","price":"100.00","description":"This book is all about EES!","status":"active","quantity":12,"categories":[{"name":"Software"}],"tags":["ES","programming"]}
+{"index": {"_id":"170"}}
+{"name": "cashewnuts","price":"100.00","description":"spicy cashewnuts","status":"active","quantity":120,"categories":[{"name":"Food"}],"tags":["snacks"]}
+{"index": {"_id":"1370"}}
+{"name": "why elasticsearch is Awesome","price":"101.00","description":"This book is all about elasticsearch!","status":"active","quantity":12,"categories":[{"name":"Software"}],"tags":["elasticsearch","programming"]}
+{"index": {"_id":"1297"}}
+{"name": "why elasticsearch is Awesome","price":"101.00","description":"This book is all about elasticsearch!","status":"active","quantity":12,"categories":[{"name":"Software"}],"tags":["elasticsearch","programming"]}
+{"index": {"_id":"173"}}
+{"name": "why elasticsearch is Awesome","price":"101.00","description":"This book is all about elasticsearch!","status":"active","quantity":12,"categories":[{"name":"Software"}],"tags":["elasticsearch","programming"]}
+{"index": {"_id":"18"}}
+{"name": "why elasticsearch is Awesome","price":"101.00","description":"This book is all about elasticsearch!","status":"active","quantity":12,"categories":[{"name":"Software"}],"tags":["elasticsearch","programming"]}
+{"index": {"_id":"309"}}
+{"name": "why elasticsearch is Awesome","price":"101.00","description":"This book is all about elasticsearch!","status":"active","quantity":12,"categories":[{"name":"Software"}],"tags":["elasticsearch","programming"]}
+{"index": {"_id":"1339"}}
+{"name": "why elasticsearch is Awesome","price":"101.00","description":"This book is all about elasticsearch!","status":"active","quantity":12,"categories":[{"name":"Software"}],"tags":["elasticsearch","programming"]}
+{"index": {"_id":"1310"}}
+{"name": "why elasticsearch is Awesome","price":"101.00","description":"This book is all about elasticsearch!","status":"active","quantity":12,"categories":[{"name":"Software"}],"tags":["elasticsearch","programming"]}
+
 POST /ecommerce/product/_bulk
 {"delete" : {"_id" : "1"}}
 {"update" : {"_id" : "1006"}}

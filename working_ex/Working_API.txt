@@ -1,0 +1,40 @@
+GET /_cat/nodes?v
+GET /_nodes/_all
+GET /_nodes/_local
+GET /_nodes/_master
+GET /_cat/indices?v
+PUT /.kibana_task_manager/_settings
+{
+"index":{
+  "number_of_replicas":3,
+  "auto_expand_replicas": false
+}
+}
+PUT /newindx/_settings
+{
+"index":{
+  "number_of_replicas":2,
+  "auto_expand_replicas": false
+}
+}
+
+GET _nodes?filter_path=**.mlockall
+GET _nodes/stats/process?filter_path=**.max_file_descriptors
+GET _nodes/hot_threads
+GET _nodes/stats
+GET /_cluster/state?filter_path=metadata.cluster_coordination.last_commit_config
+GET /_cluster/allocation/explain
+GET /_cluster/health
+GET /_cluster/health/ecommerce?level=shards
+GET /_cat/shards/ecommerce?pretty=true
+GET /_cat/shards/.kibana_1?pretty=true
+GET /_cat/shards/ecommerce?pretty=true
+GET /_cat/shards/.kibana_task_manager?pretty=true
+GET /_cat/shards/.kibana?pretty=true
+GET /ecommerce/product/1339
+GET /_cat/shards/population?pretty=true
+GET /_cluster/health/population?level=shards
+GET /_cat/shards/population?h=index,shard,prirep,dc,state,node
+GET /_cat/shards/population?h=index,shard,prirep,dc,state,node,unassigned.reason
+
+
