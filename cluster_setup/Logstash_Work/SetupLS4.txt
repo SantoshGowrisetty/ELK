@@ -56,7 +56,7 @@ output {
 }
 #the conf file for this test can be found 'myconfigs/conf.d/logstash_populcsv.conf'
 #start logstash pointing to conf file 
-
+/usr/share/logstash/bin/logstash --path.settings /etc/logstash -f /etc/logstash/conf.d/logstash_populcsv.conf
 
 #login to kibana and check if index is created
 Management>Create Index pattern>population
