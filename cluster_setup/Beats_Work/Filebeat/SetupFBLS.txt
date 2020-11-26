@@ -71,7 +71,7 @@ $sudo vim /etc/filebeat/filebeat.yml
 
 enabled: true
 paths:
-    - /var/log/messages*
+    - /usr/local/elasticsearch/logs/mycluster.log
 
 #comment the following lines:
 #output.logstash:
@@ -80,14 +80,40 @@ paths:
   #ssl.certificate_authorities: ["/etc/filebeat/logstash-forwarder.crt"]
 
 #set the index dynamically by using a format string to access any event field
-#With this configuration, all events with log_type: normal are sent to an index named normal-xxx and all events with log_type: critical are sent to critical-xxx
 #The events are distributed to these nodes in round robin order. If one node becomes unreachable, the event is automatically sent to another node. 
 #Uncomment Elasticsearch:
 #output.elasticsearch:
   # Array of hosts to connect to.
   hosts: ["ce1:9200","ce2:9200","ce3:9200"]
-  index: "%{[fields.log_type]}-%{[agent.version]}-%{+yyyy.MM.dd}"
+  #if data contains field type:log_type ,that could be used to route data into 2 different indexes
+  #With this configuration, all events with log_type: normal are sent to an index named normal-xxx and all events with log_type: critical are sent to critical-xxx
+  #index: "%{[fields.log_type]}-%{[agent.version]}-%{+yyyy.MM.dd}"
+  #setting our own index name, which would also mean if we need to use our own template 
+  # "ESLog-%{[agent.version]}-%{+yyyy.MM.dd}"
+  #setup.template.name: "ESLog"
+  #setup.template.pattern: "ESLog-*"
 
+#Addtional options ( which we will check later)
+output.elasticsearch:
+  hosts: ["http://localhost:9200"]
+  indices:
+    - index: "warning-%{[agent.version]}-%{+yyyy.MM.dd}"
+      when.contains:
+        message: "WARN"
+    - index: "error-%{[agent.version]}-%{+yyyy.MM.dd}"
+      when.contains:
+        message: "ERR"
+
+#Additional options (which we will check later)
+output.elasticsearch:
+  hosts: ["http://localhost:9200"]
+  indices:
+    - index: "%{[fields.log_type]}"
+      mappings:
+        critical: "sev1"
+        normal: "sev2"
+      default: "sev3"
+ 
 check if index was created..
 
 ===========================================
@@ -102,7 +128,7 @@ paths:
 #Uncomment the following lines:
 output.logstash:
   # The Logstash hosts
-  hosts: ["elk-server:5443"]
+  hosts: ["ce4:5443"]
   ssl.certificate_authorities: ["/etc/filebeat/logstash-forwarder.crt"]
 
 #Comment Elasticsearch:
@@ -122,7 +148,6 @@ $sudo vim /etc/filebeat/logstash-forwarder.crt
 $sudo systemctl enable filebeat.service
 $sudo systemctl start filebeat.service
 $sudo service filebeat status
-$sudo service filebeat stop
 
 #we will start it again after we setup logstash to accept beats..
 
@@ -130,7 +155,7 @@ $sudo service filebeat stop
 #Creating a sample pipeline on logstash node to accept beats from filebeat on client server
 #To Test
 
-$root@u1:~# vi /etc/logstash/conf.d/first-pipeline.conf
+$root@u1:~# vi /etc/logstash/conf.d/fb_pipeline.conf
 input{
   beats {
         port => "5443"
@@ -141,29 +166,22 @@ output {
        }
 
 #Testing newly created config
-root@u1:~# /usr/share/logstash/bin/logstash --path.settings /etc/logstash/ -f /etc/logstash/conf.d/first-pipeline.conf --config.test_and_exit
+[elk@ce4 ~]$ /usr/share/logstash/bin/logstash --path.settings /etc/logstash/ -f /etc/logstash/conf.d/fb_pipeline.conf --config.test_and_exit
+Sending Logstash logs to /var/log/logstash which is now configured via log4j2.properties
+[2020-11-26T22:31:44,420][WARN ][logstash.config.source.multilocal] Ignoring the 'pipelines.yml' file because modules or command line options are specified
+Configuration OK
+[2020-11-26T22:31:53,406][INFO ][logstash.runner          ] Using config.test_and_exit mode. Config Validation Result: OK. Exiting Logstash
 
 #To run logstash with above mentioned config, remember to update output location in *.conf to receive content sent by filebeat and forward it 
 #as per location
 
-input{
-  beats {
-        port => "5443"
-        }
-     }
-output {
-     elasticsearch {
-          hosts => "192.168.56.104"
-          index => "LogInfo"
-          document_type => "AllLogs"
-      }
-      stdout {}
+--refer input-filter-output content from fb_pipeline.conf
 
 #now start logstash with this config
-root@u1:~# /usr/share/logstash/bin/logstash --path.settings /etc/logstash/ -f /etc/logstash/conf.d/first-pipeline.conf
+[elk@ce4 ~]$ /usr/share/logstash/bin/logstash --path.settings /etc/logstash/ -f /etc/logstash/conf.d/fb_pipeline.conf
 
 ###on filebeat running node####
-#to check
+#start filebeat service or start command to publish data 
 root@u2:/usr/share/filebeat/bin# ./filebeat -e -c /etc/filebeat/filebeat.yml -d "publish"
 
 #if fine, start filebeat service

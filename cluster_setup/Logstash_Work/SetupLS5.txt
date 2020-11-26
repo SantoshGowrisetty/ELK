@@ -3,7 +3,7 @@
 
 #Create following files inside “/etc/logstash/conf.d”
 
-#sudo vi filebeat-lstash.conf
+#sudo vi fb_pipeline.conf 
 ----------------
 #Add the following lines to it to configure input
 
@@ -46,10 +46,13 @@ output {
 sudo chown -R elk:elk /var/lib/logstash
 sudo chown -R elk:elk /var/log/logstash
 
-#by starting logstash in this way, we will have logstash ready to take input from a beat,filter it and push it to elasticsearch,as per our conf files in '/etc/logstash/conf.d'
+#by starting logstash in this way, we will have logstash ready to take input from a beat,filter it and push it to elasticsearch,
+as per our conf files in '/etc/logstash/conf.d'
 
 #start logstash & 
-#look for following output
-
+[elk@ce4 ~]$ /usr/share/logstash/bin/logstash --path.settings /etc/logstash/ -f /etc/logstash/conf.d/fb_pipeline.conf
 
 #on other node setup filebeat to send data to logstash (refer file '' from Beats_Work
+sudo /usr/share/filebeat/bin/filebeat -e -c /etc/filebeat/filebeat.yml -d "publish"
+or start filebeat as a service
+
