@@ -5,6 +5,10 @@ the server and forwards these logs to your Logstash instance for processing.
 Filebeat is designed for reliability and low latency.Filebeat has a light resource footprint
 on the host machine, and the Beats input plugin minimizes the resource demands on the Logstash
 instance.
+
+SETUP
+
+#If UBUNTU
 #Download and install the Public Signing Key:
 $sudo wget -qO - https://artifacts.elastic.co/GPG-KEY-elasticsearch | sudo apt-key add -
 
@@ -17,6 +21,77 @@ $sudo echo "deb https://artifacts.elastic.co/packages/6.x/apt stable main" | sud
 $sudo apt-get update
 $sudo apt-get install filebeat
 
+#If Centos
+#to download and install the Elasticsearch public signing key:
+sudo rpm --import https://artifacts.elastic.co/GPG-KEY-elasticsearch
+
+#add the Elastic repository
+sudo vi /etc/yum.repos.d/elasticsearch.repo
+
+[elasticsearch-6.x]
+name=Elasticsearch repository for 6.x packages
+baseurl=https://artifacts.elastic.co/packages/6.x/yum
+gpgcheck=1
+gpgkey=https://artifacts.elastic.co/GPG-KEY-elasticsearch
+enabled=1
+autorefresh=1
+type=rpm-md
+
+then
+yum install filebeat
+
+CONFIGURATION
+
+#Option 1: Here index name would be default "filebeat-%{[agent.version]}-%{+yyyy.MM.dd}"
+
+#Sending data directly to ES
+#Modify Filebeat configurations.
+$sudo vim /etc/filebeat/filebeat.yml
+
+enabled: true
+paths:
+    - /var/log/messages*
+
+#comment the following lines:
+#output.logstash:
+  # The Logstash hosts
+  #hosts: ["elk-server:5443"]
+  #ssl.certificate_authorities: ["/etc/filebeat/logstash-forwarder.crt"]
+
+#Uncomment Elasticsearch:
+#output.elasticsearch:
+  # Array of hosts to connect to.
+  hosts: ["ce1:9200"]
+
+check if index was created..
+
+#Option 2: 
+#Modify Filebeat configurations.
+$sudo vim /etc/filebeat/filebeat.yml
+
+enabled: true
+paths:
+    - /var/log/messages*
+
+#comment the following lines:
+#output.logstash:
+  # The Logstash hosts
+  #hosts: ["elk-server:5443"]
+  #ssl.certificate_authorities: ["/etc/filebeat/logstash-forwarder.crt"]
+
+#set the index dynamically by using a format string to access any event field
+#With this configuration, all events with log_type: normal are sent to an index named normal-xxx and all events with log_type: critical are sent to critical-xxx
+#The events are distributed to these nodes in round robin order. If one node becomes unreachable, the event is automatically sent to another node. 
+#Uncomment Elasticsearch:
+#output.elasticsearch:
+  # Array of hosts to connect to.
+  hosts: ["ce1:9200","ce2:9200","ce3:9200"]
+  index: "%{[fields.log_type]}-%{[agent.version]}-%{+yyyy.MM.dd}"
+
+check if index was created..
+
+===========================================
+#Sending data to logstash to fwd to ES
 #Modify Filebeat configurations.
 $sudo vim /etc/filebeat/filebeat.yml
 

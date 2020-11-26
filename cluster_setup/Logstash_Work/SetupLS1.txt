@@ -36,8 +36,9 @@ $sudo mkdir ssl
 $sudo openssl req -subj '/CN=ce1/' -x509 -days 3650 -batch -nodes -newkey rsa:2048 -keyout ssl/logstash-forwarder.key -out ssl/logstash-forwarder.crt
 
 #the files described below can be found in 'myconfigs/conf.d/'
-
 #Create following files inside “/etc/logstash/conf.d”
+
+#if configuring logstash to receive data sent by a beat
 #sudo vim filebeat-input.conf
 Add the following lines to it to configure input
 

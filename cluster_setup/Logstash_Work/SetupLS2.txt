@@ -98,9 +98,11 @@ input for logstash-simple-conf created
 
 #going forward we will create conf files that have input + filter (with or without plugins)+ output and run logstash pipeline refering to specific file
 
-#Option 3
+#Option 3(not required as we will run logstash instances pointing to specific files)
+
 #We can start logstash as a service
 #remember if we do it this way, it will look into all conf files within '/etc/logstash/conf.d' too
+#so if multiple pipeline confs created ,we can do that too..
 
 #Let’s enable Logstash on boot 
 #sudo systemctl enable logstash.service

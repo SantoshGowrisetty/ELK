@@ -1,3 +1,55 @@
-mkdir /var/lib/logstash_temp
-/usr/share/logstash/bin/logstash --path.settings /etc/logstash/ 
--f /root/data/logstash_bank.config --path.data /var/lib/logstash_temp
+#Setup logstash to receive data from a beat ,say filebeat
+#the files described below can be found in 'myconfigs/conf.d/'
+
+#Create following files inside “/etc/logstash/conf.d”
+
+#sudo vi filebeat-lstash.conf
+----------------
+#Add the following lines to it to configure input
+
+input {
+  beats {
+    port => 5443
+    type => syslog
+    ssl => true
+    ssl_certificate => "/etc/logstash/ssl/logstash-forwarder.crt"
+    ssl_key => "/etc/logstash/ssl/logstash-forwarder.key"
+  }
+}
+#Add the following contents to it(here we are using GROK plugin) to filter/transform data
+
+filter {
+  if [type] == "syslog" {
+    grok {
+      match => { "message" => "%{SYSLOGTIMESTAMP:syslog_timestamp} %{SYSLOGHOST:syslog_hostname} %{DATA:syslog_program}(?:\[%{POSINT:syslog_pid}\])?: %{GREEDYDATA:syslog_message}" }
+      add_field => [ "received_at", "%{@timestamp}" ]
+      add_field => [ "received_from", "%{host}" ]
+    }
+    date {
+      match => [ "syslog_timestamp", "MMM  d HH:mm:ss", "MMM dd HH:mm:ss" ]
+    }
+  }
+}
+#Add the following lines to it to route output
+
+output {
+  elasticsearch { hosts => ["ce1:9200"]
+    hosts => "ce1:9200"
+    manage_template => false
+    index => "%{[@metadata][beat]}-%{+YYYY.MM.dd}"
+    document_type => "%{[@metadata][type]}"
+  }
+}
+-----------------
+#if starting as a non-root user
+#remember to
+sudo chown -R elk:elk /var/lib/logstash
+sudo chown -R elk:elk /var/log/logstash
+
+#by starting logstash in this way, we will have logstash ready to take input from a beat,filter it and push it to elasticsearch,as per our conf files in '/etc/logstash/conf.d'
+
+#start logstash & 
+#look for following output
+
+
+#on other node setup filebeat to send data to logstash (refer file '' from Beats_Work
