@@ -1,0 +1,237 @@
+What is Metricbeat?
+
+Metricbeat evolved out of Topbeat and like the other beats, is built upon Libbeat – a Go framework. 
+As its name implies, Metricbeat is a lightweight shipper that collects and ships various system and service 
+metrics to a specified output destination.
+
+Metricbeat is installed on the different servers in your environment and used for monitoring their performance,
+ as well as that of different external services running on them. For example, you can use Metricbeat to 
+monitor and analyze system CPU, memory and load. In Dockerized environments, Metricbeat can be installed 
+on a host for monitoring container performance metrics.
+
+Metricbeat is usually configured to ship the data directly to an Elasticsearch deployment. To gain 
+architectural flexibility though, Metricbeat can also be configured to ship to a messaging or queuing 
+buffer such as Kafka or Redis.
+
+Installing Metricbeat
+Metricbeat can be downloaded and installed using a variety of different methods and on a variety of 
+supported platforms. Of course, you will need to have a running ELK Stack to be able to ship and 
+store the collected metrics. I will outline two methods, using Apt and Docker, but you can refer
+ to the official docs for more options.
+
+Install Metricbeat on Linux using Apt
+For an easier way of updating to a newer version, and depending on your Linux distro, 
+you can use Apt or Yum to install Metricbeat from Elastic’s repositories:
+
+Configuring Metricbeat
+Before we run Metricbeat, we need to understand the basics of how to configure it, first and foremost 
+what configuration options are available within the main configuration file.
+
+Metricbeat Configuration File
+Metricbeat is configured using a YAML configuration file. On Linux, this file is located at: 
+/etc/metricbeat/metricbeat.yml.
+
+YAML is syntax sensitive. You cannot, for example, use tabs for spacing. 
+There are a number of additional best practices that will help you avoid mistakes in this Musing in YAML article.
+
+Metricbeat Modules and Metricsets
+Metricbeat modules contain service-specific collection and connection definitions. 
+They define what specific metrics to collect from the service, the frequency in which to collect them, 
+and how to connect to it. Modules, in turn, are comprised of one or multiple metricsets – literally, 
+a set of related metrics to be collected and shipped.
+
+Metricbeat supports a growing number of modules, such as System, Apache, nginx, MySQL and Docker, 
+to name just the popular and more commonly used modules. By default, Metricbeat is configured to use 
+the system module which collects server system metrics, such as CPU and memory usage, network, and so forth.
+
+Here is an example of a Metricbeat configuration file that has two modules defined, the System and 
+Apache modules:
+
+metricbeat.modules:
+- module: system
+  metricsets: ["cpu","memory","network"]
+  enabled: true
+  period: 15s
+  processes: ['.*']
+- module: apache
+  metricsets: ["status"]
+  enabled: true
+  period: 5s
+  hosts: ["http://172.20.11.7"]
+Copy
+The system module may also appear as such in the config file:
+
+- module: system
+  period: 10s
+  metricsets:
+    - cpu
+    - load
+    - memory
+    - network
+    - process
+    - process_summary
+    - socket_summary
+    #- entropy
+    #- core
+    #- diskio
+    #- socket
+  process.include_top_n:
+    by_cpu: 5      # include top 5 processes by CPU
+    by_memory: 5   # include top 5 processes by memory
+- module: system
+  period: 1m
+  metricsets:
+    - filesystem
+    - fsstat
+  processors:
+  - drop_event.when.regexp:
+      system.filesystem.mount_point: '^/(sys|cgroup|proc|dev|etc|host|lib)($|/)'
+- module: system
+  period: 15m
+  metricsets:
+    - uptime
+
+
+Note
+If you are using MacOS or another POSIX-compliant operating system, 
+keep in mind that all Beats config files (including Metricbeat configuration files) have permission checks. 
+So in order to start Metricbeat, you have to use the chown root command (i.e., you must assert dominance).
+
+sudo chown root metricbeat.yml
+
+sudo chown root modules.d/system.yml
+Copy
+At this point, enter the following commands to make sure Metricbeat is running. 
+If successful, the messages below those commands should appear.
+
+$ sudo metricbeat modules enable system
+Copy
+Index setup finished.
+
+$ sudo service metricbeat start
+Copy
+Loaded dashboards
+
+Metricbeat configuration settings
+For each module, define a list of module-specific metricsets. We cannot define a metricset that is 
+not supported by the module used.
+
+Using the period setting, we define the frequency at which we want Metricbeat to fetch the metrics.
+
+The hosts setting is optional, and it defines the host, or hosts, we want Metricset to fetch the metrics from. 
+You can also use fields and tags to add custom fields and tags to the metricset events.
+
+Another optional setting is processors, which can be used to apply different changes to the data collected by
+ Metricbeat. For example, you can use processors to drop specific fields, drop specific events, add metadata 
+and more.
+
+There are two main methods for enabling modules – you can enable them in the modules.d directory in which they 
+are installed (/etc/metricbeat/modules.d) or as shown in the example above from within the configuration file.
+ (enabled: true).
+
+
+Metricbeat Output
+This section in the Metricbeat configuration file defines where you want to ship the metrics to. 
+As we specified above, in most cases you will make do with shipping the events directly into Elasticsearch, 
+but Metricbeat can be configured to ship the data to other destinations.
+
+For more advanced processing and data enhancement, 
+you can define Logstash as your output (remember to use the beats input plugin in Logstash 
+to collect the data from metricbeat). Kafka and Redis also have support as output destinations, 
+for more complex and traffic-heavy pipelines.
+
+Output within the Elastic Stack
+For forwarding metrics to Elasticsearch:
+
+output.elasticsearch:
+  hosts: ["localhost:9200"]
+Copy
+For forwarding metrics to Logstash:
+
+output.logstash:
+  hosts: ["localhost:5044"]
+Copy
+Output to Message Queues/Log Aggregators
+For forwarding metrics to Kafka:
+
+output.kafka:
+  hosts: ["localhost:9092"]
+  topic: "topicname"
+Copy
+To add topic selector rules, use the topics setting. In this example, error and access logs 
+are forwarded to separate topics when identified by certain text in respective logs:
+
+output.kafka:
+  hosts: ["localhost:9092"]
+  topic: "topicname"
+
+For forwarding metrics to Redis:
+
+output.redis:
+  hosts: ["localhost:6379"]
+  index: "redis.index.for.logstash"
+  key: "metricbeat.to.redis" #If you don't designate a specific key, 
+this will default to the specified index
+
+Running Metricbeat
+Now that we understand the basics of configuring Metricbeat, it’s time to actually run the program.
+
+Before we do so, however, it’s a good practice to test your configuration file. To do this, access the directory where Metricbeat is installed, and run Metricbeat with the test subcommand:
+
+cd /usr/share/metricbeat
+sudo metricbeat -c /etc/metricbeat/metricbeat.yml test config
+config OK
+
+Depending on how you installed Metricbeat, enter the following commands to start Metricbeat.
+
+Apt
+Start the Metricbeat service with:
+
+sudo service metricbeat start
+If all runs as expected, you should be seeing a new index generate in Elasticsearch:
+
+curl -XGET 'localhost:9200/_cat/indices?v&pretty'
+
+health status index                       uuid                   pri rep docs.count docs.deleted store.size pri.store.size
+yellow open   metricbeat-7.4.2-2019.12.01 YePjpOgqQR-pU_SuKrm5vw   1   1       2989            0      1.1mb          1.1mb
+Copy
+Define the new index pattern in Kibana to start the analysis.
+
+First, you will need to download an SSL certificate to use encryption:
+
+wget https://raw.githubusercontent.com/logzio/public-certificates/master/COMODORSADomainValidationSecureServerCA.crt
+
+sudo mkdir -p /etc/pki/tls/certs
+
+sudo cp COMODORSADomainValidationSecureServerCA.crt /etc/pki/tls/certs/
+Copy
+Next, retrieve your Logz.io account token from the UI (under Settings → Manage Accounts).
+
+Finally, to ship the data to Logz.io, your Metricbeat configuration file needs to look as follows:
+
+metricbeat.modules:
+- module: system
+  metricsets: ["cpu","memory","network"]
+  enabled: true
+  period: 15s
+  processes: ['.*']
+
+fields:
+  logzio_codec: json
+  token: <yourToken>
+fields_under_root: true
+ignore_older: 3hr
+type: system_metrics
+
+output:
+  logstash:
+    hosts: ["listener.logz.io:5015"]     
+    ssl:
+      certificate_authorities: ['/etc/pki/tls/certs/COMODORSADomainValidationSecureServerCA.crt']
+Copy
+ship data
+Logz.io provides ready-made dashboards for monitoring the data that Metricbeat shipped. To install 
+it, simply open ELK Apps, Logz.io’s library of pre-made dashboards and visualizations and search for ‘metricbeat’.
+
+
+
