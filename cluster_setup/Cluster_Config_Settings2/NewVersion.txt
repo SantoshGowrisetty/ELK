@@ -1,0 +1,15 @@
+Version 7.8
+-------------
+refer configs in /ESCluster_Work2/MyConfigsES/>  NODE1,NODE2,NODE3 DIRECTORIES
+
+GET /_cat/nodes?v
+ip             heap.percent ram.percent cpu load_1m load_5m load_15m node.role master name
+192.168.251.49           21          47   1    0.13    0.22     0.23 dilmrt    -      node3
+192.168.251.48           55          52  29    2.34    1.14     0.62 dilmrt    *      node2
+192.168.251.47           46          68   4    0.99    0.77     0.51 dilmrt    -      node1
+
+
+node.role, r, role, nodeRole
+    (Default) Roles of the node. Returned values include c (cold node), d (data node), h (hot node), 
+    i (ingest node), l (machine learning node), m (master-eligible node), r (remote cluster client node), 
+    s (content node), t (transform node), v (voting-only node), w (warm node) and - (coordinating node only). 
