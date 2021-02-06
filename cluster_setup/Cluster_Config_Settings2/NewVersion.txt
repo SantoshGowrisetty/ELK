@@ -12,4 +12,66 @@ ip             heap.percent ram.percent cpu load_1m load_5m load_15m node.role m
 node.role, r, role, nodeRole
     (Default) Roles of the node. Returned values include c (cold node), d (data node), h (hot node), 
     i (ingest node), l (machine learning node), m (master-eligible node), r (remote cluster client node), 
-    s (content node), t (transform node), v (voting-only node), w (warm node) and - (coordinating node only). 
+    s (content node), t (transform node), v (voting-only node), w (warm node) and - (coordinating node only).
+
+#enabling security
+
+#on each node
+
+vi /usr/local/elasticsearch/config/elasticsearch.yml
+xpack.security.enabled: true
+xpack.security.transport.ssl.enabled: true
+xpack.security.transport.ssl.verification_mode: full
+xpack.security.transport.ssl.keystore.path: certs/${node.name}.p12
+xpack.security.transport.ssl.truststore.path: certs/${node.name}.p12 
+
+on node1:
+elasticsearch-certutil ca
+<enter>[when asked for filename]
+<enter>[when asked for password]
+
+#copy the p12 file across nodes
+scp /usr/local/elasticsearch/elastic-stack-ca.p12 elk@ce2:/usr/local/elasticsearch
+scp /usr/local/elasticsearch/elastic-stack-ca.p12 elk@ce3:/usr/local/elasticsearch
+
+---xx
+elasticsearch-certutil cert --ca elastic-stack-ca.p12 --name node1 --ip 192.168.251.47
+<enter>[when asked for filename]
+<enter>[when asked for password i.e. no password]
+
+#optional if password was set
+elasticsearch-keystore add xpack.security.transport.ssl.keystore.secure_password
+elasticsearch-keystore add xpack.security.transport.ssl.truststore.secure_password
+
+mkdir config/certs
+mv *.p12 config/certs/
+
+#check if all certs were copied
+
+ls config/certs/
+---xx
+#on node2 and node3 repeat steps shown in '---xx'
+
+start elasticsearch on each node
+
+#for kibana to communicate with elasticsearch(investing error...)
+elasticsearch-certutil http
+
+[elk@ce1 ~]$ unzip /usr/local/elasticsearch/elasticsearch-ssl-http.zip
+[elk@ce1 ~]$ cp elasticsearch/http.p12 /usr/local/elasticsearch/config/certs/
+[elk@ce1 ~]$ cp kibana/elasticsearch-ca.pem /usr/local/kibana/config/
+[elk@ce1 ~]$ vi /usr/local/elasticsearch/config/elasticsearch.yml
+xpack.security.http.ssl.enabled: true
+xpack.security.http.ssl.keystore.path: certs/http.p12
+
+[elk@ce1 ~]$ vi /usr/local/kibana/config/kibana.yml
+#add these:
+elasticsearch.username: "kibana_system"
+elasticsearch.password: "kibanapassword"
+elasticsearch.ssl.certificateAuthorities: [ "/usr/local/kibana/config/elasticsearch-ca.pem" ]
+xpack.security.encryptionKey: "kibanaisusingthistomakesureitconnectstosecureelasticsearchcluster"
+xpack.security.session.idleTimeout: "10h"
+xpack.security.session.lifespan: "30d"
+elasticsearch.hosts: ["https://192.168.251.47:9200"]
+
+
