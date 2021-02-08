@@ -30,6 +30,8 @@ LOGSTASH SETUP:
 #To install logstash
 sudo yum install logstash
 
+#using openssl to create certificates.
+
 $cd /etc/logstash
 $sudo mkdir ssl
 #Generate SSL certificate. Change value of CN to your es-server name in the below command.(for example: ce1 since ES is running on ce1 as being one of the nodes of ES cluster)
@@ -37,6 +39,7 @@ $sudo openssl req -subj '/CN=ce1/' -x509 -days 3650 -batch -nodes -newkey rsa:20
 
 #the files described below can be found in 'myconfigs/conf.d/'
 #Create following files inside “/etc/logstash/conf.d”
+
 
 #if configuring logstash to receive data sent by a beat
 #sudo vim filebeat-input.conf

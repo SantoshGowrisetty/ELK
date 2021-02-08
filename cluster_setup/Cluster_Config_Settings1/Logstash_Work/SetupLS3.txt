@@ -14,7 +14,7 @@ $vi logstash_cars.config
 #paste this content 
 input {
      file {
-      path => "/root/data/cars.csv"
+      path => "/home/elk/cars.csv"
       start_position => "beginning"
       sincedb_path => "/dev/null"
       }
@@ -30,14 +30,21 @@ filter {
      mutate {convert => ["door_count","integer"]}
      mutate {convert => ["seat_count","integer"]}
 }
+
 output {
-     elasticsearch {
-          hosts => "localhost"
-          index => "cars"
-          document_type => "sold_cars"
-      }
+  elasticsearch {
+    hosts => ["https://192.168.251.47:9200","https://192.168.251.48:9200","https://192.168.251.49:9200"]
+    ssl_certificate_verification => true
+    cacert => '/etc/logstash/certs/ca.crt'
+    user => 'elastic'
+    password => 'abcd@1234'
+  }
+
+
       stdout {}
 }
+
+-----------
 
 #note** Make sure elasticsearch & kibana service is running already
 
