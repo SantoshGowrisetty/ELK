@@ -19,14 +19,12 @@ sudo su
 cd /usr/local
 
 #untar elasticsearch and kibana for now
-tar -xvf /home/elk/Downloads/elasticsearch-6.8.13.tar.gz
 tar -xvf /home/elk/Downloads/elasticsearch-7.8.0-linux-x86_64.tar.gz
-tar -xvf /home/elk/Downloads/kibana-6.8.13-linux-x86_64.tar.gz
 tar -xvf /home/elk/Downloads/kibana-7.8.0-linux-x86_64.tar.gz
 
 #create softlinks pointing to desired version to work on (for ex: to elasticsearch-6.8 and kibana-6.8)
-ln -s elasticsearch-7.8.0-linux-x86_64 elasticsearch
-ln -s kibana-7.8.0-linux-x86_64 kibana
+ln -s elasticsearch-7.8.0 elasticsearch
+ln -s kibana-7.8.0-linux kibana
 
 #Note** later we can unlink and make our links pointing to newer versions
 
