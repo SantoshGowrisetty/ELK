@@ -4,6 +4,7 @@
 
 ======================
 #Steps for node1,node2,node3
+#kibana unpacking can be done on only one node
 
 #Download the following(from elasticsearch web) on node
 
@@ -11,6 +12,8 @@
 elasticsearch-6.8.13.tar.gz              kibana-7.8.0-linux-x86_64.tar.gz
 elasticsearch-7.8.0-linux-x86_64.tar.gz  logstash-6.8.13.tar.gz
 kibana-6.8.13-linux-x86_64.tar.gz        logstash-7.8.0.tar.gz
+
+#note kibana steps can be done only on one machine..
 
 #Login as root
 sudo su
@@ -24,7 +27,7 @@ tar -xvf /home/elk/Downloads/kibana-7.8.0-linux-x86_64.tar.gz
 
 #create softlinks pointing to desired version to work on (for ex: to elasticsearch-6.8 and kibana-6.8)
 ln -s elasticsearch-7.8.0 elasticsearch
-ln -s kibana-7.8.0-linux kibana
+ln -s kibana-7.8.0-linux-x86-64 kibana
 
 #Note** later we can unlink and make our links pointing to newer versions
 
@@ -73,6 +76,14 @@ transport.port: 9300
 node.master: true
 node.data: false
 
+#discovery.zen.ping.unicast.hosts:["ipaddress of master"]
+#the below setting tells how many master nodes must exist for the cluster,in order to avoid 
+#split-brain
+#discovery.zen.minimum_master_nodes: set majority quorum value(for now we can set to 1)
+
+cluster.initial_master_nodes:
+  - master
+
 ######ON DATANODES#####
 #on node2(c2)
 cluster.name: mycluster
@@ -98,16 +109,66 @@ discovery.zen.ping.unicast.hosts:["ipaddress of master"]
 discovery.zen.minimum_master_nodes: set majority quorum value(for now we can set to 1)
 
 #######ON OTHER DATANODES#####
-(SAME CONFIG AS NODE 2 with one change)
+(SAME CONFIG AS NODE 2 with two changes)
 network.host: ipaddress of node3
+node.name: data2
 
 Note** Before starting elasticsearch or enabling elasticsearch on boot,refer "setup_errors.txt" file
 #once important configurations have been done
 
+The reference files ie 'limits.conf' and 'sysctl.conf' are provided in this path
+https://github.com/ajaykuma/ELK/tree/master/cluster_setup
+
+Copy these to respective locations (you may have to use root/sudo)
+Node1: (while being on c1 and assuming the git repo was downloaded and unzipped here)
+sudo cp <unzipped-folder-of-git-repo>/cluster_setup/limits.conf /etc/security/
+sudo cp <unzipped-folder-of-git-repo>/cluster_setup/sysctl.conf /etc/   
+
+From Node1 to Node2: (while being on Node1 i.e. c1)
+c1$sudo scp <unzipped-folder-of-git-repo>/cluster_setup/limits.conf elk@c2:/etc/security/
+c1$sudo scp <unzipped-folder-of-git-repo>/cluster_setup/sysctl.conf elk@c2:/etc/ 
+
+--if above steps don't work--
+--then copy to /tmp first
+
+c1$sudo scp <unzipped-folder-of-git-repo>/cluster_setup/limits.conf elk@c2:/tmp
+c1$sudo scp <unzipped-folder-of-git-repo>/cluster_setup/sysctl.conf elk@c2:/tmp
+
+ssh c2
+on c2 now:
+sudo cp /tmp/limits.conf /etc/security/
+sudo cp /tmp/sysctl.conf /etc/
+
+<logout>
+<back to c1>
+
+From Node1 to Node3: (while being on Node1 i.e. c1)
+c1$sudo scp <unzipped-folder-of-git-repo>/cluster_setup/limits.conf elk@c3:/etc/security/
+c1$sudo scp <unzipped-folder-of-git-repo>/cluster_setup/sysctl.conf elk@c3:/etc/ 
+
+--if above steps don't work--
+--then copy to /tmp first
+
+c1$sudo scp <unzipped-folder-of-git-repo>/cluster_setup/limits.conf elk@c3:/tmp
+c1$sudo scp <unzipped-folder-of-git-repo>/cluster_setup/sysctl.conf elk@c3:/tmp
+
+ssh c3
+on c3 now:
+sudo cp /tmp/limits.conf /etc/security/
+sudo cp /tmp/sysctl.conf /etc/
+
+<logout>
+<back to c1>
+
+<-------------RESTART YOUR MACHINES--------------------->
+
+
 on node1:
 [elk@c1 ~]$elasticsearch<enter>
+
 on node2:
 [elk@c2 ~]$elasticsearch<enter>
+
 on node3:
 [elk@c3 ~]$elasticsearch<enter>
 
@@ -122,11 +183,6 @@ ip             heap.percent ram.percent cpu load_1m load_5m load_15m node.role m
 192.168.251.47           15          43   1    0.40    0.50     0.30 mi        *      master
 192.168.251.48           16          43   6    0.12    0.39     0.25 di        -      data1
 
-#optional----
-#make sure ElasticSearch works seamlessly, enable it on boot and Start ElasticSearch.
-$sudo systemctl enable elasticsearch.service
-$sudo systemctl start elasticsearch.service
-$sudo service elasticsearch status
 #optional----
 
 refer:
