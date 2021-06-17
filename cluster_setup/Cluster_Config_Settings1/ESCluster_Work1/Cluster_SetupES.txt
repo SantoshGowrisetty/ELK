@@ -55,7 +55,7 @@ Editing config files: (Config files ie elasticsearch.yml as should
 exist on each node is given under ImpConfigs folder)
 
 #To setup cluster
-update /usr/local/elasticsearch/elasticsearch.yml in each node
+update /usr/local/elasticsearch/config/elasticsearch.yml in each node
 
 ####ON MASTER NODE#####
 #on node1(c1)
