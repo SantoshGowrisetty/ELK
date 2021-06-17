@@ -1,7 +1,12 @@
 #Logstash setup
 #can be setup using tar or using RPM
-The Elastic Stack components are not available through the package manager by default, but you can install them with yum by adding Elastic’s package repository.
-All of the Elastic Stack’s packages are signed with the Elasticsearch signing key in order to protect your system from package spoofing. Packages which have been authenticated using the key will be considered trusted by your package manager. In this step, you will import the Elasticsearch public GPG key and add the Elastic repository in order to install Elasticsearch.
+The Elastic Stack components are not available through the package manager by default, 
+but you can install them with yum by adding Elastic’s package repository.
+All of the Elastic Stack’s packages are signed with the Elasticsearch signing key in order to 
+protect your system from package spoofing. Packages which have been authenticated 
+using the key will be considered trusted by your package manager. 
+In this step, you will import the Elasticsearch public GPG key and add the 
+Elastic repository in order to install Elasticsearch.
 
 #to download and install the Elasticsearch public signing key:
 sudo rpm --import https://artifacts.elastic.co/GPG-KEY-elasticsearch

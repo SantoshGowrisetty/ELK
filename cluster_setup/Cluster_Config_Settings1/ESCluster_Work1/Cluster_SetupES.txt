@@ -1,4 +1,4 @@
-#Setup atleast 3 nodes (say hostnames:ce1,ce2,ce3 (centos7.x)
+#Setup atleast 3 nodes (say hostnames:c1,c2,c3 (centos7.x)
 #Make sure they can ping each other, Java is installated,ssh each other (passwordless) for root user and dedicated user(say elk)
 #Make sure firewalld is turned off /allow connection to each other
 
@@ -7,7 +7,7 @@
 
 #Download the following(from elasticsearch web) on node
 
-[elk@ce1 ~]$ ls /home/elk/Downloads/
+[elk@c1 ~]$ ls /home/elk/Downloads/
 elasticsearch-6.8.13.tar.gz              kibana-7.8.0-linux-x86_64.tar.gz
 elasticsearch-7.8.0-linux-x86_64.tar.gz  logstash-6.8.13.tar.gz
 kibana-6.8.13-linux-x86_64.tar.gz        logstash-7.8.0.tar.gz
@@ -25,8 +25,8 @@ tar -xvf /home/elk/Downloads/kibana-6.8.13-linux-x86_64.tar.gz
 tar -xvf /home/elk/Downloads/kibana-7.8.0-linux-x86_64.tar.gz
 
 #create softlinks pointing to desired version to work on (for ex: to elasticsearch-6.8 and kibana-6.8)
-ln -s elasticsearch-6.8.13.tar.gz elasticsearch
-ln -s kibana-6.8.13-linux-x86_64.tar.gz kibana
+ln -s elasticsearch-7.8.0-linux-x86_64 elasticsearch
+ln -s kibana-7.8.0-linux-x86_64 kibana
 
 #Note** later we can unlink and make our links pointing to newer versions
 
@@ -51,13 +51,14 @@ export PATH=$PATH:$KIBANA_HOME/bin
 source .bashrc
 
 =================================
-Editing config files: (Config files ie elasticsearch.yml as should exist on each node is given under ImpConfigs folder)
+Editing config files: (Config files ie elasticsearch.yml as should 
+exist on each node is given under ImpConfigs folder)
 
 #To setup cluster
-#update /etc/elasticsearch/elasticsearch.yml in each node
+update /usr/local/elasticsearch/elasticsearch.yml in each node
 
 ####ON MASTER NODE#####
-#on node1(ce1)
+#on node1(c1)
 
 cluster.name: mycluster
 node.name: master
@@ -75,7 +76,7 @@ node.master: true
 node.data: false
 
 ######ON DATANODES#####
-#on node2(ce2)
+#on node2(c2)
 cluster.name: mycluster
 node.name: data1
 
@@ -106,18 +107,18 @@ Note** Before starting elasticsearch or enabling elasticsearch on boot,refer "se
 #once important configurations have been done
 
 on node1:
-[elk@ce1 ~]$elasticsearch<enter>
+[elk@c1 ~]$elasticsearch<enter>
 on node2:
-[elk@ce2 ~]$elasticsearch<enter>
+[elk@c2 ~]$elasticsearch<enter>
 on node3:
-[elk@ce3 ~]$elasticsearch<enter>
+[elk@c3 ~]$elasticsearch<enter>
 
 
 #Test the status
-$curl ce1:9200/_cat/nodes
-$curl ce1:9200/_cat/nodes?v
+$curl c1:9200/_cat/nodes
+$curl c1:9200/_cat/nodes?v
 
-[elk@ce1 ~]$ curl ce1:9200/_cat/nodes?v
+[elk@c1 ~]$ curl c1:9200/_cat/nodes?v
 ip             heap.percent ram.percent cpu load_1m load_5m load_15m node.role master name
 192.168.251.49           17          43   5    0.12    0.36     0.23 di        -      data2
 192.168.251.47           15          43   1    0.40    0.50     0.30 mi        *      master
