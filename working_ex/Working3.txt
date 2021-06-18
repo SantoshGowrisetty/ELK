@@ -71,3 +71,11 @@ GET /ecommerce/product/1006
 _source : shows the document itself
 
 ================================
+example
+using routing to shard data on any other field
+PUT ecommerce/_doc/1?routing=user1&refresh=true 
+{
+  "title": "This is a document"
+}
+
+GET my-index-000001/_doc/1?routing=user1

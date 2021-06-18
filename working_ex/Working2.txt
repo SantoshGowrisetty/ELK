@@ -4,8 +4,7 @@
 PUT /ecommerce
 {
      "mappings": {
-       "product": {
-          "properties": {
+                "properties": {
              "name": {
                 "type": "text"
          },
@@ -32,14 +31,14 @@ PUT /ecommerce
         "tags": {
            "type": "text"
          }
-}
+
 }
 }
 }
 =============================================
 #Adding Documents
 5.
-PUT /ecommerce/product/1001
+PUT /ecommerce/_doc/1001
 {
   "name": "Test Frameowrk",
   "price": "30.00",
@@ -59,7 +58,7 @@ PUT /ecommerce/product/1001
 #Replacing a document
 #using put to update the value(will find and replace based on ID or insert new document)
 6.
-PUT /ecommerce/product/1001
+PUT /ecommerce/_doc/1001
 {
   "name": "Test Frameowrk",
   "price": "300.00",
@@ -99,7 +98,7 @@ _score:
 #Updating documents
 #here we would want to update specific fields instead of passing in all fields or a complete document
 7.
-POST /ecommerce/product/1001/_update
+POST /ecommerce/_doc/1001/_update
 {
   "doc": {
     "price": 500.00
