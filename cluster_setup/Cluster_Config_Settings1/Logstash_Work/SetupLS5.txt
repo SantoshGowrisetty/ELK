@@ -1,3 +1,9 @@
+#conf files exist in MyConfigsLS
+
+>> MyConfigsLS/conf.d/fb_pipeline.conf
+
+#change paths according to your setup
+
 #Setup logstash to receive data from a beat ,say filebeat
 #the files described below can be found in 'myconfigs/conf.d/'
 

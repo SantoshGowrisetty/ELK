@@ -1,3 +1,7 @@
+#conf file for this exists in 'MyConfigsLS'
+
+>>MyConfigsLS/conf.d/logstash_cars.conf
+>>MyConfigsLS/conf.d/logstash_carscsv.conf
 
 #using logstash to send csv file to ES and create index automatically
 #Download dataset from "https://www.kaggle.com/mirosval/personal-cars-classifieds"
@@ -49,6 +53,7 @@ output {
 #note** Make sure elasticsearch & kibana service is running already
 
 #start logstash pointing to this config file
+#change paths according to your setup
 $/usr/share/logstash/bin/logstash --path.settings /etc/logstash/ -f /root/data/logstash_cars.config
 
 #testing while data is being pushed into ES

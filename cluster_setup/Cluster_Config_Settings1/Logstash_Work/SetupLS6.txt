@@ -1,3 +1,10 @@
+#conf files exist in MyConfigsLS
+
+#change paths according to your setup
+
+>>MyConfigsLS/conf.d/newpipeline.conf
+>>MyConfigsLS/conf.d/newpipeline2.conf
+
 #Using Logstash for sending TCP data to ES.
 #you can initially try with one pipeline
 

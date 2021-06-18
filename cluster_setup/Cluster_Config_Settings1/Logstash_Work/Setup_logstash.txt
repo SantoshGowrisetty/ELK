@@ -1,5 +1,7 @@
 #Logstash setup
-#can be setup using tar or using RPM
+#Can be setup using tar or using RPM
+
+#Note
 The Elastic Stack components are not available through the package manager by default, 
 but you can install them with yum by adding Elastic’s package repository.
 All of the Elastic Stack’s packages are signed with the Elasticsearch signing key in order to 
@@ -8,7 +10,7 @@ using the key will be considered trusted by your package manager.
 In this step, you will import the Elasticsearch public GPG key and add the 
 Elastic repository in order to install Elasticsearch.
 
-#if using RPMs
+#If using RPMs
 
 #to download and install the Elasticsearch public signing key:
 sudo rpm --import https://artifacts.elastic.co/GPG-KEY-elasticsearch
@@ -25,20 +27,23 @@ enabled=1
 autorefresh=1
 type=rpm-md
 
-#if installing ES using this method and if not already done
+#if ES not already installed
 sudo yum install elasticsearch
 
-#& then editing sudo vi /etc/elasticsearch/elasticsearch.yml
+#& then editing (as per your path of installation)
+sudo vi /etc/elasticsearch/config/elasticsearch.yml
 
-#if installing Kibana using this method and if not already done
+#if Kibana not already installed
 sudo yum install kibana
 
+#& then editing (as per your path of installation)
+vi /etc/kibana/config/kibana.yml 
 ------------------
-Two methods mentioned, either via RPMs or Tar (as per your method, follow the instructions)
 
 LOGSTASH SETUP:
+Two methods mentioned, either via RPMs or Tar (as per your method, follow the instructions)
 
-#if using RPMs
+#If using RPMs
 
 #To install logstash
 $sudo yum install logstash
@@ -48,16 +53,18 @@ $sudo yum install logstash
 
 $cd /etc/logstash
 $sudo mkdir ssl
-#Generate SSL certificate. Change value of CN to your es-server name in the below command.(for example: ce1 since ES is running on ce1 as being one of the nodes of ES cluster)
+#Generate SSL certificate. Change value of CN to your es-server name in the below command.(for example: c1 since ES is running on ce1 as being one of the nodes of ES cluster)
 
 $sudo openssl req -subj '/CN=ce1/' -x509 -days 3650 -batch -nodes -newkey rsa:2048 -keyout ssl/logstash-forwarder.key -out ssl/logstash-forwarder.crt
 
-#the files described below can be found in 'myconfigs/conf.d/'
+#The files explained below can be found in 'MyConfigsLS/conf.d/'
 #Create following files inside “/etc/logstash/conf.d”
 
---These are just examples, actual files are in 'myconfigs/conf.d/'
+--These are just examples, actual files are in 'MyConfigsLS/conf.d/'
 
 #if configuring logstash to receive data sent by a beat
+#we need to create a input conf file
+
 #sudo vim filebeat-input.conf
 Add the following lines to it to configure input
 
@@ -71,7 +78,9 @@ input {
   }
 }
 
-#Save and close the file and create a new configuration file
+#Save and close the file 
+
+#create a new configuration file for transformation(filter)
 
 $sudo vim syslog-filter.conf
 Add the following contents to it(here we are using GROK plugin) to filter/transform data
@@ -88,7 +97,9 @@ filter {
     }
   }
 }
-#Save and exit the file. Create elasticsearch output file.
+#Save and exit the file. 
+
+#Create output file to send data
 
 $sudo vim output-elasticsearch.conf
 Add the following lines to it to route output
@@ -107,12 +118,15 @@ output {
 sudo chown -R elk:elk /var/lib/logstash
 sudo chown -R elk:elk /var/log/logstash
 
-#by starting logstash in this way, we will have logstash ready to take input from a beat,
-filter it and push it to elasticsearch,as per our conf files in '/etc/logstash/conf.d'
+#When we places these 3 files in /etc/logstash/conf.d and start logstash, we will have logstash take input from a beat,
+filter it and push it to elasticsearch,
+
+#to start logstash pipeline..
 /usr/share/logstash/bin/logstash --path.settings /etc/logstash
 
 #look for following output
-[elk@ce3 ~]$ /usr/share/logstash/bin/logstash --path.settings /etc/logstash
+#this is output from my machine where logstash was started.
+[elk@c3 ~]$ /usr/share/logstash/bin/logstash --path.settings /etc/logstash
 Sending Logstash logs to /var/log/logstash which is now configured via log4j2.properties
 [2020-11-16T22:27:48,023][INFO ][logstash.setting.writabledirectory] Creating directory {:setting=>"path.queue", :path=>"/var/lib/logstash/queue"}
 [2020-11-16T22:27:48,043][INFO ][logstash.setting.writabledirectory] Creating directory {:setting=>"path.dead_letter_queue", :path=>"/var/lib/logstash/dead_letter_queue"}
@@ -136,8 +150,8 @@ Sending Logstash logs to /var/log/logstash which is now configured via log4j2.pr
 --Download logstash-7.8 from elastic.co
 
 $cd /usr/local
-$sudo tar -xvf /home/elk/Downloads/logstash<tab>
-$sudo ln -s logstash<tab> logstash
+$sudo tar -xvf /home/elk/Downloads/logstash-7.8.0.tar.gz
+$sudo ln -s logstash-7.8.0 logstash
 $sudo chown -R elk:elk logstash*
 $cd
 $vi .bashrc
@@ -152,10 +166,11 @@ source .bashrc
 $cd /usr/local/logstash
 $mkdir conf.d
 
---copy the *.conf files from myconfigs/conf.d/* into /usr/local/logstash/conf.d/
+--copy the *.conf files from MyconfigsLS/conf.d/* into /usr/local/logstash/conf.d/
 
---start editing files to use them to send data to ES
+--start editing files as per your requirement
 
-logstash --path.settings /etc/logstash /usr/local/logstash/conf.d/logstash-xxxx.conf
+--to run logstash
+logstash --path.settings /usr/local/logstash /usr/local/logstash/conf.d/logstash-xxxx.conf
 
-
+--look into files in 'MyConfigsLS' for better understanding
