@@ -24,7 +24,8 @@ PUT /ecommerce
 }
 
 #Here the above command is translated to HTTP request that uses HTTP puts
-#If using curl/connecting to ES in an application  we would have to use fully qualified URL . We can find the same , 
+#If using curl/connecting to ES in an application  we would have to use fully qualified URL .
+We can find the same , 
 #using the settings icon and 'copy as URL'
 #if we copy the curl request, it will automatically be convereted into required syntax
 

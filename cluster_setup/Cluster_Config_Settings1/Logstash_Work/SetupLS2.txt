@@ -1,9 +1,11 @@
+#when running logstash check if your logstash is in /etc/logstash or in /usr/local/logstash and 
+choose the one you prefer and have configured.
+
 #once logstash is installed ,it can be run as a service or from command line
 refering to a specific config file which controls input-filter-output of 
 logstash pipeline
 
 #in addition to previously created files, 
-
 
 create a 'logstash-simple.conf' file
 vi /etc/logstash/conf.d/logstash-simple.conf
@@ -68,8 +70,10 @@ hello world
       "@version" => "1",
           "host" => "u1"
 }
+------
 
-#Option 2(notice here,all conf files in '/etc/logstash/conf.d' will be applicable for logstash
+#Option 2
+(notice here,all conf files in '/etc/logstash/conf.d' will be applicable for logstash
 
 [elk@ce4 ~]$ /usr/share/logstash/bin/logstash --path.settings /etc/logstash 
 Sending Logstash logs to /var/log/logstash which is now configured via log4j2.properties
@@ -98,7 +102,8 @@ input for logstash-simple-conf created
 
 #going forward we will create conf files that have input + filter (with or without plugins)+ output and run logstash pipeline refering to specific file
 
-#Option 3(not required as we will run logstash instances pointing to specific files)
+#Option 3
+(not required as we will run logstash instances pointing to specific files)
 
 #We can start logstash as a service
 #remember if we do it this way, it will look into all conf files within '/etc/logstash/conf.d' too

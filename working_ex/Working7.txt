@@ -3,8 +3,7 @@ Example 1:
 PUT /newdata
 {
      "mappings": {
-       "product": {
-          "properties": {
+                "properties": {
              "name": {
                 "type": "text"
          },
@@ -35,13 +34,13 @@ PUT /newdata
 }
 }
 }
-}
+
 ===============
 Example 2:
 PUT /newproducts
 {
      "mappings": {
-       "product": {
+       
           "properties": {
              "name": {
                 "type": "text"
@@ -74,9 +73,9 @@ PUT /newproducts
            "analyzer": "standard"
          }
 }
-}
+
 ==============
-POST /newproducts/product/_bulk
+POST /newproducts/_bulk
 {"index": {"_id":"10"}}
 {"name": "why ES is Awesome","price":"100.00","description":"This book is all about the ES!","status":"active","quantity":12,"categories":[{"name":"Software","quantity":200}],"tags":["ES the search store","programming JAVA"]}
 {"index": {"_id":"11"}}

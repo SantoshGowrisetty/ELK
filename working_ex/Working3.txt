@@ -8,7 +8,7 @@ DELETE /ecommerce/product/1003
 #Using _bulk API expects a single line with action ie create,update or delete
 #It uses '/n' for new lines
 
-POST /ecommerce/product/_bulk
+POST /ecommerce/_doc/_bulk
 {"index": {"_id":"1004"}}
 {"name": "why ES is Awesome","price":"100.00","description":"This book is all about ES!","status":"active","quantity":12,"categories":[{"name":"Software"}],"tags":["ES","programming"]}
 {"index": {"_id":"1005"}}
@@ -16,7 +16,7 @@ POST /ecommerce/product/_bulk
 {"index": {"_id":"1006"}}
 {"name": "why elasticsearch is Awesome","price":"100.00","description":"This book is all about elasticsearch!","status":"active","quantity":12,"categories":[{"name":"Software"}],"tags":["elasticsearch","programming"]}
 
-PUT /ecommerce/product/_bulk
+PUT /ecommerce/_doc/_bulk
 {"index": {"_id":"711"}}
 {"name": "why ESS is Awesome","price":"100.00","description":"This book is all about EES!","status":"active","quantity":12,"categories":[{"name":"Software"}],"tags":["ES","programming"]}
 {"index": {"_id":"170"}}
@@ -36,7 +36,7 @@ PUT /ecommerce/product/_bulk
 {"index": {"_id":"1310"}}
 {"name": "why elasticsearch is Awesome","price":"101.00","description":"This book is all about elasticsearch!","status":"active","quantity":12,"categories":[{"name":"Software"}],"tags":["elasticsearch","programming"]}
 
-POST /ecommerce/product/_bulk
+POST /ecommerce/_doc/_bulk
 {"delete" : {"_id" : "1"}}
 {"update" : {"_id" : "1006"}}
 {"doc" : {"quantity" : 11}}

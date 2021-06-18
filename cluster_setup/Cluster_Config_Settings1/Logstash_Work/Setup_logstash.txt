@@ -8,15 +8,17 @@ using the key will be considered trusted by your package manager.
 In this step, you will import the Elasticsearch public GPG key and add the 
 Elastic repository in order to install Elasticsearch.
 
+#if using RPMs
+
 #to download and install the Elasticsearch public signing key:
 sudo rpm --import https://artifacts.elastic.co/GPG-KEY-elasticsearch
 
 #add the Elastic repository
 sudo vi /etc/yum.repos.d/elasticsearch.repo
 
-[elasticsearch-6.x]
-name=Elasticsearch repository for 6.x packages
-baseurl=https://artifacts.elastic.co/packages/6.x/yum
+[elasticsearch-7.x]
+name=Elasticsearch repository for 7.x packages
+baseurl=https://artifacts.elastic.co/packages/7.x/yum
 gpgcheck=1
 gpgkey=https://artifacts.elastic.co/GPG-KEY-elasticsearch
 enabled=1
@@ -31,20 +33,29 @@ sudo yum install elasticsearch
 #if installing Kibana using this method and if not already done
 sudo yum install kibana
 
-LOGSTASH SETUP:
-#To install logstash
-sudo yum install logstash
+------------------
+Two methods mentioned, either via RPMs or Tar (as per your method, follow the instructions)
 
+LOGSTASH SETUP:
+
+#if using RPMs
+
+#To install logstash
+$sudo yum install logstash
+
+#if enabling security
 #using openssl to create certificates.
 
 $cd /etc/logstash
 $sudo mkdir ssl
 #Generate SSL certificate. Change value of CN to your es-server name in the below command.(for example: ce1 since ES is running on ce1 as being one of the nodes of ES cluster)
+
 $sudo openssl req -subj '/CN=ce1/' -x509 -days 3650 -batch -nodes -newkey rsa:2048 -keyout ssl/logstash-forwarder.key -out ssl/logstash-forwarder.crt
 
 #the files described below can be found in 'myconfigs/conf.d/'
 #Create following files inside “/etc/logstash/conf.d”
 
+--These are just examples, actual files are in 'myconfigs/conf.d/'
 
 #if configuring logstash to receive data sent by a beat
 #sudo vim filebeat-input.conf
@@ -59,6 +70,7 @@ input {
     ssl_key => "/etc/logstash/ssl/logstash-forwarder.key"
   }
 }
+
 #Save and close the file and create a new configuration file
 
 $sudo vim syslog-filter.conf
@@ -90,13 +102,13 @@ output {
   }
 }
 
-
 #if starting as a non-root user
 #remember to
 sudo chown -R elk:elk /var/lib/logstash
 sudo chown -R elk:elk /var/log/logstash
 
-#by starting logstash in this way, we will have logstash ready to take input from a beat,filter it and push it to elasticsearch,as per our conf files in '/etc/logstash/conf.d'
+#by starting logstash in this way, we will have logstash ready to take input from a beat,
+filter it and push it to elasticsearch,as per our conf files in '/etc/logstash/conf.d'
 /usr/share/logstash/bin/logstash --path.settings /etc/logstash
 
 #look for following output
@@ -120,3 +132,30 @@ Sending Logstash logs to /var/log/logstash which is now configured via log4j2.pr
 [2020-11-16T22:28:02,463][INFO ][logstash.agent           ] Successfully started Logstash API endpoint {:port=>9600}
 
 -----------------------------
+#if using tar files
+--Download logstash-7.8 from elastic.co
+
+$cd /usr/local
+$sudo tar -xvf /home/elk/Downloads/logstash<tab>
+$sudo ln -s logstash<tab> logstash
+$sudo chown -R elk:elk logstash*
+$cd
+$vi .bashrc
+
+--update .bashrc
+export LOGSTASH_HOME=/usr/local/logstash
+export PATH=$PATH:$LOGSTASH_HOME/bin
+
+--refresh .bashrc
+source .bashrc
+
+$cd /usr/local/logstash
+$mkdir conf.d
+
+--copy the *.conf files from myconfigs/conf.d/* into /usr/local/logstash/conf.d/
+
+--start editing files to use them to send data to ES
+
+logstash --path.settings /etc/logstash /usr/local/logstash/conf.d/logstash-xxxx.conf
+
+

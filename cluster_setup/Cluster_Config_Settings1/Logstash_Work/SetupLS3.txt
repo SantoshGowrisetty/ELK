@@ -1,4 +1,4 @@
-#to be updated...
+
 #using logstash to send csv file to ES and create index automatically
 #Download dataset from "https://www.kaggle.com/mirosval/personal-cars-classifieds"
 $mkdir data

@@ -87,8 +87,6 @@ categories:
     { "name": "Software" }
 _id:
     1001
-_type:
-    product
 _index:
     ecommerce
 _score:
