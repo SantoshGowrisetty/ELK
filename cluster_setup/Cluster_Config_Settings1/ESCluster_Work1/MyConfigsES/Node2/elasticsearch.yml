@@ -44,7 +44,7 @@ node.name: data1
 #
 # Lock the memory on startup:
 #
-#bootstrap.memory_lock: true
+bootstrap.memory_lock: true
 #
 # Make sure that the heap size is set to about half the memory available
 # on the system and that the owner of the process is allowed to use this
@@ -58,7 +58,7 @@ node.name: data1
 #
 #network.host: 192.168.0.1
 #updated v1
-network.host: 192.168.251.48
+network.host: c2
 #
 # Set a custom port for HTTP:
 #
@@ -76,15 +76,12 @@ node.data: true
 # Pass an initial list of hosts to perform discovery when new node is started:
 # The default list of hosts is ["127.0.0.1", "[::1]"]
 #
-#discovery.zen.ping.unicast.hosts: ["host1", "host2"]
+discovery.zen.ping.unicast.hosts: ["c1"]
 #
 # Prevent the "split brain" by configuring the majority of nodes (total number of master-eligible nodes / 2 + 1):
 #
-#discovery.zen.minimum_master_nodes: 
-#updated v1
-discovery.zen.ping.unicast.hosts: ["192.168.251.47"]
 discovery.zen.minimum_master_nodes: 1
-
+#
 # For more information, consult the zen discovery module documentation.
 #
 # ---------------------------------- Gateway -----------------------------------
