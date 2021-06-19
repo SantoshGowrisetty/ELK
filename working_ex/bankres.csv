@@ -1,0 +1,1 @@
+{"error":"Incorrect HTTP method for uri [/_sql?format=csv] and method [PUT], allowed: [GET, POST]","status":405}
