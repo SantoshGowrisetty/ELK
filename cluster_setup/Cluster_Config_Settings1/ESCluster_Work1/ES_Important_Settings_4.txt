@@ -9,7 +9,6 @@ Ensure sufficient virtual memory
 Ensure sufficient threads
 JVM DNS cache settings
 Temporary directory not mounted with noexec
-
 ------------
 Disable swapping:
 Swapping is very bad for performance, for node stability, and should be avoided at all costs. 
@@ -70,7 +69,6 @@ export ES_JAVA_OPTS="$ES_JAVA_OPTS -Djna.tmpdir=<path>"
 
 --------------
 File Descriptors:
-
 Elasticsearch uses a lot of file descriptors or file handles. Running out of file descriptors 
 can be disastrous and will most probably lead to data loss. 
 Make sure to increase the limit on the number of open files descriptors for the user 

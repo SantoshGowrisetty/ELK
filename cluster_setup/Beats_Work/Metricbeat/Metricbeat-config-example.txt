@@ -1,3 +1,4 @@
+Quick Notes
 What is Metricbeat?
 
 Metricbeat evolved out of Topbeat and like the other beats, is built upon Libbeat – a Go framework. 

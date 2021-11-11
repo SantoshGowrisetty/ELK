@@ -1,3 +1,4 @@
+#paths may have changed, read through and recheck in git 
 #conf file for this exists in 'MyConfigsLS'
 
 >>MyConfigsLS/conf.d/logstash_cars.conf

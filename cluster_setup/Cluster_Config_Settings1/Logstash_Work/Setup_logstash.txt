@@ -1,4 +1,5 @@
 #Logstash setup
+
 #Can be setup using tar or using RPM
 
 #Note

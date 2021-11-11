@@ -1,4 +1,5 @@
-Note** on Bootstrap Checks
+Note** 
+on Bootstrap Checks
 
 Maximum map count check
 

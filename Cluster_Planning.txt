@@ -1,4 +1,6 @@
+
 cluster planning
+
 capacity planning:
 -----------------
 
@@ -10,7 +12,9 @@ avg size of index
 count of shards--that are increasing/day/week/month
 cpu usage[memory usage/disk usage] /
 
+
 ram/node=-20% overhead
+
 no of queries/appls--running (avg count)
 
 disk = -20% overhead

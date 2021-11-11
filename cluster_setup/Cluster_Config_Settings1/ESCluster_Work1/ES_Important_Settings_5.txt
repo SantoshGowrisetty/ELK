@@ -1,4 +1,5 @@
-Note** on Bootstrap Checks
+Note** 
+on Bootstrap Checks
 
 Development vs. production mode
 By default, ES binds to loopback addresses for HTTP and transport (internal) communication. 

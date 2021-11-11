@@ -1,4 +1,5 @@
-ERROR: [2] bootstrap checks failed
+ERROR: [2] 
+bootstrap checks failed
 [1]: max file descriptors [4096] for elasticsearch process is too low, increase to at least [65535]
 
 Elasticsearch uses a lot of file descriptors or file handles. 
@@ -14,6 +15,7 @@ RPM and Debian packages already default the maximum number of file descriptors t
 You can check the max_file_descriptors configured for each node using the Nodes stats API, with:
 
 To check:
+
 GET _nodes/stats/process?filter_path=**.max_file_descriptors
 
 To fix:
@@ -27,7 +29,8 @@ elk               soft   nofile  100000
 elk               hard   nofile  100000
 
 ===================
-ERROR: [1] bootstrap checks failed
+ERROR: [1] 
+bootstrap checks failed
 Error: max virtual memory areas vm.max_map_count [65530] is too low, increase to at least [262144]
 Elasticsearch uses a mmapfs directory by default to store its indices. 
 The default operating system limits on mmap counts is likely to be too low, 

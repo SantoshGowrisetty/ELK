@@ -1,3 +1,4 @@
+#paths may have changed, read through and recheck in git 
 #conf files exist in MyConfigsLS
 
 >> MyConfigsLS/conf.d/fb_pipeline.conf

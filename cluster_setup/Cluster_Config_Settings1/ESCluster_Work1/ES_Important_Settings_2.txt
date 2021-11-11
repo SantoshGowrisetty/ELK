@@ -78,5 +78,5 @@ cluster.initial_master_nodes: ---4
    then you must use the fully-qualified name in this list; conversely if node.name is a bare hostname 
    without any trailing qualifiers then you must also omit the trailing qualifiers in cluster.initial_master_nodes.
 
-
+-----
 

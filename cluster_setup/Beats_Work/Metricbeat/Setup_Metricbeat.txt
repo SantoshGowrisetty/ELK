@@ -1,3 +1,4 @@
+#change version as per your need
 #get metric beat on each node
 curl -L -O https://artifacts.elastic.co/downloads/beats/metricbeat/metricbeat-7.8.0-x86_64.rpm
 

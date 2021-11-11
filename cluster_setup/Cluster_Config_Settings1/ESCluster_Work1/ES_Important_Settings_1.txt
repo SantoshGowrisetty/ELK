@@ -1,6 +1,6 @@
 ES Important Settings
 -------------------
-
+-----------------
 path.data and path.logs :
 
 For macOS .tar.gz, Linux .tar.gz, and Windows .zip installations, Elasticsearch writes data and logs 

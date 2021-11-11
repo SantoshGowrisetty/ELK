@@ -1,4 +1,5 @@
 #we can install and use kibana plugins such as 'sense' to work with our ES cluster or
+
 #we can use 'KIBANA>DEV TOOLS"
 #Open browser and access kibana "localhost:5601" [assuming elasticsearch and kibana services are running]
 

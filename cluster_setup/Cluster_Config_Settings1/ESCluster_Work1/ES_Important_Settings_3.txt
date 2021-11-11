@@ -2,6 +2,7 @@ ES Important Settings
 -------------------
 
 Heap settings:
+
 By default, ES tells JVM to use a heap with a minimum and maximum size of 1 GB. 
 Configure heap size to ensure that Elasticsearch has enough heap available.
 
@@ -10,10 +11,12 @@ Xms (minimum heap size)
 Xmx (maximum heap size) 
 
 You should set these two settings to be equal to each other.
+
 The value for these settings depends on the amount of RAM available on your server:
 
 Set Xmx and Xms to no more than 50% of your physical RAM. ES requires memory for purposes other than the JVM heap 
 and it is important to leave space for this. 
+
 For example: 
 -ES uses off-heap buffers for efficient network communication, 
 -relies on the operating system’s filesystem cache for efficient access to files, 
