@@ -35,12 +35,40 @@ PUT /ecommerce
 }
 }
 }
+
+#Deleting Index
+DELETE /ecommerce
+
+#Test if it was deleted, by listing indexes as in #2
 =============================================
+#creating index specifying shards and replicas
+
+#1
+changing settings of already created index
+
+PUT /ecommerce/_settings
+{
+"index":{
+  "number_of_replicas":2,
+  "auto_expand_replicas": false
+}
+}
+
+#creating index with specific number of shards and replicas
+PUT /ecommerce
+{
+  "settings": {
+    "number_of_shards": 1
+    , "number_of_replicas": 1
+  }
+}
+
+---------------------
 #Adding Documents
 5.
 PUT /ecommerce/_doc/1001
 {
-  "name": "Test Frameowrk",
+  "name": "Test Framework",
   "price": "30.00",
   "description": "For processing data",
   "status": "active",
@@ -105,25 +133,5 @@ POST /ecommerce/_doc/1001/_update
 
 #check from discover kibana
 =========================================
-Extras:
-#1
-changing settings of already created index
-
-PUT /ecommerce/_settings
-{
-"index":{
-  "number_of_replicas":2,
-  "auto_expand_replicas": false
-}
-}
-
-#creating index with specific number of shards and replicas
-PUT /ecommerce
-{
-  "settings": {
-    "number_of_shards": 1
-    , "number_of_replicas": 1
-  }
-}
 
 

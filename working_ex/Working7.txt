@@ -1,134 +1,78 @@
-#Creating new index with mappings specifying Analyzer
-Example 1:
-PUT /newdata
-{
-     "mappings": {
-                "properties": {
-             "name": {
-                "type": "text"
-         },
-         "price": {
-           "type": "double"
-         },
-         "description": {
-            "type": "text"
-         },
-         "status": {
-            "type": "text"
-         },
-         "quantity": {
-           "type": "integer"
-         },
-         "categories": {
-            "type": "nested",
-            "properties": {
-              "name": {
-                "type": "text"
-          }
-         }
-        },
-        "tags": {
-           "type": "text",
-           "analyzer": "english"
-         }
-}
-}
-}
+Query examples after ingesting data using logstash
+---------------------------------
+--refer logstash specific folder for instructions to load file
+Queries using Dev tools >
 
-===============
-Example 2:
-PUT /newproducts
+GET /_cat/indices?v
+--
+POST /_sql?format=txt
 {
-     "mappings": {
-       
-          "properties": {
-             "name": {
-                "type": "text"
-         },
-         "price": {
-           "type": "double"
-         },
-         "description": {
-            "type": "text",
-            "analyzer": "standard"
-         },
-         "status": {
-            "type": "text"
-         },
-         "quantity": {
-           "type": "integer"
-         },
-         "categories": {
-            "type": "nested",
-            "properties": {
-              "name": {
-                "type": "text"
-                        },
-           "quantity": {
-              "type":"integer"}
-         }
-        },
-        "tags": {
-           "type": "text",
-           "analyzer": "standard"
-         }
+  "query": "select * from bankdata"
 }
-
-==============
-POST /newproducts/_bulk
-{"index": {"_id":"10"}}
-{"name": "why ES is Awesome","price":"100.00","description":"This book is all about the ES!","status":"active","quantity":12,"categories":[{"name":"Software","quantity":200}],"tags":["ES the search store","programming JAVA"]}
-{"index": {"_id":"11"}}
-{"name": "why logstash","price":"100.00","description":"processing THE LOGS and sending to ES","status":"active","quantity":120,"categories":[{"name":"Book","quantity":20}],"tags":["LOG PROCESSING","BEAT PROCESSING"]}
-{"index": {"_id":"3"}}
-{"name": "why elasticsearch is Awesome","price":"100.00","description":"This book is A book which is all about elasticsearch!","status":"active","quantity":12,"categories":[{"name":"Software"}],"tags":["elasticsearch","programming","SEARCHING INdexes"]}
-==================
-
-#Test Query
-1.
-GET /newproducts/_search
+--
+GET _xpack/sql
 {
-  "query": {
-    "bool": {
-      "should": [{
-        "match": {
-          "name": {
-            "query": "Test Framework"
-                      }
-        }
-      }],
-      "must": [{
-        "match": {
-          "description": {
-            "query": "and",
-            "analyzer": "standard"
-          }
-        }
-      }]
+  "query":"select avg(balance) from bankdata"
+}
+--
+POST /_sql?format=txt
+{
+  "query": "select age,marital from bankdata order by age desc limit 10"
+}
+--
+GET /_sql?format=txt
+{
+  "query": "select * from bankdata",
+  "filter": {
+    "range": {
+      "balance": {
+        "gte": 500,
+        "lte": 1200
+      }
     }
-  }
+  },
+  "fetch_size": 5
 }
-
-2.Due to english analyzer at run time which avoids stop words such as and doesnt show anything"
-GET /newproducts/_search
+--
+GET /_sql?format=txt
 {
-  "query": {
-    "bool": {
-      "should": [{
-        "match": {
-          "name": {
-            "query": "Test Framework"
-                      }
-        }
-      }],
-      "must": [{
-        "match": {
-          "description": {
-            "query": "and",
-            "analyzer": "english"
-          }
-        }
-      }]
+  "query": "select * from bankdata",
+  "filter": {
+    "terms": {
+      "_routing": ["age"]
     }
-  }
+  },
+  "fetch_size": 5
 }
+--
+POST /_sql?format=json
+{
+  "query": "select age,marital from bankdata order by age desc limit 10",
+  "columnar": true
+}
+--
+POST /_sql?format=txt
+{
+  "query": "select age,y,count(*) as count from bankdata where age > ? group by age,y order by count desc",
+  "params": [75]
+  
+}
+--
+POST /_sql/translate
+{
+  "query": "select age,y,count(*) as count from bankdata where age > 75 group by age,y order by count desc"
+}
+--
+
+#using elasticsearch-sql-cli
+$elasticsearch-sql-cli http://c1:9200
+
+sql>select * from bankdata;
+
+
+#running using curl and from command line
+curl -XPOST "http://c1:9200/_sql?format=txt" -H 'Content-Type: application/json' -d'{  "query": "select * from bankdata limit 2"}'
+
+curl -XPUT "http://c1:9200/_sql?format=csv" -H 'Content-Type: application/json' -d'{  "query": "select age,y,count(*) as count from bankdata where age > ? group by age,y order by count desc",  "params": [75]  }' > bankres.csv
+
+

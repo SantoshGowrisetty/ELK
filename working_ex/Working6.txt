@@ -1,38 +1,134 @@
-#If ES running on standalone
-
-#creating backup
-$mkdir ESbckup
-$chown -R elasticsearch:elasticsearch ESbckup
-
-#This directory will be used to store snapshots
-
-#update elasticsearch.yml
-path.repo: ["ESbckup"]
-
-$service elasticsearch restart
-
-#register the repository
-PUT localhost:9200/_snapshot/demobackup
+#Creating new index with mappings specifying Analyzer
+Example 1:
+PUT /newdata
 {
-   "type": "fs",
-   "settings": {
-       "compress": true,
-       "location": "ESbackup"
-    }
+     "mappings": {
+                "properties": {
+             "name": {
+                "type": "text"
+         },
+         "price": {
+           "type": "double"
+         },
+         "description": {
+            "type": "text"
+         },
+         "status": {
+            "type": "text"
+         },
+         "quantity": {
+           "type": "integer"
+         },
+         "categories": {
+            "type": "nested",
+            "properties": {
+              "name": {
+                "type": "text"
+          }
+         }
+        },
+        "tags": {
+           "type": "text",
+           "analyzer": "english"
+         }
+}
+}
 }
 
-GET localhost:9200/_snapshot/_all
+===============
+Example 2:
+PUT /newproducts
+{
+     "mappings": {
+       
+          "properties": {
+             "name": {
+                "type": "text"
+         },
+         "price": {
+           "type": "double"
+         },
+         "description": {
+            "type": "text",
+            "analyzer": "standard"
+         },
+         "status": {
+            "type": "text"
+         },
+         "quantity": {
+           "type": "integer"
+         },
+         "categories": {
+            "type": "nested",
+            "properties": {
+              "name": {
+                "type": "text"
+                        },
+           "quantity": {
+              "type":"integer"}
+         }
+        },
+        "tags": {
+           "type": "text",
+           "analyzer": "standard"
+         }
+}
 
-#create index and a document
+==============
+POST /newproducts/_bulk
+{"index": {"_id":"10"}}
+{"name": "why ES is Awesome","price":"100.00","description":"This book is all about the ES!","status":"active","quantity":12,"categories":[{"name":"Software","quantity":200}],"tags":["ES the search store","programming JAVA"]}
+{"index": {"_id":"11"}}
+{"name": "why logstash","price":"100.00","description":"processing THE LOGS and sending to ES","status":"active","quantity":120,"categories":[{"name":"Book","quantity":20}],"tags":["LOG PROCESSING","BEAT PROCESSING"]}
+{"index": {"_id":"3"}}
+{"name": "why elasticsearch is Awesome","price":"100.00","description":"This book is A book which is all about elasticsearch!","status":"active","quantity":12,"categories":[{"name":"Software"}],"tags":["elasticsearch","programming","SEARCHING INdexes"]}
+==================
 
-#taking a snapshot of ES cluster
-PUT localhost:9200/_snapshot/demo_backup/snaphot-one?wait_for_completion=true
+#Test Query
+1.
+GET /newproducts/_search
+{
+  "query": {
+    "bool": {
+      "should": [{
+        "match": {
+          "name": {
+            "query": "Test Framework"
+                      }
+        }
+      }],
+      "must": [{
+        "match": {
+          "description": {
+            "query": "and",
+            "analyzer": "standard"
+          }
+        }
+      }]
+    }
+  }
+}
 
-#delete index you created
-
-#restore the data from snapshot
-POST localhost:9200/_snapshot/demo_backup/snaphot-one/_restore
-{"indices":"index_name"}
-#
-#CHECK IF DATA IS BACK
-
+2.Due to english analyzer at run time which avoids stop words such as and doesnt show anything"
+GET /newproducts/_search
+{
+  "query": {
+    "bool": {
+      "should": [{
+        "match": {
+          "name": {
+            "query": "Test Framework"
+                      }
+        }
+      }],
+      "must": [{
+        "match": {
+          "description": {
+            "query": "and",
+            "analyzer": "english"
+          }
+        }
+      }]
+    }
+  }
+}

@@ -1,7 +1,9 @@
 #Performing searches
 #sample simple query(with query strings using _search API with q paramter)
 10.
-GET /ecommerce/product/_search?q=cashewnuts
+GET /ecommerce/_doc/_search?q=cashewnuts
+or
+GET /ecommerce/_search?q=cashewnuts
 #sample output
 {
   "took" : 7,
@@ -18,7 +20,7 @@ GET /ecommerce/product/_search?q=cashewnuts
     "hits" : [
       {
         "_index" : "ecommerce",
-        "_type" : "product",
+        "_type" : "_doc",
         "_id" : "1005",
         "_score" : 0.2876821,
         "_source" : {
@@ -43,7 +45,9 @@ GET /ecommerce/product/_search?q=cashewnuts
 =============================
 #
 11.
-GET /ecommerce/product/_search?q=*
+GET /ecommerce/_doc/_search?q=*
+or
+GET /ecommerce/_search?q=*
 #two main properties
 hits: total number of matched results
 max_score: highest score of all matched documents
@@ -67,7 +71,7 @@ _source : contains the document as JSON as it was added to index
     "hits" : [
       {
         "_index" : "ecommerce",
-        "_type" : "product",
+        "_type" : "_doc",
         "_id" : "1001",
         "_score" : 1.0,
         "_source" : {
@@ -90,7 +94,7 @@ _source : contains the document as JSON as it was added to index
       },
       {
         "_index" : "ecommerce",
-        "_type" : "product",
+        "_type" : "_doc",
         "_id" : "1004",
         "_score" : 1.0,
         "_source" : {
@@ -112,7 +116,7 @@ _source : contains the document as JSON as it was added to index
       },
       {
         "_index" : "ecommerce",
-        "_type" : "product",
+        "_type" : "_doc",
         "_id" : "1006",
         "_score" : 1.0,
         "_source" : {
@@ -134,7 +138,7 @@ _source : contains the document as JSON as it was added to index
       },
       {
         "_index" : "ecommerce",
-        "_type" : "product",
+        "_type" : "_doc",
         "_id" : "1005",
         "_score" : 1.0,
         "_source" : {
@@ -155,7 +159,7 @@ _source : contains the document as JSON as it was added to index
       },
       {
         "_index" : "ecommerce",
-        "_type" : "product",
+        "_type" : "_doc",
         "_id" : "1002",
         "_score" : 1.0,
         "_source" : {
@@ -181,7 +185,9 @@ _source : contains the document as JSON as it was added to index
 }
 =====================================
 12.
-GET /ecommerce/product/_search?q=name:Frame*
+GET /ecommerce/_doc/_search?q=name:Frame*
+or
+GET /ecommerce/_search?q=name:Frame*
 
 #Sample output
 {
@@ -199,7 +205,7 @@ GET /ecommerce/product/_search?q=name:Frame*
     "hits" : [
       {
         "_index" : "ecommerce",
-        "_type" : "product",
+        "_type" : "_doc",
         "_id" : "1001",
         "_score" : 1.0,
         "_source" : {
@@ -222,7 +228,7 @@ GET /ecommerce/product/_search?q=name:Frame*
       },
       {
         "_index" : "ecommerce",
-        "_type" : "product",
+        "_type" : "_doc",
         "_id" : "1002",
         "_score" : 1.0,
         "_source" : {
