@@ -89,3 +89,6 @@ GET /cars/_count
 #save the chart: Top Five Manufacturers
 ==========================
 
+Similarly we can ingest Banking data and create an index:
+Download Bank_full.csv from github and rename it,save it  as mentioned in logstash_bankcsv.conf.
+logstash --path.settings /usr/local/logstash -f /usr/local/logstash/conf.d/logstash_bankcsv.conf

@@ -9,16 +9,13 @@ POST /_sql?format=txt
 {
   "query": "select * from bankdata"
 }
---
-GET _xpack/sql
-{
-  "query":"select avg(balance) from bankdata"
-}
+
 --
 POST /_sql?format=txt
 {
   "query": "select age,marital from bankdata order by age desc limit 10"
 }
+
 --
 GET /_sql?format=txt
 {
@@ -33,6 +30,7 @@ GET /_sql?format=txt
   },
   "fetch_size": 5
 }
+
 --
 GET /_sql?format=txt
 {
@@ -44,6 +42,7 @@ GET /_sql?format=txt
   },
   "fetch_size": 5
 }
+
 --
 POST /_sql?format=json
 {

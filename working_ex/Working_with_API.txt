@@ -1,9 +1,21 @@
 #working with API
-GET /_cat/nodes?v
+
 GET /_nodes/_all
 GET /_nodes/_local
 GET /_nodes/_master
-GET /_cat/indices?v
+GET _nodes/stats
+GET _nodes?filter_path=**.mlockall
+GET _nodes/stats/process?filter_path=**.max_file_descriptors
+GET _nodes/hot_threads
+
+
+GET /_cat/allocation?v
+GET /_cat/count?v
+GET /_cat/fielddata?v
+GET /_cat/fielddata?help
+GET /_cat/health?v
+GET _cat/master?v
+GET /_cat/nodes?v
 
 #changing settings for default index
 PUT /.kibana_task_manager/_settings
@@ -14,33 +26,14 @@ PUT /.kibana_task_manager/_settings
 }
 }
 
-#creating a new index with settings
-PUT /newindx/_settings
-{
-"index":{
-  "number_of_replicas":2,
-  "auto_expand_replicas": false
-}
-}
-
-#checking some system settings
-GET _nodes?filter_path=**.mlockall
-GET _nodes/stats/process?filter_path=**.max_file_descriptors
-GET _nodes/hot_threads
-GET _nodes/stats
-GET /_cluster/state?filter_path=metadata.cluster_coordination.last_commit_config
-
 #looking at allocation/shard level information
 #(assuming indexes like ecommerce were created and populated
-# assuming indexes like population were created via logstash ingestion pipeline)
+# assuming indexes like bankdata/population were created via logstash ingestion pipeline)
 
 GET /_cluster/allocation/explain
 GET /_cat/shards/ecommerce?pretty=true
 GET /_cat/shards/.kibana_1?pretty=true
-GET /_cat/shards/ecommerce?pretty=true
 GET /_cat/shards/.kibana_task_manager?pretty=true
-GET /_cat/shards/.kibana?pretty=true
-GET /ecommerce/product/1339
 GET /_cat/shards/population?pretty=true
 
 #commands accepts a query string parameter h which forces only those columns to appear
@@ -113,7 +106,7 @@ shards disk.indices disk.used disk.avail disk.total disk.percent host           
 #quick access to a document count for a data stream, an index, or an entire cluster.
 #The document count only includes live documents, not deleted documents which have not yet been removed by the merge process.
 
-GET /_cat/count/population?v
+GET /_cat/count/bankdata?v
 epoch      timestamp count
 1606334551 20:02:31  466
 
@@ -197,7 +190,7 @@ GET /_cluster/health/ecommerce?level=shards
 }
 
 #similarly
-GET /_cluster/health/population?level=shards
+GET /_cluster/health/bankdata?level=shards
 
 #cat indices API to get the following information for each index in a cluster:
    Shard count
