@@ -1,5 +1,3 @@
-#Creating new index with mappings specifying Analyzer
-Example 1:
 PUT /newdata
 {
      "mappings": {
@@ -35,12 +33,13 @@ PUT /newdata
 }
 }
 
-===============
+GET /newdata
+
 Example 2:
 PUT /newproducts
 {
      "mappings": {
-       
+
           "properties": {
              "name": {
                 "type": "text"
@@ -73,7 +72,7 @@ PUT /newproducts
            "analyzer": "standard"
          }
 }
-
+}}
 ==============
 POST /newproducts/_bulk
 {"index": {"_id":"10"}}

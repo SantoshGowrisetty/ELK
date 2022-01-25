@@ -1,47 +1,20 @@
 #Performing searches
 #sample simple query(with query strings using _search API with q paramter)
 10.
-GET /ecommerce/_doc/_search?q=cashewnuts
-or
 GET /ecommerce/_search?q=cashewnuts
-#sample output
+
+GET /ecommerce/_search 
+
+GET /ecommerce/_search?q=elasticsearch*
+
+GET /ecommerce/_search
 {
-  "took" : 7,
-  "timed_out" : false,
-  "_shards" : {
-    "total" : 5,
-    "successful" : 5,
-    "skipped" : 0,
-    "failed" : 0
-  },
-  "hits" : {
-    "total" : 1,
-    "max_score" : 0.2876821,
-    "hits" : [
-      {
-        "_index" : "ecommerce",
-        "_type" : "_doc",
-        "_id" : "1005",
-        "_score" : 0.2876821,
-        "_source" : {
-          "name" : "cashewnuts",
-          "price" : "100.00",
-          "description" : "spicy cashewnuts",
-          "status" : "active",
-          "quantity" : 120,
-          "categories" : [
-            {
-              "name" : "Food"
-            }
-          ],
-          "tags" : [
-            "snacks"
-          ]
-        }
-      }
-    ]
+  "query": {
+  "match": 
+  {"name": "cashewnuts"}
   }
-}
+  }
+
 =============================
 #
 11.
@@ -55,201 +28,7 @@ nested hits: contains an array of matched documents
 _score: the score ,how well the document matched the searched query
 _source : contains the document as JSON as it was added to index
 
-#sample output
 
-  "took" : 2,
-  "timed_out" : false,
-  "_shards" : {
-    "total" : 5,
-    "successful" : 5,
-    "skipped" : 0,
-    "failed" : 0
-  },
-  "hits" : {
-    "total" : 5,
-    "max_score" : 1.0,
-    "hits" : [
-      {
-        "_index" : "ecommerce",
-        "_type" : "_doc",
-        "_id" : "1001",
-        "_score" : 1.0,
-        "_source" : {
-          "name" : "Test Frameowrk",
-          "price" : 500.0,
-          "description" : "For processing data",
-          "status" : "active",
-          "quantity" : 1,
-          "categories" : [
-            {
-              "name" : "Software"
-            }
-          ],
-          "tags" : [
-            "Test framework",
-            "logstash",
-            "nagios"
-          ]
-        }
-      },
-      {
-        "_index" : "ecommerce",
-        "_type" : "_doc",
-        "_id" : "1004",
-        "_score" : 1.0,
-        "_source" : {
-          "name" : "why ES is Awesome",
-          "price" : "100.00",
-          "description" : "This book is all about ES!",
-          "status" : "active",
-          "quantity" : 12,
-          "categories" : [
-            {
-              "name" : "Software"
-            }
-          ],
-          "tags" : [
-            "ES",
-            "programming"
-          ]
-        }
-      },
-      {
-        "_index" : "ecommerce",
-        "_type" : "_doc",
-        "_id" : "1006",
-        "_score" : 1.0,
-        "_source" : {
-          "name" : "why elasticsearch is Awesome",
-          "price" : "100.00",
-          "description" : "This book is all about elasticsearch!",
-          "status" : "active",
-          "quantity" : 11,
-          "categories" : [
-            {
-              "name" : "Software"
-            }
-          ],
-          "tags" : [
-            "elasticsearch",
-            "programming"
-          ]
-        }
-      },
-      {
-        "_index" : "ecommerce",
-        "_type" : "_doc",
-        "_id" : "1005",
-        "_score" : 1.0,
-        "_source" : {
-          "name" : "cashewnuts",
-          "price" : "100.00",
-          "description" : "spicy cashewnuts",
-          "status" : "active",
-          "quantity" : 120,
-          "categories" : [
-            {
-              "name" : "Food"
-            }
-          ],
-          "tags" : [
-            "snacks"
-          ]
-        }
-      },
-      {
-        "_index" : "ecommerce",
-        "_type" : "_doc",
-        "_id" : "1002",
-        "_score" : 1.0,
-        "_source" : {
-          "name" : "New Frameowrk",
-          "price" : "35.00",
-          "description" : "For processing maps data",
-          "status" : "active",
-          "quantity" : 1,
-          "categories" : [
-            {
-              "name" : "Software"
-            }
-          ],
-          "tags" : [
-            "Test framework",
-            "kibana",
-            "ES"
-          ]
-        }
-      }
-    ]
-  }
-}
 =====================================
-12.
-GET /ecommerce/_doc/_search?q=name:Frame*
-or
-GET /ecommerce/_search?q=name:Frame*
 
-#Sample output
-{
-  "took" : 4,
-  "timed_out" : false,
-  "_shards" : {
-    "total" : 5,
-    "successful" : 5,
-    "skipped" : 0,
-    "failed" : 0
-  },
-  "hits" : {
-    "total" : 2,
-    "max_score" : 1.0,
-    "hits" : [
-      {
-        "_index" : "ecommerce",
-        "_type" : "_doc",
-        "_id" : "1001",
-        "_score" : 1.0,
-        "_source" : {
-          "name" : "Test Frameowrk",
-          "price" : 500.0,
-          "description" : "For processing data",
-          "status" : "active",
-          "quantity" : 1,
-          "categories" : [
-            {
-              "name" : "Software"
-            }
-          ],
-          "tags" : [
-            "Test framework",
-            "logstash",
-            "nagios"
-          ]
-        }
-      },
-      {
-        "_index" : "ecommerce",
-        "_type" : "_doc",
-        "_id" : "1002",
-        "_score" : 1.0,
-        "_source" : {
-          "name" : "New Frameowrk",
-          "price" : "35.00",
-          "description" : "For processing maps data",
-          "status" : "active",
-          "quantity" : 1,
-          "categories" : [
-            {
-              "name" : "Software"
-            }
-          ],
-          "tags" : [
-            "Test framework",
-            "kibana",
-            "ES"
-          ]
-        }
-      }
-    ]
-  }
-}
-========================================
+

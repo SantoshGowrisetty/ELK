@@ -1,7 +1,9 @@
 #Embedding boolean logic in querying
 13.
-GET /ecommerce/_doc/_search?q=name:(cashewnuts AND peanuts)
-GET /ecommerce/_doc/_search?q=name:(cashewnuts OR Framework)
+GET /ecommerce/_search?q=name:(cashewnuts OR peanuts)
+
+GET /ecommerce/_search?q=name:(cashenuts AND "why elasticsearch is Awesome")
+
 #look for score value if value was higher in any case
 GET /ecommerce/_doc/_search?q=(name:(cashewnuts OR Framework) AND status:active)
 
@@ -16,12 +18,19 @@ GET /ecommerce/_doc/_search?q=name:+cashewnuts -peanuts
 #Note** remember default boolean operator is OR
 GET /ecommerce/_doc/_search?q=name:"Test Framework"
 #order of terms does matter when searching using phrase
+
 #ES analyzer is used to search for phrase 
 GET ecommerce/_analyze
 {"analyzer": "standard",
  "text": "Test Framework"}
 
 #this will show what was used by analyzer when tokenizing and list of tokens
+GET ecommerce/_analyze 
+{
+  "analyzer": "stop",
+  "text": "Test the new Framework"
+}
+
 ================================
 
 #Querying using DSL (Domain specific language)
@@ -85,13 +94,3 @@ GET /ecommerce/_doc/_search
     }
   }
 }
-
-==========================================
-#function_score query
-	providing function to modify the score of documents ,returned by a query
-        useful for boosting newly added documents or boosting documents based on popularity
-#boosting query
-	to reduce the score of documents that match
-        positive query: typical query
-        negative query: have lower score and by how much low
-=========================================

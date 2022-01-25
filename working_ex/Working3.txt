@@ -1,22 +1,16 @@
-#Deleting a Document
-#By default its possible deleting a document by ID but you can also delete a document using a plugin
-#'delete by query'
-8.
-DELETE /ecommerce/product/1003
-
 #Performing operations in Batches
 #Using _bulk API expects a single line with action ie create,update or delete
 #It uses '/n' for new lines
 
 POST /ecommerce/_doc/_bulk
-{"index": {"_id":"1004"}}
+{"index": {"_id":"1002"}}
 {"name": "why ES is Awesome","price":"100.00","description":"This book is all about ES!","status":"active","quantity":12,"categories":[{"name":"Software"}],"tags":["ES","programming"]}
-{"index": {"_id":"1005"}}
+{"index": {"_id":"1003"}}
 {"name": "cashewnuts","price":"100.00","description":"spicy cashewnuts","status":"active","quantity":120,"categories":[{"name":"Food"}],"tags":["snacks"]}
-{"index": {"_id":"1006"}}
+{"index": {"_id":"1005"}}
 {"name": "why elasticsearch is Awesome","price":"100.00","description":"This book is all about elasticsearch!","status":"active","quantity":12,"categories":[{"name":"Software"}],"tags":["elasticsearch","programming"]}
 
-PUT /ecommerce/_doc/_bulk
+PUT /ecommerce2/_doc/_bulk
 {"index": {"_id":"711"}}
 {"name": "why ESS is Awesome","price":"100.00","description":"This book is all about EES!","status":"active","quantity":12,"categories":[{"name":"Software"}],"tags":["ES","programming"]}
 {"index": {"_id":"170"}}
@@ -36,46 +30,41 @@ PUT /ecommerce/_doc/_bulk
 {"index": {"_id":"1310"}}
 {"name": "why elasticsearch is Awesome","price":"101.00","description":"This book is all about elasticsearch!","status":"active","quantity":12,"categories":[{"name":"Software"}],"tags":["elasticsearch","programming"]}
 
-POST /ecommerce/_doc/_bulk
-{"delete" : {"_id" : "1"}}
-{"update" : {"_id" : "1006"}}
-{"doc" : {"quantity" : 11}}
+GET /_cat/indices/ecommerce*?v
+GET /_cluster/health/ecommerce2?level=shards
+
+#more operations using bulk
+POST /ecommerce2/_doc/_bulk
+{"delete" : {"_id" : "711"}}
+{"update" : {"_id" : "1310"}}
+{"doc" : {"price" : 102}}
+
+GET ecommerce2/_search
+{
+    "query": {
+        "match_all": {}
+    }
+}
 
 #check from discover kibana if quantity was updated
-#Also check via 
-GET /ecommerce/product/1
-#shows no document with id as 1 was found
-{
-  "_index" : "ecommerce",
-  "_type" : "product",
-  "_id" : "1",
-  "found" : false
-}
 
 #Notes
 #All actions are performed in sequence,so if any action fails, rest will still be processed.
-POST /ecommerce/product/_bulk
-POST /ecommerce/_bulk
+POST /ecommerce2/_bulk
 POST /_bulk
 
 example:
 POST /_bulk
-{"update" : {"_id" : "1006", "_index" : "ecommerce", "_type" : "product"}}
-{"doc" : {"quantity" : 10}}
+{"update" : {"_id" : "1310", "_index" : "ecommerce2"}}
+{"doc" : {"price" : 103}}
 
 ========================
-#Retrieving documents using ID
-
-9.
-GET /ecommerce/product/1006
-_source : shows the document itself
-
-================================
-example
-using routing to shard data on any other field
-PUT ecommerce/_doc/1?routing=user1&refresh=true 
+#using routing to shard data on any other field
+PUT ecommerce2/_doc/1?routing=user1&refresh=true
 {
   "title": "This is a document"
 }
 
-GET my-index-000001/_doc/1?routing=user1
+GET ecommerce2/_doc/1?routing=user1
+
+
