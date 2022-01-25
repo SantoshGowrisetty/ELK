@@ -8,7 +8,10 @@
 #Setup logstash to receive data from a beat ,say filebeat
 #the files described below can be found in 'myconfigs/conf.d/'
 
-#Create following files inside “/etc/logstash/conf.d”
+#when running logstash check if your logstash is in /etc/logstash or in /usr/local/logstash and
+choose the one you prefer and have configured.
+
+#Create following files inside “/usr/local/logstash/conf.d”
 
 #sudo vi fb_pipeline.conf 
 ----------------
@@ -57,7 +60,7 @@ sudo chown -R elk:elk /var/log/logstash
 as per our conf files in '/etc/logstash/conf.d'
 
 #start logstash & 
-[elk@ce4 ~]$ /usr/share/logstash/bin/logstash --path.settings /etc/logstash/ -f /etc/logstash/conf.d/fb_pipeline.conf
+[elk@ce4 ~]$ /usr/local/logstash/bin/logstash --path.settings /usr/local/logstash/ -f /usr/local/logstash/conf.d/fb_pipeline.conf
 
 #on other node setup filebeat to send data to logstash (refer file '' from Beats_Work
 sudo /usr/share/filebeat/bin/filebeat -e -c /etc/filebeat/filebeat.yml -d "publish"

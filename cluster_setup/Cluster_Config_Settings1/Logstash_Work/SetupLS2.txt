@@ -17,7 +17,7 @@ logstash pipeline
 #if created 'conf.d' in 'logstash path' proceed, if not, create the directory
 
 create a 'logstash-simple.conf' file
-vi /etc/logstash/conf.d/logstash-simple.conf
+vi /usr/local/logstash/conf.d/logstash-simple.conf
 
 #add details to configure input and output
 input {
@@ -69,7 +69,7 @@ testing logstash
 #note** logstash -e 'input {stdin {}} output {stdout{}}'
 
 ##sample output
-root@u1:~# /usr/share/logstash/bin/logstash --path.settings /etc/logstash/ -e 'input {stdin {}} output {stdout{}}'
+root@u1:~# /usr/local/logstash/bin/logstash --path.settings /usr/local/logstash/ -e 'input {stdin {}} output {stdout{}}'
 Sending Logstash logs to /var/log/logstash which is now configured via log4j2.properties
 [2019-09-19T23:34:23,705][WARN ][logstash.config.source.multilocal] Ignoring the 'pipelines.yml' file because modules or command line options are specified
 [2019-09-19T23:34:23,725][INFO ][logstash.runner          ] Starting Logstash {"logstash.version"=>"6.8.3"}

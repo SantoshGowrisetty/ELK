@@ -10,6 +10,8 @@
 #you can initially try with one pipeline
 
 These files are found in cluster_setup/Logstash_Work/myconfigs/conf.d
+#when running logstash check if your logstash is in /etc/logstash or in /usr/local/logstash and
+choose the one you prefer and have configured.
 
 newpipeline.conf
 input {
@@ -66,8 +68,8 @@ output {
 }
 
 #start pipelines
-/usr/share/logstash/bin/logstash --path.settings /etc/logstash -f /etc/logstash/conf.d/newpipeline.conf --path.data /var/lib/logstash_temp/temp1
-/usr/share/logstash/bin/logstash --path.settings /etc/logstash -f /etc/logstash/conf.d/newpipeline2.conf --path.data /var/lib/logstash_temp/temp2
+/usr/local/logstash/bin/logstash --path.settings /usr/local/logstash -f /usr/local/logstash/conf.d/newpipeline.conf --path.data /var/lib/logstash_temp/temp1
+/usr/share/logstash/bin/logstash --path.settings /usr/local/logstash -f /usr/local/logstash/conf.d/newpipeline2.conf --path.data /var/lib/logstash_temp/temp2
 
 #check if listener on designed port is active
 #send some data 
