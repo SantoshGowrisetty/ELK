@@ -1,5 +1,5 @@
-#Setup atleast 3 nodes (say hostnames:c1,c2,c3 (centos7.x)
-#Make sure they can ping each other, Java is installated,ssh each other (passwordless) for root user and dedicated user(say nif)
+#Setup atleast 3 nodes (say hostnames:n1,n2,n3 (centos7.x)
+#Make sure they can ping each other, Java is installated,ssh each other (passwordless) for root user and dedicated user(say elk)
 #Make sure firewalld is turned off /allow connection to each other
 
 ======================
@@ -8,7 +8,7 @@
 
 #Download the following(from elasticsearch web) on node
 
-[nif@c1 ~]$ ls /home/nif/Downloads/
+[elk@n1 ~]$ ls /home/elk/Downloads/
 elasticsearch-6.8.13.tar.gz              kibana-7.8.0-linux-x86_64.tar.gz
 elasticsearch-7.8.0-linux-x86_64.tar.gz  logstash-6.8.13.tar.gz
 kibana-6.8.13-linux-x86_64.tar.gz        logstash-7.8.0.tar.gz
@@ -22,8 +22,8 @@ sudo su
 cd /usr/local
 
 #untar elasticsearch and kibana for now
-tar -xvf /home/nif/Downloads/elasticsearch-7.8.0-linux-x86_64.tar.gz
-tar -xvf /home/nif/Downloads/kibana-7.8.0-linux-x86_64.tar.gz
+tar -xvf /home/elk/Downloads/elasticsearch-7.8.0-linux-x86_64.tar.gz
+tar -xvf /home/elk/Downloads/kibana-7.8.0-linux-x86_64.tar.gz
 
 #create softlinks pointing to desired version to work on (for ex: to elasticsearch-6.8 and kibana-6.8)
 ln -s elasticsearch-7.8.0 elasticsearch
@@ -31,17 +31,17 @@ ln -s kibana-7.8.0-linux-x86-64 kibana
 
 #Note** later we can unlink and make our links pointing to newer versions
 
-#change ownership to nif user
-chown -R nif:nif elasticsearch*
-chown -R nif:nif kibana*
+#change ownership to elk user
+chown -R elk:elk elasticsearch*
+chown -R elk:elk kibana*
 
 #now our path to elasticsearch is /usr/local/elasticsearch
 #now our path to kibana is /usr/local/kibana
 
-#change back to nif user
-su - nif
+#change back to elk user
+su - elk
 
-#update .bashrc for nif user
+#update .bashrc for elk user
 vi .bashrc
 
 export ELASTICSEARCH_HOME=/usr/local/elasticsearch
@@ -58,8 +58,12 @@ exist on each node is given under ImpConfigs folder)
 #To setup cluster
 update /usr/local/elasticsearch/config/elasticsearch.yml in each node
 
+Note**
+Making 1 node as master eligible and 2 nodes as data eligible, below configs should be good
+To have all 3 nodes as master and data eligible, refer configs in 'MyConfigsES' folder.
+
 ####ON MASTER NODE#####
-#on node1(c1)
+#on node1(n1)
 
 cluster.name: mycluster
 node.name: master
@@ -85,7 +89,7 @@ cluster.initial_master_nodes:
   - master
 
 ######ON DATANODES#####
-#on node2(c2)
+#on node2(n2)
 cluster.name: mycluster
 node.name: data1
 
@@ -120,64 +124,64 @@ The reference files ie 'limits.conf' and 'sysctl.conf' are provided in this path
 https://github.com/ajaykuma/elk/tree/master/cluster_setup
 
 Copy these to respective locations (you may have to use root/sudo)
-Node1: (while being on c1 and assuming the git repo was downloaded and unzipped here)
+Node1: (while being on n1 and assuming the git repo was downloaded and unzipped here)
 sudo cp <unzipped-folder-of-git-repo>/cluster_setup/limits.conf /etc/security/
 sudo cp <unzipped-folder-of-git-repo>/cluster_setup/sysctl.conf /etc/   
 
-From Node1 to Node2: (while being on Node1 i.e. c1)
-c1$sudo scp <unzipped-folder-of-git-repo>/cluster_setup/limits.conf nif@c2:/etc/security/
-c1$sudo scp <unzipped-folder-of-git-repo>/cluster_setup/sysctl.conf nif@c2:/etc/ 
+From Node1 to Node2: (while being on Node1 i.e. n1)
+n1$sudo scp <unzipped-folder-of-git-repo>/cluster_setup/limits.conf elk@n2:/etc/security/
+n1$sudo scp <unzipped-folder-of-git-repo>/cluster_setup/sysctl.conf elk@n2:/etc/ 
 
 --if above steps don't work--
 --then copy to /tmp first
 
-c1$sudo scp <unzipped-folder-of-git-repo>/cluster_setup/limits.conf nif@c2:/tmp
-c1$sudo scp <unzipped-folder-of-git-repo>/cluster_setup/sysctl.conf nif@c2:/tmp
+n1$sudo scp <unzipped-folder-of-git-repo>/cluster_setup/limits.conf elk@n2:/tmp
+n1$sudo scp <unzipped-folder-of-git-repo>/cluster_setup/sysctl.conf elk@n2:/tmp
 
-ssh c2
-on c2 now:
+ssh n2
+on n2 now:
 sudo cp /tmp/limits.conf /etc/security/
 sudo cp /tmp/sysctl.conf /etc/
 
 <logout>
-<back to c1>
+<back to n1>
 
-From Node1 to Node3: (while being on Node1 i.e. c1)
-c1$sudo scp <unzipped-folder-of-git-repo>/cluster_setup/limits.conf nif@c3:/etc/security/
-c1$sudo scp <unzipped-folder-of-git-repo>/cluster_setup/sysctl.conf nif@c3:/etc/ 
+From Node1 to Node3: (while being on Node1 i.e. n1)
+n1$sudo scp <unzipped-folder-of-git-repo>/cluster_setup/limits.conf elk@n3:/etc/security/
+n1$sudo scp <unzipped-folder-of-git-repo>/cluster_setup/sysctl.conf elk@n3:/etc/ 
 
 --if above steps don't work--
 --then copy to /tmp first
 
-c1$sudo scp <unzipped-folder-of-git-repo>/cluster_setup/limits.conf nif@c3:/tmp
-c1$sudo scp <unzipped-folder-of-git-repo>/cluster_setup/sysctl.conf nif@c3:/tmp
+n1$sudo scp <unzipped-folder-of-git-repo>/cluster_setup/limits.conf elk@n3:/tmp
+n1$sudo scp <unzipped-folder-of-git-repo>/cluster_setup/sysctl.conf elk@n3:/tmp
 
-ssh c3
-on c3 now:
+ssh n3
+on n3 now:
 sudo cp /tmp/limits.conf /etc/security/
 sudo cp /tmp/sysctl.conf /etc/
 
 <logout>
-<back to c1>
+<back to n1>
 
 <-------------RESTART YOUR MACHINES--------------------->
 
 
 on node1:
-[nif@c1 ~]$elasticsearch<enter>
+[elk@n1 ~]$elasticsearch<enter>
 
 on node2:
-[nif@c2 ~]$elasticsearch<enter>
+[elk@n2 ~]$elasticsearch<enter>
 
 on node3:
-[nif@c3 ~]$elasticsearch<enter>
+[elk@n3 ~]$elasticsearch<enter>
 
 
 #Test the status
-$curl c1:9200/_cat/nodes
-$curl c1:9200/_cat/nodes?v
+$curl n1:9200/_cat/nodes
+$curl n1:9200/_cat/nodes?v
 
-[nif@c1 ~]$ curl c1:9200/_cat/nodes?v
+[elk@n1 ~]$ curl n1:9200/_cat/nodes?v
 ip             heap.percent ram.percent cpu load_1m load_5m load_15m node.role master name
 192.168.251.49           17          43   5    0.12    0.36     0.23 di        -      data2
 192.168.251.47           15          43   1    0.40    0.50     0.30 mi        *      master
