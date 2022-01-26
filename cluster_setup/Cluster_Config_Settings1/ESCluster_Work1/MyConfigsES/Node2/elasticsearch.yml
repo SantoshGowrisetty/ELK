@@ -58,7 +58,7 @@ bootstrap.memory_lock: true
 #
 #network.host: 192.168.0.1
 #updated v1
-network.host: c2
+network.host: n2
 #
 # Set a custom port for HTTP:
 #
@@ -67,7 +67,7 @@ network.host: c2
 http.port: 9200
 #added v1
 transport.port: 9300
-node.master: false
+node.master: true
 node.data: true
 # For more information, consult the network module documentation.
 #
@@ -76,11 +76,11 @@ node.data: true
 # Pass an initial list of hosts to perform discovery when new node is started:
 # The default list of hosts is ["127.0.0.1", "[::1]"]
 #
-discovery.zen.ping.unicast.hosts: ["c1"]
+discovery.zen.ping.unicast.hosts: ["n1","n2"]
 #
 # Prevent the "split brain" by configuring the majority of nodes (total number of master-eligible nodes / 2 + 1):
 #
-discovery.zen.minimum_master_nodes: 1
+discovery.zen.minimum_master_nodes: 2
 #
 # For more information, consult the zen discovery module documentation.
 #
