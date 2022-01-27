@@ -1,0 +1,682 @@
+GET /_cat/nodes?v
+GET /_cat/nodes?v
+GET _cat/indices?v
+
+DELETE /newpro*
+
+
+PUT /ecommerce
+{
+}
+
+
+DELETE /ecommerce
+
+PUT /ecommerce
+{
+  "settings": {
+    
+    "number_of_replicas": 2
+    , "auto_expand_replicas": false
+  }
+}
+
+PUT /ecommerce/_settings
+{
+"index":{
+  "number_of_replicas":2,
+  "auto_expand_replicas": false
+}
+}
+
+GET /_cat/indices/ecommerce?v
+
+PUT /ecommerce/_settings
+{
+"index":{
+  "number_of_shards":3
+}
+}
+
+GET /_cat/indices/ecommerce?v
+GET /_cat/shards/ecommerce?v
+
+GET /ecommerce
+
+PUT /ecommerce2
+{
+     "mappings": {
+                "properties": {
+             "name": {
+                "type": "text"
+         },
+         "price": {
+           "type": "double"
+         },
+         "description": {
+            "type": "text"
+         },
+         "status": {
+            "type": "text"
+         },
+         "quantity": {
+           "type": "integer"
+         },
+         "categories": {
+            "type": "nested",
+            "properties": {
+              "name": {
+                "type": "text"
+          }
+         }
+        },
+        "tags": {
+           "type": "text"
+         }
+
+}
+}
+}
+
+GET /ecommerce
+GET /ecommerce2
+
+GET /_cat/indices?v
+GET /_cat/shards
+
+PUT ecommerce3
+{
+}
+
+GET ecommerce3
+
+GET /_cat/shards/ecommerce3?v
+DELETE ecommerce3
+
+GET /_cat/indices/ecommer*?v
+GET /_cat/indices?help
+
+GET /_cat/shards/ecommerce?h=index,shard,prirep,dc,state,node,unassigned.reason?v
+
+GET /_cat/shards/ecommerce2?h=index,shard,prirep,dc,node,segments.count
+
+GET /_cat/indices?bytes=b&s=store.size:desc&v
+
+GET /_cat/indices?help
+
+GET /_cat/indices?s=store.size:desc&format=json&v
+
+GET /_cat/indices/ecommerce?v
+
+POST /ecommerce/_doc/1001
+{
+  "name": "Test Frameowrk",
+  "price": "30.00",
+  "description": "For processing data",
+  "status": "active",
+  "quantity": 1,
+  "categories": [
+    {"name": "Software"}],
+    "tags": ["Test framework","logstash","nagios"]
+}
+
+GET ecommerce/_search
+{
+    "query": {
+        "match_all": {}
+    }
+}
+
+
+PUT /ecommerce/_doc/1001
+{
+  "name": "Test Framework"
+}
+
+GET ecommerce/_search
+{
+    "query": {
+        "match_all": {}
+    }
+}
+
+
+DELETE /ecommerce/_doc/1001
+
+PUT /ecommerce/_doc/1001
+{
+  "name": "Test Framework",
+  "price": "30.00",
+  "description": "For processing data",
+  "status": "active",
+  "quantity": 1,
+  "categories": [
+    {"name": "Software"}],
+    "tags": ["Test framework","logstash","nagios"]
+}
+
+GET ecommerce/_search
+{
+    "query": {
+        "match_all": {}
+    }
+}
+
+
+POST /ecommerce/_doc/1001/_update
+{
+  "doc": {
+    "price": 500.00
+  }
+}
+
+POST /ecommerce/_update/1001/
+{
+  "doc": {
+    "price": 501.00
+  }
+}
+
+PUT /ecommerce/_doc/1001
+{
+  "name": "Test Framework",
+  "price": "300.00",
+  "description": "For processing data",
+  "status": "active",
+  "quantity": 1,
+  "categories": [
+    {"name": "Software"}],
+    "tags": ["Test framework","logstash","nagios"]
+}
+
+
+PUT /ecommerce/_doc/1004
+{
+  "name": "Test ",
+  "price": "30.00",
+  "description": "Ingesting data",
+  "status": "active",
+  "quantity": 1,
+  "categories": [
+    {"name": "components"}],
+    "tags": ["metricbeat","logstash","filebeat"]
+}
+
+GET /_cat/nodes?v
+GET /_nodes/_all
+GET /_nodes/_local
+GET /_nodes/_master?format=json
+GET /_nodes/master:true
+
+POST /ecommerce/_doc/_bulk
+{"index": {"_id":"1002"}}
+{"name": "why ES is Awesome","price":"100.00","description":"This book is all about ES!","status":"active","quantity":12,"categories":[{"name":"Software"}],"tags":["ES","programming"]}
+{"index": {"_id":"1003"}}
+{"name": "cashewnuts","price":"100.00","description":"spicy cashewnuts","status":"active","quantity":120,"categories":[{"name":"Food"}],"tags":["snacks"]}
+{"index": {"_id":"1005"}}
+{"name": "why elasticsearch is Awesome","price":"100.00","description":"This book is all about elasticsearch!","status":"active","quantity":12,"categories":[{"name":"Software"}],"tags":["elasticsearch","programming"]}
+
+GET /_cat/indices/ecommerce*?v
+
+GET ecommerce2/_search
+{
+    "query": {
+        "match_all": {}
+    }
+}
+
+PUT /ecommerce2/_bulk
+{"index": {"_id":"711"}}
+{"name": "why ESS is Awesome","price":"100.00","description":"This book is all about EES!","status":"active","quantity":12,"categories":[{"name":"Software"}],"tags":["ES","programming"]}
+{"index": {"_id":"170"}}
+{"name": "cashewnuts","price":"100.00","description":"spicy cashewnuts","status":"active","quantity":120,"categories":[{"name":"Food"}],"tags":["snacks"]}
+{"index": {"_id":"1370"}}
+{"name": "why elasticsearch is Awesome","price":"101.00","description":"This book is all about elasticsearch!","status":"active","quantity":12,"categories":[{"name":"Software"}],"tags":["elasticsearch","programming"]}
+{"index": {"_id":"1297"}}
+{"name": "why elasticsearch is Awesome","price":"101.00","description":"This book is all about elasticsearch!","status":"active","quantity":12,"categories":[{"name":"Software"}],"tags":["elasticsearch","programming"]}
+{"index": {"_id":"173"}}
+{"name": "why elasticsearch is Awesome","price":"101.00","description":"This book is all about elasticsearch!","status":"active","quantity":12,"categories":[{"name":"Software"}],"tags":["elasticsearch","programming"]}
+{"index": {"_id":"18"}}
+{"name": "why elasticsearch is Awesome","price":"101.00","description":"This book is all about elasticsearch!","status":"active","quantity":12,"categories":[{"name":"Software"}],"tags":["elasticsearch","programming"]}
+{"index": {"_id":"309"}}
+{"name": "why elasticsearch is Awesome","price":"101.00","description":"This book is all about elasticsearch!","status":"active","quantity":12,"categories":[{"name":"Software"}],"tags":["elasticsearch","programming"]}
+{"index": {"_id":"1339"}}
+{"name": "why elasticsearch is Awesome","price":"101.00","description":"This book is all about elasticsearch!","status":"active","quantity":12,"categories":[{"name":"Software"}],"tags":["elasticsearch","programming"]}
+{"index": {"_id":"1310"}}
+{"name": "why elasticsearch is Awesome","price":"101.00","description":"This book is all about elasticsearch!","status":"active","quantity":12,"categories":[{"name":"Software"}],"tags":["elasticsearch","programming"]}
+
+GET /_cluster/health/ecommerce2?level=shards
+
+POST /ecommerce2/_doc/_bulk
+{"delete" : {"_id" : "711"}}
+{"update" : {"_id" : "1310"}}
+{"doc" : {"price" : 102}}
+
+GET ecommerce2/_search
+{
+    "query": {
+        "match_all": {}
+    }
+}
+
+POST /_bulk
+{"update" : {"_id" : "1310", "_index" : "ecommerce2"}}
+{"doc" : {"price" : 103}}
+
+PUT ecommerce2/_doc/1?routing=user1&refresh=true
+{
+  "title": "This is a document"
+}
+
+GET ecommerce2/_doc/1?routing=user1
+
+#querying
+GET /ecommerce2/_search?q=book
+
+#GET /ecommerce3/_search?q= _all
+
+GET /ecommerce/_search?q=elasticsearch*
+
+GET /ecommerce/_search
+{
+  "query": {
+  "match": 
+  {"name": "cashewnuts"}
+  }
+  }
+  
+GET /ecommerce/_search?q=*
+
+GET /ecommerce3/_search?q=cashewnuts
+
+GET /ecommerce3/_search?q=name:(cashewnuts OR peanuts)
+
+GET /ecommerce/_search?q=name:(cashenuts AND "why elasticsearch is Awesome")
+
+GET /ecommerce/_doc/_search?q=(name:(cashewnuts OR Framework) AND status:active)
+
+GET /ecommerce3/_search?q=name:+cashewnuts -peanuts
+
+GET /ecommerce3/_search?q=name:"Test Framework"
+
+GET ecommerce3/_search?q=*&size=5&from=2
+
+GET ecommerce3/_search?q=name:Frame*
+
+POST _analyze
+{
+  "analyzer": "stop",
+  "text": "hey this is test"
+}
+
+POST _analyze
+{
+  "analyzer": "analyzer",
+  "text": "hey this is test"
+}
+
+PUT ecommerce4
+{
+  "settings": {
+    "analysis": {
+      "analyzer": {
+        "my_english_analyzer": {
+          "type": "standard",
+          "max_token_length": 4,
+          "stopwords": "_english_"
+        }
+      }
+    }
+  }
+}
+
+POST ecommerce4/_analyze
+{
+  "analyzer": "my_english_analyzer",
+  "text": "this is awesome playful smart and tokenization"
+}
+
+GET ecommerce3/_analyze
+{"analyzer": "standard",
+ "text": "Test Framework"}
+
+GET ecommerce/_analyze 
+{
+  "analyzer": "stop",
+  "text": "Test the new Framework"
+}
+
+GET /ecommerce3/_search
+{
+  "query": {
+    "bool": {
+      "must": [
+        {"match": {"name": "cashewnuts"}}
+        ]
+    }
+  }
+}
+
+GET /ecommerce3/_search
+{
+  "query": {
+    "bool": {
+      "must": [
+        {"match": {"name": "cashewnuts"}}
+        ],
+      "must_not": [
+        {"match": {"name": "Test Framework"}}
+        ]
+    }
+  }
+}
+
+GET /ecommerce3/_search
+{
+  "query": {
+    "bool": {
+      "must": [
+        {"match": {"name": "cashew*"}}
+        ],
+      "should": [
+        {"match": {"name": "cashewmuts"}}
+        ]
+    }
+  }
+}
+
+PUT /newdata
+{
+     "mappings": {
+                "properties": {
+             "name": {
+                "type": "text"
+         },
+         "price": {
+           "type": "double"
+         },
+         "description": {
+            "type": "text"
+         },
+         "status": {
+            "type": "text"
+         },
+         "quantity": {
+           "type": "integer"
+         },
+         "categories": {
+            "type": "nested",
+            "properties": {
+              "name": {
+                "type": "text"
+          }
+         }
+        },
+        "tags": {
+           "type": "text",
+           "analyzer": "english"
+         }
+}
+}
+}
+
+GET /newdata
+
+PUT /newproducts
+{
+     "mappings": {
+
+          "properties": {
+             "name": {
+                "type": "text"
+         },
+         "price": {
+           "type": "double"
+         },
+         "description": {
+            "type": "text",
+            "analyzer": "standard"
+         },
+         "status": {
+            "type": "text"
+         },
+         "quantity": {
+           "type": "integer"
+         },
+         "categories": {
+            "type": "nested",
+            "properties": {
+              "name": {
+                "type": "text"
+                        },
+           "quantity": {
+              "type":"integer"}
+         }
+        },
+        "tags": {
+           "type": "text",
+           "analyzer": "standard"
+         }
+}
+}}
+
+POST /newproducts/_bulk
+{"index": {"_id":"10"}}
+{"name": "why ES is Awesome","price":"100.00","description":"This book is all about the ES!","status":"active","quantity":12,"categories":[{"name":"Software","quantity":200}],"tags":["ES the search store","programming JAVA"]}
+{"index": {"_id":"11"}}
+{"name": "why logstash","price":"100.00","description":"processing THE LOGS and sending to ES","status":"active","quantity":120,"categories":[{"name":"Book","quantity":20}],"tags":["LOG PROCESSING","BEAT PROCESSING"]}
+{"index": {"_id":"3"}}
+{"name": "why elasticsearch is Awesome","price":"100.00","description":"This book is A book which is all about elasticsearch!","status":"active","quantity":12,"categories":[{"name":"Software"}],"tags":["elasticsearch","programming","SEARCHING INdexes"]}
+
+GET /newproducts/_search
+{
+  "query": {
+    "bool": {
+      "should": [{
+        "match": {
+          "name": {
+            "query": "Test Framework"
+                      }
+        }
+      }],
+      "must": [{
+        "match": {
+          "description": {
+            "query": "and",
+            "analyzer": "standard"
+          }
+        }
+      }]
+    }
+  }
+}
+
+GET /newproducts/_search
+{
+  "query": {
+    "bool": {
+      "should": [{
+        "match": {
+          "name": {
+            "query": "Test Framework"
+                      }
+        }
+      }],
+      "must": [{
+        "match": {
+          "description": {
+            "query": "and",
+            "analyzer": "english"
+          }
+        }
+      }]
+    }
+  }
+}
+
+DELETE bankdata
+
+PUT /bankdata
+{
+  "settings": {
+    
+    "number_of_replicas": 2
+    , "auto_expand_replicas": false,
+    "number_of_shards": 2
+  }
+}
+
+GET /_cat/indices/bankdata?v
+GET bankdata/_search
+{
+    "query": {
+        "match_all": {}
+    }
+}
+
+GET /_cat/shards/bankdata?v
+#querying bankdata index
+
+POST /_sql?format=txt
+{
+  "query": "select * from bankdata"
+}
+
+POST /_sql?format=txt
+{
+  "query": "select * from bankdata"
+}
+
+POST /_sql?format=txt
+{
+  "query": "select age,marital from bankdata order by age desc limit 10"
+}
+
+POST /_sql?format=txt
+{
+  "query": "select avg(balance) as avg_balance from bankdata  order by avg_balance desc limit 10"
+}
+
+GET /_sql?format=txt
+{
+  "query": "select * from bankdata",
+  "filter": {
+    "range": {
+      "balance": {
+        "gte": 500,
+        "lte": 1200
+      }
+    }
+  },
+  "fetch_size": 5
+}
+
+GET /_sql?format=txt
+{
+  "query": "select * from bankdata",
+  "filter": {
+    "terms": {
+      "_routing": ["age"]
+    }
+  },
+  "fetch_size": 5
+}
+
+POST /_sql?format=json
+{
+  "query": "select age,marital from bankdata order by age desc limit 10",
+  "columnar": true
+}
+
+GET /bankdata/_search
+{
+  "sort": [
+    {"age": {"order": "asc"}},
+    {"balance": {"order": "desc"}},
+    "_score"],
+    "query": {
+      "term": {
+        "age": {
+          "value": "75"
+        }
+      }
+    }
+}
+
+GET /bankdata/_search
+{
+  "query": {
+      "term": {
+        "age": {
+          "value": "75"
+        }
+      }
+    },
+  "sort": [
+    {"balance": {"order": "asc",
+    "mode": "avg"}}
+  ]
+}
+
+  
+GET /_nodes/_all
+GET /_nodes/_local
+GET /_nodes/_master
+GET _nodes/stats
+GET _nodes/hot_threads
+
+GET /_cat/thread_pool/search?v&h=node_name,name,active,rejected,completed
+
+GET /_cat/allocation?v
+GET /_cat/count?v
+GET /_cat/fielddata?v
+GET /_cat/fielddata?help
+GET /_cat/health?v
+GET _cat/master?v
+GET /_cat/nodes?v
+
+GET /_cluster/state?filter_path=metadata.cluster_coordination.last_commit_config
+
+GET /_cluster/health
+
+GET /_cat/indices?bytes=b&s=store.size:desc&v
+GET /_cat/indices?s=store.size:desc&format=json&v
+
+GET /_cat/allocation?v
+
+GET /_cat/indices/bankdata?s=store.size:desc&v
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
