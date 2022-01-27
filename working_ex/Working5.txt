@@ -19,6 +19,40 @@ GET /ecommerce/_doc/_search?q=name:+cashewnuts -peanuts
 GET /ecommerce/_doc/_search?q=name:"Test Framework"
 #order of terms does matter when searching using phrase
 
+#Analyzer examples
+POST _analyze
+{
+  "analyzer": "stop",
+  "text": "hey this is test"
+}
+
+POST _analyze
+{
+  "analyzer": "analyzer",
+  "text": "hey this is test"
+}
+
+PUT ecommerce4
+{
+  "settings": {
+    "analysis": {
+      "analyzer": {
+        "my_english_analyzer": {
+          "type": "standard",
+          "max_token_length": 4,
+          "stopwords": "_english_"
+        }
+      }
+    }
+  }
+}
+
+POST ecommerce4/_analyze
+{
+  "analyzer": "my_english_analyzer",
+  "text": "this is awesome playful smart and tokenization"
+}
+
 #ES analyzer is used to search for phrase 
 GET ecommerce/_analyze
 {"analyzer": "standard",
