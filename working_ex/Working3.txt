@@ -67,4 +67,95 @@ PUT ecommerce2/_doc/1?routing=user1&refresh=true
 
 GET ecommerce2/_doc/1?routing=user1
 
+===================
+#creating index with multiple shards and replicas
+PUT /ecommerce3
+{
+  "settings": {
+    
+    "number_of_replicas": 2
+    , "auto_expand_replicas": false,
+    "number_of_shards": 2
+  }
+}
+
+#check 
+GET /_cat/indices/ecommerce3?v
+GET /_cat/shards/ecommerce3?v
+
+GET ecommerce3/_search
+{
+    "query": {
+        "match_all": {}
+    }
+}
+
+POST /ecommerce3/_doc/_bulk
+{"index": {"_id":"1002"}}
+{"name": "why ES is Awesome","price":"100.00","description":"This book is all about ES!","status":"active","quantity":12,"categories":[{"name":"Software"}],"tags":["ES","programming"]}
+{"index": {"_id":"1003"}}
+{"name": "cashewnuts","price":"100.00","description":"spicy cashewnuts","status":"active","quantity":120,"categories":[{"name":"Food"}],"tags":["snacks"]}
+{"index": {"_id":"1005"}}
+{"name": "why elasticsearch is Awesome","price":"100.00","description":"This book is all about elasticsearch!","status":"active","quantity":12,"categories":[{"name":"Software"}],"tags":["elasticsearch","programming"]}
+
+GET ecommerce3/_doc/1002
+
+PUT /ecommerce3/_bulk
+{"index": {"_id":"712"}}
+{"name": "why ESS is Awesome","price":"100.00","description":"This book is all about EES!","status":"active","quantity":12,"categories":[{"name":"Software"}],"tags":["ES","programming"]}
+{"index": {"_id":"171"}}
+{"name": "cashewnuts","price":"100.00","description":"spicy cashewnuts","status":"active","quantity":120,"categories":[{"name":"Food"}],"tags":["snacks"]}
+{"index": {"_id":"13710"}}
+{"name": "why elasticsearch is Awesome","price":"101.00","description":"This book is all about elasticsearch!","status":"active","quantity":12,"categories":[{"name":"Software"}],"tags":["elasticsearch","programming"]}
+{"index": {"_id":"12917"}}
+{"name": "why elasticsearch is Awesome","price":"101.00","description":"This book is all about elasticsearch!","status":"active","quantity":12,"categories":[{"name":"Software"}],"tags":["elasticsearch","programming"]}
+{"index": {"_id":"1731"}}
+{"name": "why elasticsearch is Awesome","price":"101.00","description":"This book is all about elasticsearch!","status":"active","quantity":12,"categories":[{"name":"Software"}],"tags":["elasticsearch","programming"]}
+{"index": {"_id":"118"}}
+{"name": "why elasticsearch is Awesome","price":"101.00","description":"This book is all about elasticsearch!","status":"active","quantity":12,"categories":[{"name":"Software"}],"tags":["elasticsearch","programming"]}
+{"index": {"_id":"3019"}}
+{"name": "why elasticsearch is Awesome","price":"101.00","description":"This book is all about elasticsearch!","status":"active","quantity":12,"categories":[{"name":"Software"}],"tags":["elasticsearch","programming"]}
+{"index": {"_id":"13319"}}
+{"name": "why elasticsearch is Awesome","price":"101.00","description":"This book is all about elasticsearch!","status":"active","quantity":12,"categories":[{"name":"Software"}],"tags":["elasticsearch","programming"]}
+{"index": {"_id":"131011"}}
+{"name": "why elasticsearch is Awesome","price":"101.00","description":"This book is all about elasticsearch!","status":"active","quantity":12,"categories":[{"name":"Software"}],"tags":["elasticsearch","programming"]}
+
+GET /_cluster/health/ecommerce3?level=shards
+
+#bulk multiple operations
+POST /ecommerce3/_doc/_bulk
+{"delete" : {"_id" : "71299"}}
+{"update" : {"_id" : "1310110"}}
+{"doc" : {"price" : 1020}}
+
+#looking at document wise shard allocation
+GET ecommerce3/_search
+{
+    "explain": true,
+    "query": {
+        "match_all": {}
+    }
+}
+
+#routing data into shards based on a different field (other than _id)
+PUT ecommerce3/_doc/101?routing=title&refresh=true
+{
+  "title": "This is a document"
+}
+
+PUT ecommerce3/_doc/102?routing=title&refresh=true
+{
+  "title": "This is a document"
+}
+
+PUT ecommerce3/_doc/103?routing=title&refresh=true
+{
+  "title": "This is a document"
+}
+
+#retrieving data using routing
+GET ecommerce3/_doc/101?routing=title
+
+#check shard allocation and if documents increase in one particular shard
+GET /_cat/shards/ecommerce3?v
 
