@@ -3,7 +3,7 @@ $sudo vim /usr/local/kibana/config/kibana.yml
 #Uncomment following lines:
 server.port: 5601
 server.host: "ipaddress of master node of es cluster"
-elasticsearch.hosts: "http://ipaddressof masternode:9200"
+elasticsearch.hosts: "http://<ipaddressofmasternodeORnodeswhereESisrunning>:9200"
 
 #start kibana <type>
 $kibana
@@ -15,7 +15,7 @@ $service kibana status
 #optional 
 
 connect to kibana console
-http://hostname:5601
+http://<hostname-where-kibana-is-running>:5601
 
 >Dev tools
 
