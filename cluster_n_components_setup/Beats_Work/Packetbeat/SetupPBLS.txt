@@ -1,0 +1,18 @@
+#Setting up beats(packetbeat) to send information to logstash > then to ES
+#Setting up beats(packetbeat) to send information directly to ES
+
+$apt-get install packetbeat
+
+$vi /etc/packetbeat/packetbeat.yml
+
+#edit the contents 
+
+#remember to download packetbeat.yml and relevant templates
+
+$cd /usr/share/packetbeat/bin
+
+$./packetbeat -e -c /etc/packetbeat/packetbeat.yml -d "publish"
+
+#refer to Beats folder in this git link to see a customized packetbeat.yml
+
+--to be updated
