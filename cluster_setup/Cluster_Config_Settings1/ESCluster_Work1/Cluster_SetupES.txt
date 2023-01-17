@@ -4,14 +4,17 @@
 
 ======================
 #Steps for node1,node2,node3
-#kibana unpacking can be done on only one node
+#kibana unpacking can be done on one of the node
 
 #Download the following(from elasticsearch web) on node
 
 [elk@n1 ~]$ ls /home/elk/Downloads/
-elasticsearch-6.8.13.tar.gz              kibana-7.8.0-linux-x86_64.tar.gz
-elasticsearch-7.8.0-linux-x86_64.tar.gz  logstash-6.8.13.tar.gz
-kibana-6.8.13-linux-x86_64.tar.gz        logstash-7.8.0.tar.gz
+elasticsearch-7.8.0-linux-x86_64.tar.gz
+elasticsearch-8.4.0-linux-x86_64.tar.gz
+kibana-7.8.0-linux-x86_64.tar.gz
+kibana-8.4.0-linux-x86_64.tar.gz
+logstash-7.8.0.tar.gz
+logstash-8.4.0-linux-x86_64.tar.gz
 
 #note kibana steps can be done only on one machine..
 
@@ -25,7 +28,7 @@ cd /usr/local
 tar -xvf /home/elk/Downloads/elasticsearch-7.8.0-linux-x86_64.tar.gz
 tar -xvf /home/elk/Downloads/kibana-7.8.0-linux-x86_64.tar.gz
 
-#create softlinks pointing to desired version to work on (for ex: to elasticsearch-6.8 and kibana-6.8)
+#create softlinks pointing to desired version to work on (for ex: to elasticsearch-7.8 and kibana-7.8)
 ln -s elasticsearch-7.8.0 elasticsearch
 ln -s kibana-7.8.0-linux-x86-64 kibana
 
@@ -161,6 +164,7 @@ on n3 now:
 sudo cp /tmp/limits.conf /etc/security/
 sudo cp /tmp/sysctl.conf /etc/
 
+Note** Remember to change the username from elk to <your username> in the limits.conf file
 <logout>
 <back to n1>
 
