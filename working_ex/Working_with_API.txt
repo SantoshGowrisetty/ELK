@@ -6,9 +6,36 @@ GET /_nodes/_master
 GET _nodes/stats
 GET _nodes?filter_path=**.mlockall
 GET _nodes/stats/process?filter_path=**.max_file_descriptors
+
+#This API yields a breakdown of the hot threads on each selected node in the cluster. 
+#The output is plain text with a breakdown of each node’s top hot threads.
+#
+
+<node_id>
+    (Optional, string) Comma-separated list of node IDs or names used to limit returned information. 
+
+#Query parameters
+
+ignore_idle_threads
+    (Optional, Boolean) If true, known idle threads (e.g. waiting in a socket select, or to get a 
+    task from an empty queue) are filtered out. Defaults to true. 
+interval
+    (Optional, time units) The interval to do the second sampling of threads. Defaults to 500ms. 
+snapshots
+    (Optional, integer) Number of samples of thread stacktrace. Defaults to 10. 
+threads
+    (Optional, integer) Specifies the number of hot threads to provide information for. Defaults to 3. 
+master_timeout
+    (Optional, time units) Period to wait for a connection to the master node. 
+    If no response is received before the timeout expires, the request fails and returns an error. Defaults to 30s. 
+timeout
+    (Optional, time units) Period to wait for a response. If no response is received before the timeout expires, 
+    the request fails and returns an error. Defaults to 30s. 
+type
+    (Optional, string) The type to sample. Available options are block, cpu, and wait. Defaults to cpu. 
+
+
 GET _nodes/hot_threads
-
-
 GET /_cat/allocation?v
 GET /_cat/count?v
 GET /_cat/fielddata?v

@@ -26,11 +26,6 @@ POST _analyze
   "text": "hey this is test"
 }
 
-POST _analyze
-{
-  "analyzer": "analyzer",
-  "text": "hey this is test"
-}
 
 PUT ecommerce4
 {
@@ -96,11 +91,27 @@ GET /ecommerce/_doc/_search
     }
   }
 }
+
+GET /ecommerce/_search
+{
+  "query": {
+    "bool": {
+      "must": [
+        {"match": {"name": "cashewnuts"}}
+        ],
+      "must_not": [
+        {"match": {"name": "Test Framework"}}
+        ]
+    }
+  }
+}
+
+
 ========================================
 #using bool with should clauses(to increase relevancy scores)
 #where should clause behave like logical operators
 16.
-GET /ecommerce/_doc/_search
+GET /ecommerce/_search
 {
   "query": {
     "bool": {
@@ -115,7 +126,7 @@ GET /ecommerce/_doc/_search
 }
 
 Another example
-GET /ecommerce/_doc/_search
+GET /ecommerce/_search
 {
   "query": {
     "bool": {

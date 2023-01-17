@@ -34,6 +34,4 @@ GET /bankdata/_search
   ]  
 }
 
-#Aggregations
---to be updated
 
