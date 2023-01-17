@@ -3,10 +3,10 @@
 #update /etc/hosts
 $sudo vi /etc/hosts 
 #in my case [ 127.0.0.1 localhost 
-#              10.0.2.15 u1]
+#              10.0.2.15 c1]
 #update /etc/hostname
 $sudo vi /etc/hostname
-#in my case [u1]
+#in my case [c1]
 
 #Download oracle jdk 1.8 and setup java
 #in my case --Java path is -- /usr/lib/jvm/jdk1.8.0_221/
@@ -23,7 +23,7 @@ $echo JAVA_HOME
 
 Reference Links:
 https://www.elastic.co/downloads/past-releases#elasticsearch
-https://www.elastic.co/downloads/past-releases/elasticsearch-6-8-2
+https://www.elastic.co/downloads/past-releases/elasticsearch-7-8-0
 
 
 #download Elasticsearch followed by public signing key:

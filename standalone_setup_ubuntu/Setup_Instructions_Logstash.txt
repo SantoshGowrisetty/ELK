@@ -2,7 +2,7 @@
 $sudo apt-get install logstash
 #Here we are going to generate SSL certificate key to secure log transfer from file beat client. Modify the “hosts” file before creating #the SSL certificate.
 #make sure /etc/hosts is updated as 'ipaddress elk-server'
-#in my case /etc/hosts contains [10.0.2.15  u1]
+#in my case /etc/hosts contains [10.0.2.15  c1]
 $cd /etc/logstash
 $mkdir ssl
 #Generate SSL certificate. Change elk-server to your server name in the below command.
