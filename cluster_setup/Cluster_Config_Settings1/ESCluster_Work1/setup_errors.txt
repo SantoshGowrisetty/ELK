@@ -25,8 +25,8 @@ ulimit -n 65535
 or edit /etc/security/limits.conf
 For example:
 elasticsearch     soft   nofile  100000
-elk               soft   nofile  100000
-elk               hard   nofile  100000
+hdu               soft   nofile  100000
+hdu               hard   nofile  100000
 
 ===================
 ERROR: [1] 
@@ -46,8 +46,8 @@ The RPM and Debian packages will configure this setting automatically.
  No further configuration is required.
 
 forex:
-[elk@ce1 ~]$ sudo vi /etc/sysctl.conf 
-[elk@ce1 ~]$ sudo sysctl -p
+[hdu@c1 ~]$ sudo vi /etc/sysctl.conf 
+[hdu@c1 ~]$ sudo sysctl -p
 vm.max_map_count = 262144
 
 =================
