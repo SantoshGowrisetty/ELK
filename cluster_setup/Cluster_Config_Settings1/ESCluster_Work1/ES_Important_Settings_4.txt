@@ -3,14 +3,15 @@ ES Important Settings
 
 Important to consider:
 
-Disable swapping
-Increase file descriptors
-Ensure sufficient virtual memory
-Ensure sufficient threads
-JVM DNS cache settings
-Temporary directory not mounted with noexec
+#Disable swapping
+#Increase file descriptors
+#Ensure sufficient virtual memory
+#Ensure sufficient threads
+#JVM DNS cache settings
+
+#Temporary directory not mounted with noexec
 ------------
-Disable swapping:
+#Disable swapping:
 Swapping is very bad for performance, for node stability, and should be avoided at all costs. 
 It can cause garbage collections to last for minutes instead of milliseconds and can cause nodes to respond slowly 
 or even to disconnect from the cluster. 
@@ -68,7 +69,7 @@ export ES_JAVA_OPTS="$ES_JAVA_OPTS -Djna.tmpdir=<path>"
 ./bin/elasticsearch
 
 --------------
-File Descriptors:
+#File Descriptors:
 Elasticsearch uses a lot of file descriptors or file handles. Running out of file descriptors 
 can be disastrous and will most probably lead to data loss. 
 Make sure to increase the limit on the number of open files descriptors for the user 
@@ -84,7 +85,7 @@ You can check the max_file_descriptors configured for each node using the Nodes 
 GET _nodes/stats/process?filter_path=**.max_file_descriptors
 
 ------------
-Virtual memory:
+#Virtual memory:
 Elasticsearch uses a mmapfs directory by default to store its indices. 
 The default operating system limits on mmap counts is likely to be too low, 
 which may result in out of memory exceptions.
@@ -95,7 +96,7 @@ To set this value permanently, update the vm.max_map_count setting in /etc/sysct
 To verify after rebooting, run sysctl vm.max_map_count.
 
 ---------------
-No of threads:
+#No of threads:
 
 Elasticsearch uses a number of thread pools for different types of operations. 
 It is important that it is able to create new threads whenever needed. 
@@ -108,7 +109,7 @@ before starting Elasticsearch,
 or by setting nproc to 4096 in /etc/security/limits.conf.
 
 -----------------
-DNS cache settings
+#DNS cache settings
 
 Elasticsearch runs with a security manager in place. 
 With a security manager in place, the JVM defaults to caching positive hostname resolutions indefinitely 
@@ -127,7 +128,7 @@ in the Java security policy are ignored by Elasticsearch unless you remove the s
 es.networkaddress.cache.ttl and es.networkaddress.cache.negative.ttl.
 
 -----------------
-JNA temporary directory not mounted with noexec (Applicable to linux only)
+#JNA temporary directory not mounted with noexec (Applicable to linux only)
 
 Elasticsearch uses the Java Native Access (JNA) library for executing some platform-dependent native code. 
 On Linux, the native code backing this library is extracted at runtime from the JNA archive. 
@@ -152,7 +153,7 @@ messages indicating that it is because JNA is not available.
 If you are seeing such error messages, you must remount the temporary directory used for JNA to not be mounted with noexec.
 
 ------------------
-Note** on Bootstrap Checks
+#Note** on Bootstrap Checks
 
 These bootstrap checks inspect a variety of Elasticsearch and system settings and compare them to values 
 that are safe for the operation of Elasticsearch. If Elasticsearch is in development mode, 

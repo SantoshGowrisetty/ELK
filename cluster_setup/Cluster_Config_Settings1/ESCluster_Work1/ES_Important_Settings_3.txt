@@ -1,7 +1,7 @@
 ES Important Settings
 -------------------
 
-Heap settings:
+#Heap settings:
 
 By default, ES tells JVM to use a heap with a minimum and maximum size of 1 GB. 
 Configure heap size to ensure that Elasticsearch has enough heap available.
@@ -55,7 +55,7 @@ ES_JAVA_OPTS="-Xms2g -Xmx2g" ./bin/elasticsearch
 ES_JAVA_OPTS="-Xms4000m -Xmx4000m" ./bin/elasticsearch 
 
 --------------
-JVM heap dump path
+#JVM heap dump path
 By default, ES configures the JVM to dump the heap on out of memory exceptions to the default data directory
 (this is /var/lib/elasticsearch for the RPM and Debian package distributions, 
 and the data directory under the root of the ES home for the tar and zip archive distributions). 
@@ -67,7 +67,7 @@ If you specify a fixed filename instead of a directory, the file must not exist 
 heap dump on an out of memory exception, otherwise the heap dump will fail.
 
 -------------
-GC logging
+#GC logging
 By default, Elasticsearch enables GC logs. These are configured in jvm.options and output to the same default location
 as the Elasticsearch logs. The default configuration rotates the logs every 64 MB and can consume up to 2 GB of disk space.
 
@@ -93,7 +93,7 @@ creating $ES_HOME/config/jvm.options.d/gc.options with some sample options:
 -Xlog:gc*,gc+age=trace,safepoint:file=/opt/my-app/gc.log:utctime,pid,tags:filecount=32,filesize=64m
 
 -------------
-Temp Directory:
+#Temp Directory:
 
 By default, ES uses a private temporary directory that the startup script creates immediately 
 below the system temporary directory.
@@ -114,7 +114,7 @@ This directory should have permissions set so that only the user that Elasticsea
 Then set the $ES_TMPDIR environment variable to point to it before starting Elasticsearch.
 
 -------------
-JVM fatal error logs
+#JVM fatal error logs
 
 By default, Elasticsearch configures the JVM to write fatal error logs to the default logging directory 
 (this is /var/log/elasticsearch for the RPM and Debian package distributions, and the logs directory 

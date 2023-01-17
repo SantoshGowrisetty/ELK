@@ -1,5 +1,5 @@
 Note** 
-on Bootstrap Checks
+#on Bootstrap Checks
 
 Development vs. production mode
 By default, ES binds to loopback addresses for HTTP and transport (internal) communication. 
@@ -13,13 +13,13 @@ via http.host
 and transport.host
 
 --------
-Single-node discovery
+#Single-node discovery
 We recognize that some users need to bind transport to an external interface for testing their usage of the transport client.
 For this situation, we provide the discovery type single-node (configure it by setting discovery.type to single-node);
 in this situation, a node will elect itself master and will not join a cluster with any other node.
 
 ---------
-Forcing the bootstrap checks
+#Forcing the bootstrap checks
 
 If you are running a single node in production, it is possible to evade the bootstrap checks 
 (either by not binding transport to an external interface, or by binding transport to an external interface 
@@ -30,7 +30,7 @@ es.enforce.bootstrap.checks to true (set this in Setting JVM options, or by addi
  to the environment variable ES_JAVA_OPTS). 
 
 ----------
-Heap Size check
+#Heap Size check
 
 If a JVM is started with unequal initial and max heap size, it can be prone to pauses as the JVM heap 
 is resized during system usage. To avoid these resize pauses, it’s best to start the JVM with the initial heap size 
@@ -41,7 +41,7 @@ If the initial heap size is not equal to the maximum heap size, after a resize i
 that all of the JVM heap is locked in memory. To pass the heap size check, you must configure the heap size.
 
 ------------
-File descriptor check
+#File descriptor check
 File descriptors are a Unix construct for tracking open "files". 
 In Unix though, everything is a file. For example, "files" could be a physical file, a virtual file (e.g., /proc/loadavg),
  or network sockets. 
@@ -50,7 +50,7 @@ Elasticsearch requires lots of file descriptors (e.g., every shard is composed o
  plus connections to other nodes, etc.). 
 
 ---------------
-Memory lock check
+#Memory lock check
 
 When the JVM does a major garbage collection it touches every page of the heap. 
 If any of those pages are swapped out to disk they will have to be swapped back in to memory. 
@@ -65,7 +65,7 @@ The memory lock check verifies that if the bootstrap.memory_lock setting is enab
 that the JVM was successfully able to lock the heap. 
 ------------------
 
-Maximum number of threads check
+#Maximum number of threads check
 
 Elasticsearch executes requests by breaking the request down into stages and handing those stages off 
 to different thread pool executors. 
@@ -82,7 +82,7 @@ allow the Elasticsearch process the ability to create at least 4096 threads.
 This can be done via /etc/security/limits.conf using the nproc setting 
 ------------------
 
-Max file size check
+#Max file size check
 
 The segment files that are the components of individual shards and the translog generations 
 that are components of the translog can get large (exceeding multiple gigabytes). 
@@ -98,7 +98,7 @@ This can be done via /etc/security/limits.conf using the fsize setting to unlimi
 
 ---------------------
 
-Maximum size virtual memory check
+#Maximum size virtual memory check
 
 Elasticsearch and Lucene use mmap to great effect to map portions of an index into the Elasticsearch address space.
 This keeps certain index data off the JVM heap but in memory for blazing fast access. 

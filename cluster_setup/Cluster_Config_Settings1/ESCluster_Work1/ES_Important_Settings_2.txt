@@ -1,7 +1,7 @@
 ES Important Settings
 -------------------
 
-For node discovery and master node election:
+#For node discovery and master node election:
 
 edit under discovery section (v7.8)
 discovery.seed_hosts
@@ -28,8 +28,10 @@ use an alternative hosts provider to find their addresses dynamically.
 
 Alternative hosts provider:
 EC2 hosts provider
+
 The EC2 discovery plugin adds a hosts provider that uses the AWS API to find a list of seed nodes.
 https://www.elastic.co/guide/en/elasticsearch/plugins/7.8/discovery-ec2.html
+
 AWS API: https://github.com/aws/aws-sdk-java
 
 Azure Classic hosts provider
@@ -41,7 +43,7 @@ The GCE discovery plugin adds a hosts provider that uses the GCE API find a list
 https://www.elastic.co/guide/en/elasticsearch/plugins/7.8/discovery-gce.html
 
 --------------
-cluster.initial_master_nodes or discovery.zen.minimum_master_nodes
+#cluster.initial_master_nodes or discovery.zen.minimum_master_nodes
 
 when starting a new ES cluster bootstrapping step determines the set of master-eligible nodes whose votes are counted
 in the very first election. 
