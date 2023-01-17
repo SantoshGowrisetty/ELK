@@ -1,7 +1,7 @@
 #we can install and use kibana plugins such as 'sense' to work with our ES cluster or
 
 #we can use 'KIBANA>DEV TOOLS"
-#Open browser and access kibana "localhost:5601" [assuming elasticsearch and kibana services are running]
+#Open browser and access kibana "http://<hostname>:5601" [assuming elasticsearch and kibana services are running]
 
 #checking nodes to begin
 GET /_cat/nodes?v
@@ -14,8 +14,7 @@ GET /_cat/indices?v
 
 #Result on right shows various information about our cluster such as number of private shards, replicas,
 #shards, documents, deleted documents etc..
-#By default ES created one replica for indexes and since we have one node, that one replica can't be alloca#allocated for high availability.Once a new node is added and replica is allocated to another node,the
-#health status will turn to green.
+#By default ES created one replica for indexes , If index is created with more replicas ,replicas are allocated to other nodes
 #Note** we dont need to add index before adding a document to it.By adding a document, ES creates index
 #with default settings automatically.
 
@@ -35,7 +34,9 @@ We can find the same ,
 
 #check if index is created by looking for 'acknowledged:true' on right panel
 #if tried using curl command and if index exists:
-[3~curl -XPUT "http://n1:9200/ecommerce" -H 'Content-Type: application/json' -d'{}'
+
+--curl -XPUT "http://c1:9200/ecommerce" -H 'Content-Type: application/json' -d'{}'
+
 {"error":{"root_cause":[{"type":"resource_already_exists_exception","reason":"index [ecommerce/FU8FJZC8TK6NyFw-I3Zl_g] already exists","index_uuid":"FU8FJZC8TK6NyFw-I3Zl_g","index":"ecommerce"}],"type":"resource_already_exists_exception","reason":"index [ecommerce/FU8FJZC8TK6NyFw-I3Zl_g] already exists","index_uuid":"FU8FJZC8TK6NyFw-I3Zl_g","index":"ecommerce"},"status":400}
 
 ---------------------------------

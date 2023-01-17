@@ -34,11 +34,11 @@ results in error:
     "root_cause" : [
       {
         "type" : "illegal_argument_exception",
-        "reason" : "Can't update non dynamic settings [[index.number_of_shards]] for open indices [[ecommerce/woiDb4aYQ9mBoi9MhhhinQ]]"
+        "reason" : "Can't update non dynamic settings [[index.number_of_shards]] for open indices [[ecommerce/cwpQleCHR8S0v29GptKQWA]]"
       }
     ],
     "type" : "illegal_argument_exception",
-    "reason" : "Can't update non dynamic settings [[index.number_of_shards]] for open indices [[ecommerce/woiDb4aYQ9mBoi9MhhhinQ]]"
+    "reason" : "Can't update non dynamic settings [[index.number_of_shards]] for open indices [[ecommerce/cwpQleCHR8S0v29GptKQWA]]"
   },
   "status" : 400
 }
@@ -124,7 +124,7 @@ GET /_cat/indices?s=store.size:desc&format=json&v
 5.
 PUT /ecommerce/_doc/1001
 {
-  "name": "Test Frameowrk",
+  "name": "Test Framework",
   "price": "30.00",
   "description": "For processing data",
   "status": "active",
