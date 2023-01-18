@@ -2,9 +2,6 @@ GET /_cat/nodes?v
 GET /_cat/nodes?v
 GET _cat/indices?v
 
-DELETE /newpro*
-
-
 PUT /ecommerce
 {
 }
@@ -37,6 +34,7 @@ PUT /ecommerce/_settings
   "number_of_shards":3
 }
 }
+
 
 GET /_cat/indices/ecommerce?v
 GET /_cat/shards/ecommerce?v
@@ -110,7 +108,7 @@ GET /_cat/indices/ecommerce?v
 
 POST /ecommerce/_doc/1001
 {
-  "name": "Test Frameowrk",
+  "name": "Test Framework",
   "price": "30.00",
   "description": "For processing data",
   "status": "active",
@@ -208,7 +206,7 @@ GET /_nodes/_local
 GET /_nodes/_master?format=json
 GET /_nodes/master:true
 
-POST /ecommerce/_doc/_bulk
+POST /ecommerce/_bulk
 {"index": {"_id":"1002"}}
 {"name": "why ES is Awesome","price":"100.00","description":"This book is all about ES!","status":"active","quantity":12,"categories":[{"name":"Software"}],"tags":["ES","programming"]}
 {"index": {"_id":"1003"}}
@@ -218,14 +216,14 @@ POST /ecommerce/_doc/_bulk
 
 GET /_cat/indices/ecommerce*?v
 
-GET ecommerce2/_search
+GET ecommerce/_search
 {
     "query": {
         "match_all": {}
     }
 }
 
-PUT /ecommerce2/_bulk
+PUT /ecommerce/_bulk
 {"index": {"_id":"711"}}
 {"name": "why ESS is Awesome","price":"100.00","description":"This book is all about EES!","status":"active","quantity":12,"categories":[{"name":"Software"}],"tags":["ES","programming"]}
 {"index": {"_id":"170"}}
@@ -252,7 +250,7 @@ POST /ecommerce2/_doc/_bulk
 {"update" : {"_id" : "1310"}}
 {"doc" : {"price" : 102}}
 
-GET ecommerce2/_search
+GET ecommerce/_search
 {
     "query": {
         "match_all": {}
@@ -260,18 +258,18 @@ GET ecommerce2/_search
 }
 
 POST /_bulk
-{"update" : {"_id" : "1310", "_index" : "ecommerce2"}}
+{"update" : {"_id" : "1310", "_index" : "ecommerce"}}
 {"doc" : {"price" : 103}}
 
-PUT ecommerce2/_doc/1?routing=user1&refresh=true
+PUT ecommerce/_doc/1?routing=user1&refresh=true
 {
   "title": "This is a document"
 }
 
-GET ecommerce2/_doc/1?routing=user1
+GET ecommerce/_doc/1?routing=user1
 
 #querying
-GET /ecommerce2/_search?q=book
+GET /ecommerce/_search?q=book
 
 #GET /ecommerce3/_search?q= _all
 
