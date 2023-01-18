@@ -70,7 +70,7 @@ $mkdir conf.d
 --start editing files as per your requirement
 
 --to run logstash
-logstash --path.settings /usr/local/logstash /usr/local/logstash/conf.d/logstash-xxxx.conf
+logstash --path.settings /usr/local/logstash -f /usr/local/logstash/conf.d/logstash_simple.conf
 
 --look into files in 'MyConfigsLS' for better understanding
 

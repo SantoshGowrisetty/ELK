@@ -1,0 +1,20 @@
+#Setting up a ES on a single node, however 3 instances running on different ports
+
+--create a directory 'cluster-configs' in location, say /usr/local
+--copy the configs from <gitpath/cluster-configs' into /usr/local/cluster-configs
+--notice the changes in elasticsearch.yml in Node1, Node2 & Node3
+--copy sysctl.conf and limits.conf from <gitpath/cluster_n_components_setup/Cluster_Config_Settings1/ESCluster_Work1/
+
+Start instances of Elasticsearch
+ES_PATH_CONF=/usr/local/cluster-configs/Node1 elasticsearch
+ES_PATH_CONF=/usr/local/cluster-configs/Node2 elasticsearch
+ES_PATH_CONF=/usr/local/cluster-configs/Node3 elasticsearch
+
+--verify if cluster with 3 instances of ES is started
+curl localhost:9200/_cat/nodes?v
+OR
+curl localhost:9201/_cat/nodes?v
+OR
+curl localhost:9202/_cat/nodes?v
+
+
