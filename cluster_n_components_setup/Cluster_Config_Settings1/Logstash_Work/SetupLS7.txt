@@ -1,7 +1,0 @@
-#paths may have changed, read through and recheck in git 
-#conf files exist in MyConfigsLS
-
->> MyConfigsLS/conf.d/ex_pipeline.conf
-
-#change paths according to your setup
-
