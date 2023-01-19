@@ -69,6 +69,16 @@ http.port: 9200
 transport.port: 9300
 node.master: true
 node.data: true
+#node.voting_only: true
+node.ingest: false
+search.remote.connect: false
+#node.remote_cluster_client: false
+node.transform: false
+node.ml : false
+
+#node.role: ["master","data"]
+
+#
 # For more information, consult the network module documentation.
 #
 # --------------------------------- Discovery ----------------------------------
@@ -104,3 +114,6 @@ cluster.initial_master_nodes:
 # Require explicit names when deleting indices:
 #
 #action.destructive_requires_name: true
+#------------------------------------Monitoring & Security---------------
+#xpack.security.enabled: false
+#xpack.monitoring.collection.enabled: false
