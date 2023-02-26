@@ -147,7 +147,7 @@ setup.kibana:
 #-------------------------- Elasticsearch output ------------------------------
 output.elasticsearch:
   # Array of hosts to connect to.
-  hosts: ["ce1:9200","ce2:9200","ce3:9200"]
+  hosts: ["c1:9200","c2:9200","c3:9200"]
 
   # Enabled ilm (beta) to use index lifecycle management instead daily indices.
   #ilm.enabled: false

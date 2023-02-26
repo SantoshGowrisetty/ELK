@@ -1,6 +1,8 @@
 To perform a rolling upgrade to 7.17.8:
 
-When you shut down a data node, the allocation process waits for index.unassigned.node_left.delayed_timeout (by default, one minute) before starting to replicate the shards on that node to other nodes in the cluster
+When you shut down a data node, the allocation process waits for 
+index.unassigned.node_left.delayed_timeout (by default, one minute) 
+before starting to replicate the shards on that node to other nodes in the cluster
 --disable allocation of replicas
 
 PUT _cluster/settings
@@ -11,7 +13,8 @@ PUT _cluster/settings
 }
 
 Stop non-essential indexing and perform a synced flush. (Optional)
-While you can continue indexing during the upgrade, shard recovery is much faster if you temporarily stop non-essential indexing and perform a synced-flush.
+While you can continue indexing during the upgrade, 
+shard recovery is much faster if you temporarily stop non-essential indexing and perform a synced-flush.
 
 POST _flush/synced
 
@@ -27,7 +30,8 @@ kill $(cat pid)
 
 --upgrade the node by updating ES_PATH to new version
 
-Use the elasticsearch-plugin script to install the upgraded version of each installed Elasticsearch plugin.
+Use the elasticsearch-plugin script to install the upgraded version of each installed Elasticsearch
+ plugin.
 
 start upgraded node..
 
