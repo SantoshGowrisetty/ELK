@@ -131,3 +131,55 @@ GET /newproducts/_search
     }
   }
 }
+
+--using different analyzer
+PUT /german_example
+{
+  "settings": {
+    "analysis": {
+      "filter": {
+        "german_stop": {
+          "type":       "stop",
+          "stopwords":  "_german_" 
+        },
+        "german_keywords": {
+          "type":       "keyword_marker",
+          "keywords":   ["Beispiel"] 
+        },
+        "german_stemmer": {
+          "type":       "stemmer",
+          "language":   "light_german"
+        }
+      },
+      "analyzer": {
+        "rebuilt_german": {
+          "tokenizer":  "standard",
+          "filter": [
+            "lowercase",
+            "german_stop",
+            "german_keywords",
+            "german_normalization",
+            "german_stemmer"
+          ]
+        }
+      }
+    }
+  }
+}
+
+POST _analyze
+{
+  "analyzer": "german",
+  "text": "ich spreche deutsche jetzt kaufenhaus"
+}
+
+GET /german_example
+POST german_example/_bulk
+{"index": {"_id":"10"}}
+{"name": "ES ist neue","price":"100.00","description":"In diesem Buch dreht sich alles um ES!","status":"active","quantity":12,"categories":[{"name":"Software","quantity":200}],"tags":["ES the search store","programming JAVA"]}
+{"index": {"_id":"11"}}
+{"name": "warum elast","price":"100.00","description":"Verarbeitung der PROTOKOLLE und Übermittlung an ES","status":"active","quantity":120,"categories":[{"name":"Book","quantity":20}],"tags":["LOG PROCESSING","BEAT PROCESSING"]}
+{"index": {"_id":"3"}}
+{"name": "ES ist toll","price":"100.00","description":"Dieses Buch ist ein Buch, in dem sich alles um Elasticsearch drehth!","status":"active","quantity":12,"categories":[{"name":"Software"}],"tags":["elasticsearch","programming","SEARCHING INdexes"]}
+
+--Test
