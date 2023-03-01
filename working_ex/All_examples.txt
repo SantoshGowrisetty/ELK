@@ -94,16 +94,6 @@ DELETE ecommerce3
 GET /_cat/indices/ecommer*?v
 GET /_cat/indices?help
 
-GET /_cat/shards/ecommerce?h=index,shard,prirep,dc,state,node,unassigned.reason?v
-
-GET /_cat/shards/ecommerce2?h=index,shard,prirep,dc,node,segments.count
-
-GET /_cat/indices?bytes=b&s=store.size:desc&v
-
-GET /_cat/indices?help
-
-GET /_cat/indices?s=store.size:desc&format=json&v
-
 GET /_cat/indices/ecommerce?v
 
 POST /ecommerce/_doc/1001
@@ -644,8 +634,15 @@ GET /_cat/allocation?v
 
 GET /_cat/indices/bankdata?s=store.size:desc&v
 
+GET /_cat/shards/ecommerce?h=index,shard,prirep,dc,state,node,unassigned.reason?v
 
+GET /_cat/shards/ecommerce2?h=index,shard,prirep,dc,node,segments.count
 
+GET /_cat/indices?bytes=b&s=store.size:desc&v
+
+GET /_cat/indices?help
+
+GET /_cat/indices?s=store.size:desc&format=json&v
 
 
 
