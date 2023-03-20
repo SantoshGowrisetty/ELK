@@ -120,3 +120,29 @@ curl -u elastic:F-8rbJG2Vgwe0Gt+nrpj -XGET "https://127.0.0.1:9200/_cat/nodes?v"
 Here -k to allow insecure connection i.e. without cert
 curl --cacert /usr/local/elasticsearch/config/certs/http_ca.crt https://localhost:9200 -u elastic:I5B*8vJ76Wwe8BF0bnQ0
 
+=============
+--disabling security in ES and Kibana
+stop ES and Kibana
+Disable all security related settings or set them to false in ES & kibana
+mv the 'certs' directory and '*.keystore'to a different location
+restart both 
+check
+
+============
+--setting up multinode simulated cluster on single node
+hdu@ajay-mjtj:/usr/local$ mkdir cluster-configs/Node1
+hdu@ajay-mjtj:/usr/local$ mkdir cluster-configs/Node2
+hdu@ajay-mjtj:/usr/local$ mkdir cluster-configs/Node3
+hdu@ajay-mjtj:/usr/local$ cp elasticsearch/config/jvm.options cluster-configs/Node1/
+hdu@ajay-mjtj:/usr/local$ cp elasticsearch/config/jvm.options cluster-configs/Node2/
+hdu@ajay-mjtj:/usr/local$ cp elasticsearch/config/jvm.options cluster-configs/Node3/
+hdu@ajay-mjtj:/usr/local$ cp elasticsearch/config/log4j2.properties cluster-configs/Node1/
+hdu@ajay-mjtj:/usr/local$ cp elasticsearch/config/log4j2.properties cluster-configs/Node2/
+hdu@ajay-mjtj:/usr/local$ cp elasticsearch/config/log4j2.properties cluster-configs/Node3/
+hdu@ajay-mjtj:/usr/local$ cp elasticsearch/config/elasticsearch.yml cluster-configs/Node1/
+hdu@ajay-mjtj:/usr/local$ cp elasticsearch/config/elasticsearch.yml cluster-configs/Node2/
+hdu@ajay-mjtj:/usr/local$ cp elasticsearch/config/elasticsearch.yml cluster-configs/Node3/
+
+edit elasticsearch.yml to accomodate a cluster
+
+
