@@ -1,0 +1,122 @@
+v8.5
+----
+================
+--Local Setup
+After untaring, look into following paths
+ls /usr/local/elasticsearch/config
+--no certs as of in the beginning
+ls /usr/local/elasticsearch/data
+--no data folder
+ls /usr/local/elasticsearch/logs
+--nothing in logs folder
+
+cat /usr/local/elasticsearch/config/elasticsearch.yml
+--just contains standard elasticsearch.yml file as in previous versions
+
+#Making changes
+================
+important configs
+# ---------------------------------- Cluster -----------------------------------
+#
+# Use a descriptive name for your cluster:
+#
+cluster.name: mycluster
+#
+# ------------------------------------ Node ------------------------------------
+#
+# Use a descriptive name for the node:
+#
+node.name: master
+
+---------------------------------------Memory-----------------------------------
+#if limits.conf & sysctl.conf was correctly configured
+bootstrap.memory_lock: true
+
+---------------------------------------Network-----------------------------------
+network.host: localhost
+http.port: 9200
+transport.port: 9300
+node.roles: [master,data]
+# --------------------------------- Discovery ----------------------------------
+#
+# Pass an initial list of hosts to perform discovery when new node is started:
+# The default list of hosts is ["127.0.0.1", "[::1]"]
+#
+#discovery.seed_hosts: ["localhost"]
+##
+#
+#Only for 1st time
+cluster.initial_master_nodes:
+  - master
+
+--notice xpack security features enabled towards end of config file and related paths mentioned
+# Enable security features
+xpack.security.enabled: true
+xpack.security.enrollment.enabled: true
+
+# Enable encryption for HTTP API client connections, such as Kibana, Logstash, and Agents
+xpack.security.http.ssl:
+  enabled: true
+  keystore.path: certs/http.p12
+
+# Enable encryption and mutual authentication between cluster nodes
+xpack.security.transport.ssl:
+  enabled: true
+  verification_mode: certificate
+  keystore.path: certs/transport.p12
+  truststore.path: certs/transport.p12
+#----------------------- END SECURITY AUTO CONFIGURATION -------------------------
+============
+After cluster is up, you will see this..
+
+Elasticsearch security features have been automatically configured!
+Authentication is enabled and cluster connections are encrypted.
+
+Password for the elastic user (reset with `bin/elasticsearch-reset-password -u elastic`):
+  OoaP0udcU--9uUziXqu-
+
+HTTP CA certificate SHA-256 fingerprint:
+  726bee774cc1bf97abeb0384f1edfcab2e74cb53d6b6b58d7005bbdc77db7a26
+
+Configure Kibana to use this cluster:
+Run Kibana and click the configuration link in the terminal when Kibana starts.
+Copy the following enrollment token and paste it into Kibana in your browser (valid for the next 30 minutes):
+  eyJ2ZXIiOiI4LjUuMCIsImFkciI6WyIxMjcuMC4wLjE6OTIwMCIsIls6OjFdOjkyMDAiXSwiZmdyIjoiNzI2YmVlNzc0Y2MxYmY5N2FiZWIwMzg0ZjFlZGZjYWIyZTc0Y2I1M2Q2YjZiNThkNzAwNWJiZGM3N2RiN2EyNiIsImtleSI6InBjSlNfSVlCdUY2SHB4a05vNnNMOkFIYnp0UWJTUXJTWGZfNFliczN4TUEifQ==
+
+Configure other nodes to join this cluster:
+On this node:
+	Create an enrollment token with `bin/elasticsearch-create-enrollment-token -s node`.
+        Uncomment the transport.host setting at the end of config/elasticsearch.yml.
+        Restart Elasticsearch.
+On other nodes:
+  Start Elasticsearch with `bin/elasticsearch --enrollment-token <token>`, using the enrollment token that you generated.
+
+
+#if 'discovery.seed_hosts' was configured like in previous versions
+[2023-01-20T00:12:20,271][WARN ][o.e.c.c.Coordinator      ] [master] 
+This node is a fully-formed single-node cluster with cluster UUID [R1RvKTdFR2qiPK931WajTg], but it is configured 
+as if to discover other nodes and form a multi-node cluster via the [discovery.seed_hosts=[localhost]] setting. 
+Fully-formed clusters do not attempt to discover other nodes, and nodes with different cluster UUIDs cannot 
+belong to the same cluster. The cluster UUID persists across restarts and can only be changed by deleting 
+the contents of the node's data path(s). Remove the discovery configuration to suppress this message.
+
+===========
+For kibana , start kibana and follow instructions as mentioned above..
+unless 'configure kibana' step is done
+we will see this message
+'[2023-01-20T01:56:13,658][WARN ][o.e.x.s.t.n.SecurityNetty4HttpServerTransport] [master] received plaintext 
+http traffic on an https channel, closing connection Netty4HttpChannel{localAddress=/127.0.0.1:9200, 
+remoteAddress=/127.0.0.1:46550}'
+
+--check dev tools
+
+============
+From command line
+--if password for user elastic not known or lost, recreate it using command mentioned above 
+--may need to reset pswd saved in for kibana
+
+#example
+curl -u elastic:F-8rbJG2Vgwe0Gt+nrpj -XGET "https://127.0.0.1:9200/_cat/nodes?v" -k
+Here -k to allow insecure connection i.e. without cert
+curl --cacert /usr/local/elasticsearch/config/certs/http_ca.crt https://localhost:9200 -u elastic:I5B*8vJ76Wwe8BF0bnQ0
+

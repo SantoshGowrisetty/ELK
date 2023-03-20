@@ -182,8 +182,8 @@ Configuration OK
 
 ###on filebeat running node####
 #start filebeat service or start command to publish data 
-root@u2:/usr/share/filebeat/bin# ./filebeat -e -c /etc/filebeat/filebeat.yml -d "publish"
-
+root@u2:/usr/share/filebeat/bin# ./filebeat -e -c /usr/share/filebeat/filebeat.yml -d publish
+root@u2:<filebeat path># ./filebeat -e -c <filebeat path>filebeat.yml -d publish
 #if fine, start filebeat service
 #start filebeat as a service or start filebeat from command line from /usr/share/bin/filebeat
 ===========================
