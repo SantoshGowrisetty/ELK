@@ -1,13 +1,31 @@
+--looking at nodes
+
+GET /_nodes/_master?format=json
+GET /_nodes/master:true
 GET /_cat/nodes?v
-GET /_cat/nodes?v
+GET /_nodes
+throws warning
+#! Deprecation: transport.publish_address was printed as [ip:port] instead of 
+[hostname/ip:port]. This format is deprecated and will change to [hostname/ip:port] 
+in a future version. Use -Des.transport.cname_in_publish_address=true to enforce 
+non-deprecated formatting.
+
+GET /_nodes/_all
+
+--looking at indexes
 GET _cat/indices?v
 
+--create an index with default settings
 PUT /ecommerce
 {
 }
 
-
+--delete the index
 DELETE /ecommerce
+
+--recreate index with some specific settings
+--note: if shards is not specified, index will be created with 1 shard 
+  shard configuration cannot be changed 
 
 PUT /ecommerce
 {
@@ -18,6 +36,8 @@ PUT /ecommerce
   }
 }
 
+OR 
+
 PUT /ecommerce/_settings
 {
 "index":{
@@ -26,8 +46,7 @@ PUT /ecommerce/_settings
 }
 }
 
-GET /_cat/indices/ecommerce?v
-
+--trying changing shards of already created index
 PUT /ecommerce/_settings
 {
 "index":{
@@ -35,12 +54,35 @@ PUT /ecommerce/_settings
 }
 }
 
-
-GET /_cat/indices/ecommerce?v
+--look at shard allocation
 GET /_cat/shards/ecommerce?v
+
+--looking at indexes
+GET _cat/indices?v
+GET /_cat/indices/ecomm*?v
 
 GET /ecommerce
 
+DELETE /ecommerce
+
+--create index with replica & shard configuration
+PUT /ecommerce
+{
+  "settings": {
+    "number_of_shards": 3
+    , "number_of_replicas": 2
+    , "auto_expand_replicas": false
+  }
+}
+
+--look at indexes
+GET /_cat/indices?v
+
+GET /_cat/indices/ecommerce?v
+
+GET /_cat/shards/ecommerce?v
+
+--creating index with mappings
 PUT /ecommerce2
 {
      "mappings": {
@@ -76,26 +118,68 @@ PUT /ecommerce2
 }
 }
 
+--look at settings
 GET /ecommerce
 GET /ecommerce2
-
 GET /_cat/indices?v
 GET /_cat/shards
-
-PUT ecommerce3
-{
-}
-
-GET ecommerce3
-
-GET /_cat/shards/ecommerce3?v
-DELETE ecommerce3
-
 GET /_cat/indices/ecommer*?v
+
+--looking at help
 GET /_cat/indices?help
 
-GET /_cat/indices/ecommerce?v
+--add some document to index
 
+PUT /ecommerce/_doc/1001
+{
+  "name": "Test Framework",
+  "price": "30.00",
+  "description": "For processing data",
+  "status": "active",
+  "quantity": 1,
+  "categories": [
+    {"name": "Software"}],
+    "tags": ["Test framework","logstash","nagios"]
+}
+
+--running a query
+GET ecommerce/_search
+{
+    "query": {
+        "match_all": {}
+    }
+}
+
+--using a POST  and adding data to index (without specifying value for _id)
+POST /ecommerce/_doc
+{
+  "name": "Test Framework",
+  "price": "30.00",
+  "description": "For processing data",
+  "status": "active",
+  "quantity": 1,
+  "categories": [
+    {"name": "Software"}],
+    "tags": ["Test framework","logstash","nagios"]
+}
+
+--trying to update value of a field ,which replaces the document
+PUT /ecommerce/_doc/1001
+{
+  "name": "Test Framework"
+}
+
+GET ecommerce/_search
+{
+    "query": {
+        "match_all": {}
+    }
+}
+
+--delete the document
+DELETE /ecommerce/_doc/1001
+
+--add it again
 POST /ecommerce/_doc/1001
 {
   "name": "Test Framework",
@@ -115,42 +199,7 @@ GET ecommerce/_search
     }
 }
 
-
-PUT /ecommerce/_doc/1001
-{
-  "name": "Test Framework"
-}
-
-GET ecommerce/_search
-{
-    "query": {
-        "match_all": {}
-    }
-}
-
-
-DELETE /ecommerce/_doc/1001
-
-PUT /ecommerce/_doc/1001
-{
-  "name": "Test Framework",
-  "price": "30.00",
-  "description": "For processing data",
-  "status": "active",
-  "quantity": 1,
-  "categories": [
-    {"name": "Software"}],
-    "tags": ["Test framework","logstash","nagios"]
-}
-
-GET ecommerce/_search
-{
-    "query": {
-        "match_all": {}
-    }
-}
-
-
+--update while doc type is specified
 POST /ecommerce/_doc/1001/_update
 {
   "doc": {
@@ -158,6 +207,7 @@ POST /ecommerce/_doc/1001/_update
   }
 }
 
+--update while doc type is not specified
 POST /ecommerce/_update/1001/
 {
   "doc": {
@@ -165,6 +215,7 @@ POST /ecommerce/_update/1001/
   }
 }
 
+--add some more data
 PUT /ecommerce/_doc/1001
 {
   "name": "Test Framework",
@@ -190,19 +241,14 @@ PUT /ecommerce/_doc/1004
     "tags": ["metricbeat","logstash","filebeat"]
 }
 
-GET /_cat/nodes?v
-GET /_nodes/_all
-GET /_nodes/_local
-GET /_nodes/_master?format=json
-GET /_nodes/master:true
-
+--doing bulk updates
 POST /ecommerce/_bulk
 {"index": {"_id":"1002"}}
 {"name": "why ES is Awesome","price":"100.00","description":"This book is all about ES!","status":"active","quantity":12,"categories":[{"name":"Software"}],"tags":["ES","programming"]}
 {"index": {"_id":"1003"}}
-{"name": "cashewnuts","price":"100.00","description":"spicy cashewnuts","status":"active","quantity":120,"categories":[{"name":"Food"}],"tags":["snacks"]}
+{"name": "cashewnuts","price":"101.00","description":"spicy cashewnuts","status":"active","quantity":120,"categories":[{"name":"Food"}],"tags":["snacks"]}
 {"index": {"_id":"1005"}}
-{"name": "why elasticsearch is Awesome","price":"100.00","description":"This book is all about elasticsearch!","status":"active","quantity":12,"categories":[{"name":"Software"}],"tags":["elasticsearch","programming"]}
+{"name": "why elasticsearch is Awesome","price":"500.00","description":"This book is all about elasticsearch!","status":"active","quantity":12,"categories":[{"name":"Software"}],"tags":["elasticsearch","programming"]}
 
 GET /_cat/indices/ecommerce*?v
 
@@ -221,20 +267,21 @@ PUT /ecommerce/_bulk
 {"index": {"_id":"1370"}}
 {"name": "why elasticsearch is Awesome","price":"101.00","description":"This book is all about elasticsearch!","status":"active","quantity":12,"categories":[{"name":"Software"}],"tags":["elasticsearch","programming"]}
 {"index": {"_id":"1297"}}
-{"name": "why elasticsearch is Awesome","price":"101.00","description":"This book is all about elasticsearch!","status":"active","quantity":12,"categories":[{"name":"Software"}],"tags":["elasticsearch","programming"]}
+{"name": "why elasticsearch is Awesome","price":"102.00","description":"This book is all about elasticsearch!","status":"active","quantity":12,"categories":[{"name":"Software"}],"tags":["elasticsearch","programming"]}
 {"index": {"_id":"173"}}
-{"name": "why elasticsearch is Awesome","price":"101.00","description":"This book is all about elasticsearch!","status":"active","quantity":12,"categories":[{"name":"Software"}],"tags":["elasticsearch","programming"]}
+{"name": "why elasticsearch is Awesome","price":"145.00","description":"This book is all about elasticsearch!","status":"active","quantity":12,"categories":[{"name":"Software"}],"tags":["elasticsearch","programming"]}
 {"index": {"_id":"18"}}
-{"name": "why elasticsearch is Awesome","price":"101.00","description":"This book is all about elasticsearch!","status":"active","quantity":12,"categories":[{"name":"Software"}],"tags":["elasticsearch","programming"]}
+{"name": "why elasticsearch is Awesome","price":"151.00","description":"This book is all about elasticsearch!","status":"active","quantity":12,"categories":[{"name":"Software"}],"tags":["elasticsearch","programming"]}
 {"index": {"_id":"309"}}
-{"name": "why elasticsearch is Awesome","price":"101.00","description":"This book is all about elasticsearch!","status":"active","quantity":12,"categories":[{"name":"Software"}],"tags":["elasticsearch","programming"]}
+{"name": "why elasticsearch is Awesome","price":"123.00","description":"This book is all about elasticsearch!","status":"active","quantity":12,"categories":[{"name":"Software"}],"tags":["elasticsearch","programming"]}
 {"index": {"_id":"1339"}}
-{"name": "why elasticsearch is Awesome","price":"101.00","description":"This book is all about elasticsearch!","status":"active","quantity":12,"categories":[{"name":"Software"}],"tags":["elasticsearch","programming"]}
+{"name": "why elasticsearch is Awesome","price":"171.00","description":"This book is all about elasticsearch!","status":"active","quantity":12,"categories":[{"name":"Software"}],"tags":["elasticsearch","programming"]}
 {"index": {"_id":"1310"}}
 {"name": "why elasticsearch is Awesome","price":"101.00","description":"This book is all about elasticsearch!","status":"active","quantity":12,"categories":[{"name":"Software"}],"tags":["elasticsearch","programming"]}
 
 GET /_cluster/health/ecommerce2?level=shards
 
+--doing multiple updates
 POST /ecommerce2/_doc/_bulk
 {"delete" : {"_id" : "711"}}
 {"update" : {"_id" : "1310"}}
@@ -251,45 +298,62 @@ POST /_bulk
 {"update" : {"_id" : "1310", "_index" : "ecommerce"}}
 {"doc" : {"price" : 103}}
 
-PUT ecommerce/_doc/1?routing=user1&refresh=true
+POST /ecommerce/_bulk
+{"delete" : {"_id" : "13710"}}
+{"update" : {"_id" : "712"}}
+{"doc" : {"price" : 1000}}
+{"index": {"_id":"9999"}}
+{"name": "why ES is Awesome","price":"100.00","description":"This book is all about ES!","status":"active","quantity":12,"categories":[{"name":"Software"}],"tags":["ES","programming"]}
+{"index": {"_id":"8888"}}
+{"name": "cashewnuts","price":"100.00","description":"spicy cashewnuts","status":"active","quantity":120,"categories":[{"name":"Food"}],"tags":["snacks"]}
+{"index": {"_id":"7777"}}
+{"name": "why elasticsearch is Awesome","price":"100.00","description":"This book is all about elasticsearch!","status":"active","quantity":12,"categories":[{"name":"Software"}],"tags":["elasticsearch","programming"]}
+
+GET /_cluster/health/ecommerce?level=shards
+--using routing to send/direct data to a particular shard
+--create index
+PUT /ecommerce-new
 {
-  "title": "This is a document"
+  "settings": {
+    
+    "number_of_replicas": 2
+    , "auto_expand_replicas": false,
+    "number_of_shards": 3
+  }
 }
 
-GET ecommerce/_doc/1?routing=user1
+--look at shard allocation
+GET /_cat/shards/ecommerce-new?v
 
-#querying
-GET /ecommerce/_search?q=book
-
-#GET /ecommerce3/_search?q= _all
-
-GET /ecommerce/_search?q=elasticsearch*
-
-GET /ecommerce/_search
+--put data without routing (run this multiple times and change ID n value for name)
+PUT ecommerce-new/_doc/1014
 {
-  "query": {
-  "match": 
-  {"name": "cashewnuts"}
-  }
-  }
-  
-GET /ecommerce/_search?q=*
+  "name": "John1"
+}
 
-GET /ecommerce3/_search?q=cashewnuts
+--put data with routing (run this multiple times and change ID n value for name)
+PUT ecommerce-new/_doc/1019?routing=name&refresh=true
+{
+  "name": "JohnnyMpi"
+}
 
-GET /ecommerce3/_search?q=name:(cashewnuts OR peanuts)
+--access data using routing
+GET ecommerce/_doc/1019?routing=name
 
-GET /ecommerce/_search?q=name:(cashenuts AND "why elasticsearch is Awesome")
+--look at shard allocation & compare if anyone shard has more number of docs
+GET /_cat/shards/ecommerce-new?v
+GET /_cat/indices/ecommer*?v
 
-GET /ecommerce/_doc/_search?q=(name:(cashewnuts OR Framework) AND status:active)
+--do an explain to see document to shard information
+GET ecommerce-new/_search
+{
+    "explain": true,
+    "query": {
+        "match_all": {}
+    }
+}
 
-GET /ecommerce3/_search?q=name:+cashewnuts -peanuts
-
-GET /ecommerce3/_search?q=name:"Test Framework"
-
-GET ecommerce3/_search?q=*&size=5&from=2
-
-GET ecommerce3/_search?q=name:Frame*
+--Understanding indexing (use of analyzers)
 
 POST _analyze
 {
@@ -303,6 +367,7 @@ POST _analyze
   "text": "hey this is test"
 }
 
+--create index with creation of analzer which can be used later
 PUT ecommerce4
 {
   "settings": {
@@ -318,7 +383,38 @@ PUT ecommerce4
   }
 }
 
+--delete and recreate with other settings
+DELETE ecommerce4
+
+PUT ecommerce4
+{
+  "settings": {
+    "number_of_replicas": 2,
+    "number_of_shards": 3, 
+    "analysis": {
+      "analyzer": {
+        "my_english_analyzer": {
+          "type": "standard",
+          "max_token_length": 4,
+          "stopwords": "_english_"
+        }
+      }
+    }
+  }
+}
+
+GET ecommerce4
+
+--using analyzer created above
 POST ecommerce4/_analyze
+{
+  "analyzer": "my_english_analyzer",
+  "text": "this is awesome playful smart and tokenization"
+}
+
+--if you try to use analyze without specifying index name
+? what is the response
+POST _analyze
 {
   "analyzer": "my_english_analyzer",
   "text": "this is awesome playful smart and tokenization"
@@ -334,47 +430,22 @@ GET ecommerce/_analyze
   "text": "Test the new Framework"
 }
 
-GET /ecommerce3/_search
-{
-  "query": {
-    "bool": {
-      "must": [
-        {"match": {"name": "cashewnuts"}}
-        ]
-    }
-  }
-}
-
-GET /ecommerce3/_search
-{
-  "query": {
-    "bool": {
-      "must": [
-        {"match": {"name": "cashewnuts"}}
-        ],
-      "must_not": [
-        {"match": {"name": "Test Framework"}}
-        ]
-    }
-  }
-}
-
-GET /ecommerce3/_search
-{
-  "query": {
-    "bool": {
-      "must": [
-        {"match": {"name": "cashew*"}}
-        ],
-      "should": [
-        {"match": {"name": "cashewmuts"}}
-        ]
-    }
-  }
-}
-
+--creating index with settings and analyzers
 PUT /newdata
 {
+     "settings": {
+       "number_of_replicas": 2,
+       "number_of_shards": 3,
+       "analysis": {
+      "analyzer": {
+        "my_english_analyzer": {
+          "type": "standard",
+          "max_token_length": 4,
+          "stopwords": "_english_"
+        }
+      }
+    }
+     }, 
      "mappings": {
                 "properties": {
              "name": {
@@ -410,7 +481,7 @@ PUT /newdata
 
 GET /newdata
 
-PUT /newproducts
+PUT /newdata2
 {
      "mappings": {
 
@@ -443,12 +514,14 @@ PUT /newproducts
         },
         "tags": {
            "type": "text",
-           "analyzer": "standard"
+           "analyzer": "english"
          }
 }
 }}
 
-POST /newproducts/_bulk
+GET /newdata2
+
+PUT /newdata2/_bulk
 {"index": {"_id":"10"}}
 {"name": "why ES is Awesome","price":"100.00","description":"This book is all about the ES!","status":"active","quantity":12,"categories":[{"name":"Software","quantity":200}],"tags":["ES the search store","programming JAVA"]}
 {"index": {"_id":"11"}}
@@ -456,7 +529,8 @@ POST /newproducts/_bulk
 {"index": {"_id":"3"}}
 {"name": "why elasticsearch is Awesome","price":"100.00","description":"This book is A book which is all about elasticsearch!","status":"active","quantity":12,"categories":[{"name":"Software"}],"tags":["elasticsearch","programming","SEARCHING INdexes"]}
 
-GET /newproducts/_search
+
+GET /newdata2/_search
 {
   "query": {
     "bool": {
@@ -479,7 +553,7 @@ GET /newproducts/_search
   }
 }
 
-GET /newproducts/_search
+GET /newdata2/_search
 {
   "query": {
     "bool": {
@@ -502,6 +576,210 @@ GET /newproducts/_search
   }
 }
 
+--using a language specific analyzer
+PUT /german_example
+{
+  "settings": {
+    "analysis": {
+      "filter": {
+        "german_stop": {
+          "type":       "stop",
+          "stopwords":  "_german_" 
+        },
+        "german_keywords": {
+          "type":       "keyword_marker",
+          "keywords":   ["Beispiel"] 
+        },
+        "german_stemmer": {
+          "type":       "stemmer",
+          "language":   "light_german"
+        }
+      },
+      "analyzer": {
+        "rebuilt_german": {
+          "tokenizer":  "standard",
+          "filter": [
+            "lowercase",
+            "german_stop",
+            "german_keywords",
+            "german_normalization",
+            "german_stemmer"
+          ]
+        }
+      }
+    }
+  }
+}
+
+POST _analyze
+{
+  "analyzer": "german",
+  "text": "ich spreche deutsche jetzt kaufenhaus"
+}
+
+GET /german_example
+POST german_example/_bulk
+{"index": {"_id":"10"}}
+{"name": "ES ist neue","price":"100.00","description":"In diesem Buch dreht sich alles um ES!","status":"active","quantity":12,"categories":[{"name":"Software","quantity":200}],"tags":["ES the search store","programming JAVA"]}
+{"index": {"_id":"11"}}
+{"name": "warum elast","price":"100.00","description":"Verarbeitung der PROTOKOLLE und Übermittlung an ES","status":"active","quantity":120,"categories":[{"name":"Book","quantity":20}],"tags":["LOG PROCESSING","BEAT PROCESSING"]}
+{"index": {"_id":"3"}}
+{"name": "ES ist toll","price":"100.00","description":"Dieses Buch ist ein Buch, in dem sich alles um Elasticsearch drehth!","status":"active","quantity":12,"categories":[{"name":"Software"}],"tags":["elasticsearch","programming","SEARCHING INdexes"]}
+
+------
+#querying
+
+GET /ecommerce2/_search?q=elastic*
+
+GET /ecommerce/_search
+
+GET /ecommerce/_search?q=elasticsearch*
+
+GET /ecommerce/_search
+{
+  "query": {
+  "match": 
+  {"name": "cashewnuts"}
+  }
+  }
+  
+GET /ecommerce/_search?q=*
+
+GET /ecommerce/_search?q=book
+
+GET /ecommerce/_search?q=cashewnuts
+
+#GET /ecommerce/_search?q= _all
+
+GET /ecommerce/_search?q=elasticsearch*
+
+GET /ecommerce/_search?q=name:(cashewnuts OR Test Framework)
+
+GET /ecommerce/_search?q=name:(cashewnuts OR peanuts)
+
+GET /ecommerce/_search?q=name:(cashewnuts AND "why elasticsearch is Awesome")
+
+GET /ecommerce/_search?q=(name:(cashewnuts OR Framework) AND status:active)
+
+GET /ecommerce/_search?q=name:+cashewnuts -spicy
+
+GET /ecommerce/_search?q=name:+cashewnuts -peanuts
+
+GET /ecommerce/_search?q=name:"Test Framework"
+
+GET ecommerce/_search?q=*&size=5&from=2
+
+GET ecommerce/_search?q=name:Frame*
+
+
+GET /ecommerce/_search
+{
+  "query": {
+    "bool": {
+      "must": [
+        {"match": {"name": "cashewnuts"}}
+        
+        ]
+    }
+  }
+}
+
+GET /ecommerce/_search
+{
+  "query": {
+    "bool": {
+      "must": [
+        {"match": 
+        {"description": "spicy cashewnuts"}}
+        ],
+      "must_not": [
+        {"match": {"description": "cachenuts"}}
+        ]
+    }
+  }
+}
+
+GET /ecommerce/_search
+{
+  "query": {
+    "bool": {
+      "must": [
+        {"match": {"name" : "cashewnuts"}}
+      ]
+    }
+  }
+}
+
+GET /ecommerce/_search
+{
+  "query": {
+    "bool": {
+      "must": [
+        {"match": {"name": "cashewnuts"}}
+        ],
+      "must_not": [
+        {"match": {"name": "Test Framework"}}
+        ]
+    }
+  }
+}
+
+GET /ecommerce/_search
+{
+  "query": {
+    "bool": {
+      "must": [
+      {"match": {"name": "cashewnuts"}}
+        ],
+      "should": [
+        {"match": {"name": "Test Framework"}}
+        ]
+    }
+  }
+}
+
+GET ecommerce/_search
+{
+    "query": {
+        "match_all": {}
+    }
+}
+
+GET /ecommerce/_search
+{
+  "query": {
+    "range": {
+      "price.keyword": {
+        "gte": 99,
+        "lte": 510
+      }
+    }
+}
+}
+
+GET /ecommerce/_search
+{
+  "query": {
+    "bool": {
+      "must": [
+        {"match": {"tags": "framework"}}
+        ],
+      "should": [
+        {"match": {"name": "Test Framework"}}
+        ]
+    }
+  }
+}
+
+GET /ecommerce/_search
+{
+  "query": {
+  "match": 
+  {"name": "cashewnuts"}
+  }
+  }
+  
+
 DELETE bankdata
 
 PUT /bankdata
@@ -515,6 +793,7 @@ PUT /bankdata
 }
 
 GET /_cat/indices/bankdata?v
+
 GET bankdata/_search
 {
     "query": {
@@ -523,6 +802,7 @@ GET bankdata/_search
 }
 
 GET /_cat/shards/bankdata?v
+
 #querying bankdata index
 
 POST /_sql?format=txt
@@ -606,53 +886,7 @@ GET /bankdata/_search
   ]
 }
 
-  
-GET /_nodes/_all
-GET /_nodes/_local
-GET /_nodes/_master
-GET _nodes/stats
-GET _nodes/hot_threads
-
-GET /_cat/thread_pool/search?v&h=node_name,name,active,rejected,completed
-
-GET /_cat/allocation?v
-GET /_cat/count?v
-GET /_cat/fielddata?v
-GET /_cat/fielddata?help
-GET /_cat/health?v
-GET _cat/master?v
-GET /_cat/nodes?v
-
-GET /_cluster/state?filter_path=metadata.cluster_coordination.last_commit_config
-
-GET /_cluster/health
-
-GET /_cat/indices?bytes=b&s=store.size:desc&v
-GET /_cat/indices?s=store.size:desc&format=json&v
-
-GET /_cat/allocation?v
-
-GET /_cat/indices/bankdata?s=store.size:desc&v
-
-GET /_cat/shards/ecommerce?h=index,shard,prirep,dc,state,node,unassigned.reason?v
-
-GET /_cat/shards/ecommerce2?h=index,shard,prirep,dc,node,segments.count
-
-GET /_cat/indices?bytes=b&s=store.size:desc&v
-
-GET /_cat/indices?help
-
-GET /_cat/indices?s=store.size:desc&format=json&v
-
-
-
-
-
-
-
-
-
-
+----------
 
 
 
