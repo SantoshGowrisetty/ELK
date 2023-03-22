@@ -11,6 +11,10 @@
 # configuration file.
 #=========================== Filebeat inputs =============================
 
+setup.template.enabled: false
+setup.template.overwrite: false
+setup.ilm.enabled: false
+
 filebeat.inputs:
 
 # Each - is an input. Most options can be set at the input level, so
@@ -24,7 +28,7 @@ filebeat.inputs:
 
   # Paths that should be crawled and fetched. Glob based paths.
   paths:
-    - /usr/local/elasticsearch/logs/mycluster.log
+    - /home/hdu/Downloads/opsd_germany_daily.txt
     #- c:\programdata\elasticsearch\logs\*
 
   # Exclude lines. A list of regular expressions to match. It drops the lines that are
@@ -76,10 +80,13 @@ filebeat.config.modules:
 
 #==================== Elasticsearch template setting ==========================
 
-setup.template.settings:
-  index.number_of_shards: 3
+setup.template:
+  settings:
+        index.number_of_shards: 3
   #index.codec: best_compression
   #_source.enabled: false
+  name: "opsd"
+  pattern: "opsd-*"
 
 
 #================================ General =====================================
@@ -147,10 +154,11 @@ setup.kibana:
 #-------------------------- Elasticsearch output ------------------------------
 output.elasticsearch:
   # Array of hosts to connect to.
-  hosts: ["c1:9200","c2:9200","c3:9200"]
-
+  hosts: ["c1:9200"]
+  index: "opsd-%{[agent.version]}-%{+yyyy.MM.dd}"
   # Enabled ilm (beta) to use index lifecycle management instead daily indices.
   #ilm.enabled: false
+
 
   # Optional protocol and basic auth credentials.
   #protocol: "https"
