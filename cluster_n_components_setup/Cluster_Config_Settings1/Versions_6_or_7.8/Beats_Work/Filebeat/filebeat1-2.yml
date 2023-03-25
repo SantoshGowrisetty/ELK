@@ -10,7 +10,7 @@
 # For more available modules and options, please see the filebeat.reference.yml sample
 # configuration file.
 #=========================== Filebeat inputs =============================
-
+#This sends elasticsearch log to ES cluster and uses our provided template for index name#
 filebeat.inputs:
 
 # Each - is an input. Most options can be set at the input level, so

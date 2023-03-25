@@ -6,7 +6,7 @@ Filebeat is designed for reliability and low latency.Filebeat has a light resour
 on the host machine, and the Beats input plugin minimizes the resource demands on the Logstash
 instance.
 
-SETUP
+##SETUP##
 #If UBUNTU
 #Download and install the Public Signing Key:
 $sudo wget -qO - https://artifacts.elastic.co/GPG-KEY-elasticsearch | sudo apt-key add -
@@ -28,9 +28,9 @@ sudo rpm --import https://artifacts.elastic.co/GPG-KEY-elasticsearch
 sudo vi /etc/yum.repos.d/elasticsearch.repo
 
 --change version as per your requirement
-[elasticsearch-6.x]
-name=Elasticsearch repository for 6.x packages
-baseurl=https://artifacts.elastic.co/packages/6.x/yum
+[elasticsearch-7.x]
+name=Elasticsearch repository for 7.x packages
+baseurl=https://artifacts.elastic.co/packages/7.x/yum
 gpgcheck=1
 gpgkey=https://artifacts.elastic.co/GPG-KEY-elasticsearch
 enabled=1
@@ -41,7 +41,7 @@ then
 yum install filebeat
 
 CONFIGURATION
-
+#default template for index name
 #Option 1: Here index name would be default "filebeat-%{[agent.version]}-%{+yyyy.MM.dd}"
 
 #Sending data directly to ES
@@ -52,16 +52,15 @@ enabled: true
 paths:
     - /var/log/messages*
 
-#comment the following lines:
+#comment the following lines:(to avoid sending data to logstash)
 #output.logstash:
   # The Logstash hosts
   #hosts: ["elk-server:5443"]
-  #ssl.certificate_authorities: ["/etc/filebeat/logstash-forwarder.crt"]
 
-#Uncomment Elasticsearch:
-#output.elasticsearch:
+#Uncomment Elasticsearch:(to send data to ES)
+output.elasticsearch:
   # Array of hosts to connect to.
-  hosts: ["ce1:9200"]
+  hosts: ["c1:9200"]
 
 check if index was created..
 
@@ -77,46 +76,53 @@ paths:
 #output.logstash:
   # The Logstash hosts
   #hosts: ["elk-server:5443"]
-  #ssl.certificate_authorities: ["/etc/filebeat/logstash-forwarder.crt"]
 
 #set the index dynamically by using a format string to access any event field
 #The events are distributed to these nodes in round robin order. If one node becomes unreachable, the event is automatically sent to another node. 
 #Uncomment Elasticsearch:
-#output.elasticsearch:
+output.elasticsearch:
   # Array of hosts to connect to.
-  hosts: ["ce1:9200","ce2:9200","ce3:9200"]
-  #if data contains field type:log_type ,that could be used to route data into 2 different indexes
-  #With this configuration, all events with log_type: normal are sent to an index named normal-xxx and all events with log_type: critical are sent to critical-xxx
-  #index: "%{[fields.log_type]}-%{[agent.version]}-%{+yyyy.MM.dd}"
-  #setting our own index name, which would also mean if we need to use our own template 
-  # "ESLog-%{[agent.version]}-%{+yyyy.MM.dd}"
-  #setup.template.name: "ESLog"
-  #setup.template.pattern: "ESLog-*"
+  hosts: ["c1:9200","c2:9200","c3:9200"]
+  
+#setting our own index name, which would also mean if we need to use our own template 
+#setup.ilm.enabled: false
+#setup.template:
+# settings:
+#   index.number_of_shards: 3
+#   name: "ESlog"
+#   pattern: "ESlog-*"
+# enabled: false 
 
-#Addtional options ( which we will check later)
 output.elasticsearch:
-  hosts: ["http://localhost:9200"]
-  indices:
-    - index: "warning-%{[agent.version]}-%{+yyyy.MM.dd}"
-      when.contains:
-        message: "WARN"
-    - index: "error-%{[agent.version]}-%{+yyyy.MM.dd}"
-      when.contains:
-        message: "ERR"
+  # Array of hosts to connect to.
+  hosts: ["c1:9200"]
+  index: "ESlog-%{[agent.version]}-%{+yyyy.MM.dd}" 
 
-#Additional options (which we will check later)
-output.elasticsearch:
-  hosts: ["http://localhost:9200"]
-  indices:
-    - index: "%{[fields.log_type]}"
-      mappings:
-        critical: "sev1"
-        normal: "sev2"
-      default: "sev3"
+#other options to customize index and data landing into index
+#if data contains field type:log_type ,that could be used to route data into 2 different indexes
+  #With this configuration, all events with log_type: normal are sent to an index named normal-xxx and
+                            all events with log_type: critical are sent to critical-xxx
+
+    #- index: "%{[fields.log_type]}-%{[agent.version]}-%{+yyyy.MM.dd}"
+
+#based on messages
+    #- index: "warning-%{[agent.version]}-%{+yyyy.MM.dd}"
+         when.contains:
+           message: "WARN"
+    #- index: "error-%{[agent.version]}-%{+yyyy.MM.dd}"
+         when.contains:
+           message: "ERR"
+
+#based on types
+    #- index: "%{[fields.log_type]}"
+         mappings:
+           critical: "sev1"
+           normal: "sev2"
+           default: "sev3"
  
 check if index was created..
 
-===========================================
+------------------------------
 #Sending data to logstash to fwd to ES
 #Modify Filebeat configurations.
 $sudo vim /etc/filebeat/filebeat.yml
@@ -128,28 +134,19 @@ paths:
 #Uncomment the following lines:
 output.logstash:
   # The Logstash hosts
-  hosts: ["ce4:5443"]
-  ssl.certificate_authorities: ["/etc/filebeat/logstash-forwarder.crt"]
+  hosts: ["c4:5443"]
 
 #Comment Elasticsearch:
 #output.elasticsearch:
   # Array of hosts to connect to.
   # hosts: ["localhost:9200"]
 
-#Now go to logstash server and get “logstash-forwarder.crt” contents
-$sudo cat /etc/logstash/ssl/logstash-forwarder.crt
-#get the contents 
-
-#create a certificate file on filebeat client server
-$sudo vim /etc/filebeat/logstash-forwarder.crt
-#copy the logstash-forwarder.crt contents here
-
-#Enable filebeat on system boot Start filebeat service
+--to be done after logstash is setup
+#Enable filebeat on system boot OR Start filebeat service
 $sudo systemctl enable filebeat.service
 $sudo systemctl start filebeat.service
+--to check status
 $sudo service filebeat status
-
-#we will start it again after we setup logstash to accept beats..
 
 ###on logstash running node#####
 #Creating a sample pipeline on logstash node to accept beats from filebeat on client server
@@ -175,17 +172,43 @@ Configuration OK
 #To run logstash with above mentioned config, remember to update output location in *.conf to receive content sent by filebeat and forward it 
 #as per location
 
---refer input-filter-output content from fb_pipeline.conf
+--refer fb_pipeline.conf provided in >>>> Logstash_Work/MyConfigsLS/conf.d
 
 #now start logstash with this config
 [elk@ce4 ~]$ /usr/share/logstash/bin/logstash --path.settings /etc/logstash/ -f /etc/logstash/conf.d/fb_pipeline.conf
 
 ###on filebeat running node####
-#start filebeat service or start command to publish data 
+#start filebeat service 
+or 
+start command to publish data 
+#if filebeat was installed as a tar, then run the command from appropriate location
 root@u2:/usr/share/filebeat/bin# ./filebeat -e -c /usr/share/filebeat/filebeat.yml -d publish
-root@u2:<filebeat path># ./filebeat -e -c <filebeat path>filebeat.yml -d publish
-#if fine, start filebeat service
-#start filebeat as a service or start filebeat from command line from /usr/share/bin/filebeat
+
+#Note**
+Filebeat consists of two main components: inputs and harvesters. These components work together to tail files and send event data to the output that you specify.
+A harvester is responsible for reading the content of a single file. The harvester reads each file, line by line, and sends the content 
+to the output. One harvester is started for each file. The harvester is responsible for opening and closing the file, which means that 
+the file descriptor remains open while the harvester is running. If a file is removed or renamed while it’s being harvested, 
+Filebeat continues to read the file. This has the side effect that the space on your disk is reserved until the harvester closes. 
+By default, Filebeat keeps the file open until close_inactive is reached.
+
+Filebeat keeps the state of each file and frequently flushes the state to disk in the registry file. The state is used to remember the 
+last offset a harvester was reading from and to ensure all log lines are sent. If the output, such as Elasticsearch or Logstash, is not reachable, 
+Filebeat keeps track of the last lines sent and will continue reading the files as soon as the output becomes available again. 
+While Filebeat is running, the state information is also kept in memory for each input. When Filebeat is restarted, data from the 
+registry file is used to rebuild the state, and Filebeat continues each harvester at the last known position.
+
+For each input, Filebeat keeps a state of each file it finds. Because files can be renamed or moved, the filename and path are 
+not enough to identify a file. For each file, Filebeat stores unique identifiers to detect whether a file was harvested previously. 
+
+Filebeat guarantees that events will be delivered to the configured output at least once and with no data loss. 
+Filebeat is able to achieve this behavior because it stores the delivery state of each event in the registry file.
+
+##if filename is changed for new instance of filebeat and index pattern is changed, then we can continue to run filebeat from same location
+OR
+##we can clear the registry and metadata entry from <filebeat_location>/data folder by using command such as
+rm -rf /<filebeatpath>/data/*
+ 
 ===========================
 #check from Kibana if filebeat is sending data to logstash,if logstash is fwding same to Elasticsearch 
 and a new index is created.
