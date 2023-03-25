@@ -59,7 +59,7 @@ metricbeat.modules:
   enabled: true
   period: 5s
   hosts: ["http://172.20.11.7"]
-Copy
+
 The system module may also appear as such in the config file:
 
 - module: system
@@ -92,8 +92,7 @@ The system module may also appear as such in the config file:
   metricsets:
     - uptime
 
-
-Note
+##Note
 If you are using MacOS or another POSIX-compliant operating system, 
 keep in mind that all Beats config files (including Metricbeat configuration files) have permission checks. 
 So in order to start Metricbeat, you have to use the chown root command (i.e., you must assert dominance).
@@ -101,16 +100,15 @@ So in order to start Metricbeat, you have to use the chown root command (i.e., y
 sudo chown root metricbeat.yml
 
 sudo chown root modules.d/system.yml
-Copy
+
 At this point, enter the following commands to make sure Metricbeat is running. 
 If successful, the messages below those commands should appear.
 
 $ sudo metricbeat modules enable system
-Copy
+
 Index setup finished.
 
 $ sudo service metricbeat start
-Copy
 Loaded dashboards
 
 Metricbeat configuration settings
@@ -146,19 +144,16 @@ For forwarding metrics to Elasticsearch:
 
 output.elasticsearch:
   hosts: ["localhost:9200"]
-Copy
 For forwarding metrics to Logstash:
 
 output.logstash:
   hosts: ["localhost:5044"]
-Copy
 Output to Message Queues/Log Aggregators
 For forwarding metrics to Kafka:
 
 output.kafka:
   hosts: ["localhost:9092"]
   topic: "topicname"
-Copy
 To add topic selector rules, use the topics setting. In this example, error and access logs 
 are forwarded to separate topics when identified by certain text in respective logs:
 
@@ -195,7 +190,6 @@ curl -XGET 'localhost:9200/_cat/indices?v&pretty'
 
 health status index                       uuid                   pri rep docs.count docs.deleted store.size pri.store.size
 yellow open   metricbeat-7.4.2-2019.12.01 YePjpOgqQR-pU_SuKrm5vw   1   1       2989            0      1.1mb          1.1mb
-Copy
 Define the new index pattern in Kibana to start the analysis.
 
 First, you will need to download an SSL certificate to use encryption:
@@ -205,7 +199,6 @@ wget https://raw.githubusercontent.com/logzio/public-certificates/master/COMODOR
 sudo mkdir -p /etc/pki/tls/certs
 
 sudo cp COMODORSADomainValidationSecureServerCA.crt /etc/pki/tls/certs/
-Copy
 Next, retrieve your Logz.io account token from the UI (under Settings → Manage Accounts).
 
 Finally, to ship the data to Logz.io, your Metricbeat configuration file needs to look as follows:
@@ -229,7 +222,6 @@ output:
     hosts: ["listener.logz.io:5015"]     
     ssl:
       certificate_authorities: ['/etc/pki/tls/certs/COMODORSADomainValidationSecureServerCA.crt']
-Copy
 ship data
 Logz.io provides ready-made dashboards for monitoring the data that Metricbeat shipped. To install 
 it, simply open ELK Apps, Logz.io’s library of pre-made dashboards and visualizations and search for ‘metricbeat’.

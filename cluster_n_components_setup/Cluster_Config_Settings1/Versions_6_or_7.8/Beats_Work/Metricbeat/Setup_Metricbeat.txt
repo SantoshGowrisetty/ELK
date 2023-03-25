@@ -2,15 +2,13 @@
 #get metric beat on each node
 curl -L -O https://artifacts.elastic.co/downloads/beats/metricbeat/metricbeat-7.8.0-x86_64.rpm
 
-As done for elasticsearch , kibana and logstash
-on each node
+or Download metricbeat as tar and unpack
 
-mkdir /etc/metricbeat/certs
-copy ca.crt,node1*,node2*,node3* certificates respectively to each node in /etc/metricbeat/certs
-
-
+##
 Configure metricbeat.yml
-The main configuration file for metricbeat is metricbeat.yml available under /etc/metricbeat. You configure Metricbeat to write to a specific output (elasticsearch cluster nodes) by setting options in the Outputs section of the metricbeat.yml config file
+The main configuration file for metricbeat is metricbeat.yml available under /etc/metricbeat. 
+You configure Metricbeat to write to a specific output (elasticsearch cluster nodes) by setting options in the
+ Outputs section of the metricbeat.yml config file
 
 refer metricbeat.yml files provided in Node1,Node2,Node3
 for 
@@ -22,9 +20,9 @@ ssl.certificate_authorities
 
 Configure kibana endpoint
 setup.kibana:
-  host: "https://192.168.251.47:5601"
+  host: "http://192.168.251.47:5601"
 
-This is the Kibana server where dashboards will be loaded. Since our Kibana server is using SSL hence I have used https
+This is the Kibana server where dashboards will be loaded. If Kibana server is using SSL then use https
 
 set other properties:
 monitoring.enabled: true
@@ -32,16 +30,18 @@ setup.template.settings:
   index.number_of_shards: 1
   index.codec: best_compression
 
-Note**The Elasticsearch monitoring features use ingest pipelines, therefore the cluster that stores the monitoring data must have at least one ingest node. Disable the default collection of Elasticsearch monitoring metrics. Set xpack.monitoring.elasticsearch.collection.enabled to false on the production cluster.
+Note**The Elasticsearch monitoring features use ingest pipelines, therefore the cluster that stores the monitoring data must have at 
+least one ingest node. Disable the default collection of Elasticsearch monitoring metrics. 
+Set xpack.monitoring.elasticsearch.collection.enabled to false on the production cluster.
 
 Enable module to monitor elasticsearch cluster(on all nodes)
 metricbeat modules enable elasticsearch-xpack
 
 check and confirm if all nodes have same.
-cat /etc/metricbeat/modules.d/elasticsearch-xpack.yml
+--after enabling elasticsearch-xpack, it should have contents as below
+--reference <metricbeatpath>/metricbeat.reference.yml file for example
 
-# Module: elasticsearch
-# Docs: https://www.elastic.co/guide/en/beats/metricbeat/7.5/metricbeat-module-elasticsearch.html
+cat /etc/metricbeat/modules.d/elasticsearch-xpack.yml
 
 - module: elasticsearch
   metricsets:
@@ -55,16 +55,14 @@ cat /etc/metricbeat/modules.d/elasticsearch-xpack.yml
     - node_stats
     - shard
   period: 10s
-  hosts: ["https://ce1.example.com:9200","",""]
-  username: "elastic"
-  password: "xxxx"
-  ssl.certificate_authorities: ["/etc/metricbeat/certs/ca.crt"]
-  xpack.enabled: true
+  hosts: ["http://c1:9200"]
 
 on each node:
 By default, the system module is enabled. The information it collects, however, is not shown on the Monitoring page in Kibana. 
+--we can disable this for now
 metricbeat modules disable system
 
+--start metricbeat as a service OR using command as shown below
 systemctl start metricbeat
 
 to check status 
@@ -72,3 +70,7 @@ journalctl -u metricbeat.service
 (if any issues check permission on /etc/metricbeat)
 
 login into kibana and click on 'stack monitoring'
+
+#command to be run from metricbeat path unless classpath was already set
+./metricbeat -e -c metricbeat.yml -v
+

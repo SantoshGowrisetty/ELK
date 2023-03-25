@@ -1,14 +1,6 @@
-
 # Module: elasticsearch
 # Docs: https://www.elastic.co/guide/en/beats/metricbeat/7.8/metricbeat-module-elasticsearch.html
-
 - module: elasticsearch
-  xpack.enabled: true
-  period: 10s
-  hosts: ["https://ce1.example.com:9200","https://ce2.example.com","https://ce3.example.com"]
-  username: "elastic"
-  password: "abcd@1234"
-  ssl.certificate_authorities: ["/etc/metricbeat/certs/ca.crt"]
   metricsets:
     - ccr
     - cluster_stats
@@ -19,4 +11,5 @@
     - ml_job
     - node_stats
     - shard
-
+  period: 10s
+  hosts: ["http://c1:9200"]
