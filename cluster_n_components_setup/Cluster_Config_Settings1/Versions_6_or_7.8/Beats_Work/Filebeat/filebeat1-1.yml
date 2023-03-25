@@ -76,13 +76,8 @@ filebeat.config.modules:
 
 #==================== Elasticsearch template setting ==========================
 
-setup.ilm.enabled: false
-setup.template:
-  settings:
-     index.number_of_shards: 3
-     name: "mylog"
-     pattern: "mylog-*"
-  enabled: false
+setup.template.settings:
+  index.number_of_shards: 3
   #index.codec: best_compression
   #_source.enabled: false
 #================================ General =====================================
@@ -151,7 +146,7 @@ setup.kibana:
 output.elasticsearch:
   # Array of hosts to connect to.
   hosts: ["c1:9200"]
-  index: "mylog-%{[agent.version]}-%{+yyyy.MM.dd}" 
+
   # Enabled ilm (beta) to use index lifecycle management instead daily indices.
   #ilm.enabled: false
 
