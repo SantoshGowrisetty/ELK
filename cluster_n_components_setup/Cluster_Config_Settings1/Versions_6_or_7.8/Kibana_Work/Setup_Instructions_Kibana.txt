@@ -42,3 +42,37 @@ GET /_nodes/master:true,voting_only:false
 GET /_nodes/rack:2
 GET /_nodes/ra*:2
 GET /_nodes/ra*:2*
+
+===================
+#To enable monitoring
+By default these settings might not be updated or set to false in elasticsearch.yml
+xpack.monitoring.elasticsearch.collection.enabled: false
+xpack.monitoring.enabled: false
+xpack.security.enabled: false
+xpack.monitoring.collection.enabled: false
+ 
+to enable monitoring 
+>by default click on (set self monitoring)
+--this enables 'xpack.monitoring.collection.enabled' to true
+check in elasticsearch log or console shows
+[INFO ][o.e.c.s.ClusterSettings  ] [master] updating [xpack.monitoring.collection.enabled] from [false] to [true] 
+
+>using metricbeat
+--set metricbeat
+
+If required
+--to disable stack monitoring completely in kibana
+xpack.monitoring.kibana.collection.enabled: false
+
+--changing setting using update api
+PUT /_cluster/settings
+{
+  "persistent" : {
+    "xpack.monitoring.collection.enabled" : false
+  }
+}
+
+check in elasticsearch log or console shows
+[INFO ][o.e.c.s.ClusterSettings  ] [master] updating [xpack.monitoring.collection.enabled] from [true] to [false]
+
+
