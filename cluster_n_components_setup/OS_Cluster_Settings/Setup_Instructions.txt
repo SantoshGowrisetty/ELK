@@ -1,0 +1,192 @@
+Opensearch setup- on ubuntu 18.04 using Opensearch 2.6
+-----------
+--Steps to be performed on each node (in our case 3 nodes: a1,a2,a3)
+#to check your ubuntu release
+--lsb_release -a
+
+#to get openjdk-11 for nodes
+sudo apt update
+sudo apt install openjdk-11-jdk
+
+#update .bashrc for your dedicated user on each node
+export JAVA_HOME=/usr/lib/jvm/java-11-openjdk-amd64/
+#export PATH=$PATH:$JAVA_HOME/bin
+
+--refresh
+source .bashrc
+
+#Download opensearch and opensearch-dashboards tar from 
+https://opensearch.org/downloads.html
+
+#Setup Opensearch cluster
+#untar into a location
+hdu@a1:/usr/local$ sudo tar -xvf /home/hdu/Downloads/opensearch-2.6.0-linux-x64.tar.gz
+hdu@a1:/usr/local$ sudo ln -s opensearch-2.6.0 opensearch
+hdu@a1:/usr/local$ sudo chown -R hdu:hdu opensearch*
+
+--Opensearch-dashboards
+hdu@a1:/usr/local$ sudo tar -xvf /home/hdu/Downloads/opensearch-dashboards-2.6.0-linux-x64.tar.gz
+hdu@a1:/usr/local$ sudo ln -s opensearch-dashboards-2.6.0 dashboard
+hdu@a1:/usr/local$ sudo chown -R hdu:hdu dashboard
+hdu@a1:/usr/local$ sudo chown -R hdu:hdu opensearch-dashboards-2.6.0/
+
+#update .bashrc for your dedicated user on each node
+#if python3 installed and setup
+alias python=python3
+
+#for opensearch
+export OPENSEARCH_HOME=/usr/local/opensearch
+export PATH=$PATH:$OPENSEARCH_HOME/bin
+export OPENSEARCH_DASHBOARD=/usr/local/dashboard
+export PATH=$PATH:$OPENSEARCH_DASHBOARD/bin
+
+--refresh
+source .bashrc
+
+--check
+opensearch -version
+--------
+#Important settings to handle the bootstrap process of cluster
+--refer provided limits.conf and sysctl.conf and copy into your respective folders
+    limits.conf in /etc/security/
+    sysctl.conf in /etc/
+
+--Details on what these files contain--
+-----------------------
+--Disable memory paging and swapping performance on the host to improve performance. 
+sudo swapoff -a
+
+--Increase the number of memory maps available to OpenSearch. 
+--For production workloads, make sure the 
+--Linux setting vm.max_map_count is set to at least 262144.
+# Edit the sysctl config file
+sudo vi /etc/sysctl.conf
+
+# Add a line to define the desired value
+# or change the value if the key exists,
+# and then save your changes.
+vm.max_map_count=262144
+
+# Reload the kernel parameters using sysctl
+sudo sysctl -p
+
+# Verify that the change was applied by checking the value
+cat /proc/sys/vm/max_map_count
+
+--other settings
+    bootstrap.memory_lock=true
+    Disables swapping (along with memlock). Swapping can dramatically decrease performance 
+    and stability, so you should ensure it is disabled on production clusters.
+
+    OPENSEARCH_JAVA_OPTS=-Xms512m -Xmx512m
+    Sets the size of the Java heap (recommended half of system RAM).
+	OR 
+    in <opensearch_path>/config/jvm.options, add these 
+    -Xms2g
+    -Xmx2g
+    
+    nofile 65536
+    Sets a limit of 65536 open files for the OpenSearch user.
+     OR login as root and give
+    ulimit -n 65535 
+
+    port 9600
+    Allows you to access Performance Analyzer on port 9600.
+--------------------------
+Note** for system settings to take effect, reboot machine
+--------------------------
+
+#to setup cluster
+--copy provided configs from 'MyConfigsOS'
+Node1/<configs> into <opensearch_path_node1>/config/
+Node2/<configs> into <opensearch_path_node2>/config/
+Node3/<configs> into <opensearch_path_node3>/config/
+
+#check your configs
+
+#By default security is enabled in Opensearch/ ES 
+#We can enable it and keep it or disable security
+
+#For now we will disable security and to do so, we need to edit property and remove security plugin
+--on each node (check)
+cat <opensearch_path_node1>/config/opensearch.yml
+
+--this property should be commented out
+  #plugins.security.disabled: true
+--since configs were copied , it should be already done
+
+--remove security plugin completely
+--we will just move it to another location
+hdu@a1:~$ mv /usr/local/opensearch/plugins/opensearch-security /home/hdu/Downloads
+
+#Start cluster
+on each node
+hdu@a1:~$opensearch
+hdu@a2:~$opensearch
+hdu@a3:~$opensearch
+
+#check if cluster is up
+hdu@a1:~$ curl -X GET http://a1:9200
+{
+  "name" : "Node1",
+  "cluster_name" : "mycluster",
+  "cluster_uuid" : "RQOrBS3tT9mj4gIe1ZVvQw",
+  "version" : {
+    "distribution" : "opensearch",
+    "number" : "2.6.0",
+    "build_type" : "tar",
+    "build_hash" : "7203a5af21a8a009aece1474446b437a3c674db6",
+    "build_date" : "2023-02-24T18:57:04.388618985Z",
+    "build_snapshot" : false,
+    "lucene_version" : "9.5.0",
+    "minimum_wire_compatibility_version" : "7.10.0",
+    "minimum_index_compatibility_version" : "7.0.0"
+  },
+  "tagline" : "The OpenSearch Project: https://opensearch.org/"
+}
+
+hdu@a1:~$ curl -X GET http://a1:9200/_cat/nodes?v
+ip             heap.percent ram.percent cpu load_1m load_5m load_15m node.role node.roles  cluster_manager name
+192.168.56.107            5          83   8    0.26    0.50     0.34 dm        data,master -               Node2
+192.168.56.110            4          83  10    0.43    0.66     0.40 dm        data,master -               Node3
+192.168.56.106            4          87  13    0.32    0.64     0.56 dm        data,master *               Node1
+
+hdu@a1:~$ curl -X GET http://a1:9200/_cat/plugins?v
+
+##Setup Opensearch-dashboards and connect to your opensearch cluster
+--copy provided configs from 'MyConfigsOS-dashboards'
+Node1/<configs> into <opensearch-dashboards_path_node1>/config/
+
+#we also need to disable & remove security related plugin
+--to disable , make sure following settings are commented out in opensearch_dashboards.yml
+--if config copied, this should be automatically taken care.
+
+#opensearch.username: "admin"
+#opensearch.password: "kibana"
+#opensearch_security.multitenancy.enabled: true
+#opensearch_security.multitenancy.tenants.preferred: [Private, Global]
+#opensearch_security.readonly_mode.roles: [kibana_read_only]
+# Use this setting if you are running opensearch-dashboards without https
+#opensearch_security.cookie.secure: false
+
+--to remove
+hdu@a1:/usr/local/opensearch-dashboards-2.6.0$ bin/opensearch-dashboards-plugin list
+hdu@a1:/usr/local/opensearch-dashboards-2.6.0$ bin/opensearch-dashboards-plugin remove securityDashboards
+Removing securityDashboards...
+Plugin removal complete
+
+#Now start opensearch-dashboard using command
+hdu@a1:~$ opensearch-dashboards
+
+--connect to dashboard from browser
+http://a1:5601
+
+
+
+
+
+
+
+
+
+
