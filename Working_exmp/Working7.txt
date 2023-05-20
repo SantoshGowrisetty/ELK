@@ -3,20 +3,17 @@ Query examples after ingesting data using logstash
 --refer logstash specific folder for instructions to load file
 Queries using Dev tools >
 
-GET /_cat/indices?v
---
+-----For OpenSearch------
+use these instead of 'POST /_sql?format=txt OR GET /_sql?format=txt'
+POST /_plugins/_sql
+POST /_plugins/_sql?format=json
+-------------
+
 POST /_sql?format=txt
 {
   "query": "select * from bankdata"
 }
 
---
-POST /_sql?format=txt
-{
-  "query": "select age,marital from bankdata order by age desc limit 10"
-}
-
---
 GET /_sql?format=txt
 {
   "query": "select * from bankdata",
@@ -50,6 +47,7 @@ POST /_sql?format=json
   "columnar": true
 }
 --
+--if using in OS, remove params and change ? in where clause
 POST /_sql?format=txt
 {
   "query": "select age,y,count(*) as count from bankdata where age > ? group by age,y order by count desc",
