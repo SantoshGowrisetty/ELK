@@ -2,7 +2,7 @@
 #Using _bulk API expects a single line with action ie create,update or delete
 #It uses '/n' for new lines
 
-POST /ecommerce/_doc/_bulk
+POST /ecommerce/_bulk
 {"index": {"_id":"1002"}}
 {"name": "why ES is Awesome","price":"100.00","description":"This book is all about ES!","status":"active","quantity":12,"categories":[{"name":"Software"}],"tags":["ES","programming"]}
 {"index": {"_id":"1003"}}
@@ -10,7 +10,28 @@ POST /ecommerce/_doc/_bulk
 {"index": {"_id":"1005"}}
 {"name": "why elasticsearch is Awesome","price":"100.00","description":"This book is all about elasticsearch!","status":"active","quantity":12,"categories":[{"name":"Software"}],"tags":["elasticsearch","programming"]}
 
-PUT /ecommerce/_doc/_bulk
+PUT /ecommerce/_bulk
+{"index": {"_id":"711"}}
+{"name": "why ESS is Awesome","price":"100.00","description":"This book is all about EES!","status":"active","quantity":12,"categories":[{"name":"Software"}],"tags":["ES","programming"]}
+{"index": {"_id":"170"}}
+{"name": "cashewnuts","price":"100.00","description":"spicy cashewnuts","status":"active","quantity":120,"categories":[{"name":"Food"}],"tags":["snacks"]}
+{"index": {"_id":"1370"}}
+{"name": "why elasticsearch is Awesome","price":"101.00","description":"This book is all about elasticsearch!","status":"active","quantity":12,"categories":[{"name":"Software"}],"tags":["elasticsearch","programming"]}
+{"index": {"_id":"1297"}}
+{"name": "why elasticsearch is Awesome","price":"101.00","description":"This book is all about elasticsearch!","status":"active","quantity":12,"categories":[{"name":"Software"}],"tags":["elasticsearch","programming"]}
+{"index": {"_id":"173"}}
+{"name": "why elasticsearch is Awesome","price":"101.00","description":"This book is all about elasticsearch!","status":"active","quantity":12,"categories":[{"name":"Software"}],"tags":["elasticsearch","programming"]}
+{"index": {"_id":"18"}}
+{"name": "why elasticsearch is Awesome","price":"101.00","description":"This book is all about elasticsearch!","status":"active","quantity":12,"categories":[{"name":"Software"}],"tags":["elasticsearch","programming"]}
+{"index": {"_id":"309"}}
+{"name": "why elasticsearch is Awesome","price":"101.00","description":"This book is all about elasticsearch!","status":"active","quantity":12,"categories":[{"name":"Software"}],"tags":["elasticsearch","programming"]}
+{"index": {"_id":"1339"}}
+{"name": "why elasticsearch is Awesome","price":"101.00","description":"This book is all about elasticsearch!","status":"active","quantity":12,"categories":[{"name":"Software"}],"tags":["elasticsearch","programming"]}
+{"index": {"_id":"1310"}}
+{"name": "why elasticsearch is Awesome","price":"101.00","description":"This book is all about elasticsearch!","status":"active","quantity":12,"categories":[{"name":"Software"}],"tags":["elasticsearch","programming"]}
+
+
+PUT /ecommerce2/_bulk
 {"index": {"_id":"711"}}
 {"name": "why ESS is Awesome","price":"100.00","description":"This book is all about EES!","status":"active","quantity":12,"categories":[{"name":"Software"}],"tags":["ES","programming"]}
 {"index": {"_id":"170"}}
@@ -38,25 +59,6 @@ POST /ecommerce2/_bulk
 {"index": {"_id":"1005"}}
 {"name": "why elasticsearch is Awesome","price":"100.00","description":"This book is all about elasticsearch!","status":"active","quantity":12,"categories":[{"name":"Software"}],"tags":["elasticsearch","programming"]}
 
-PUT /ecommerce2/_bulk
-{"index": {"_id":"711"}}
-{"name": "why ESS is Awesome","price":"100.00","description":"This book is all about EES!","status":"active","quantity":12,"categories":[{"name":"Software"}],"tags":["ES","programming"]}
-{"index": {"_id":"170"}}
-{"name": "cashewnuts","price":"100.00","description":"spicy cashewnuts","status":"active","quantity":120,"categories":[{"name":"Food"}],"tags":["snacks"]}
-{"index": {"_id":"1370"}}
-{"name": "why elasticsearch is Awesome","price":"101.00","description":"This book is all about elasticsearch!","status":"active","quantity":12,"categories":[{"name":"Software"}],"tags":["elasticsearch","programming"]}
-{"index": {"_id":"1297"}}
-{"name": "why elasticsearch is Awesome","price":"101.00","description":"This book is all about elasticsearch!","status":"active","quantity":12,"categories":[{"name":"Software"}],"tags":["elasticsearch","programming"]}
-{"index": {"_id":"173"}}
-{"name": "why elasticsearch is Awesome","price":"101.00","description":"This book is all about elasticsearch!","status":"active","quantity":12,"categories":[{"name":"Software"}],"tags":["elasticsearch","programming"]}
-{"index": {"_id":"18"}}
-{"name": "why elasticsearch is Awesome","price":"101.00","description":"This book is all about elasticsearch!","status":"active","quantity":12,"categories":[{"name":"Software"}],"tags":["elasticsearch","programming"]}
-{"index": {"_id":"309"}}
-{"name": "why elasticsearch is Awesome","price":"101.00","description":"This book is all about elasticsearch!","status":"active","quantity":12,"categories":[{"name":"Software"}],"tags":["elasticsearch","programming"]}
-{"index": {"_id":"1339"}}
-{"name": "why elasticsearch is Awesome","price":"101.00","description":"This book is all about elasticsearch!","status":"active","quantity":12,"categories":[{"name":"Software"}],"tags":["elasticsearch","programming"]}
-{"index": {"_id":"1310"}}
-{"name": "why elasticsearch is Awesome","price":"101.00","description":"This book is all about elasticsearch!","status":"active","quantity":12,"categories":[{"name":"Software"}],"tags":["elasticsearch","programming"]}
 
 GET /_cat/indices/ecommerce*?v
 
@@ -76,6 +78,7 @@ GET ecommerce2/_search
 
 GET /_cat/indices/ecommerce*?v
 
+GET /_cluster/health/ecommerce?level=shards
 GET /_cluster/health/ecommerce2?level=shards
 
 #more operations using bulk
@@ -103,16 +106,6 @@ POST /_bulk
 {"update" : {"_id" : "1310", "_index" : "ecommerce2"}}
 {"doc" : {"price" : 103}}
 
-========================
-#using routing to shard data on any other field
-PUT ecommerce2/_doc/1?routing=user1&refresh=true
-{
-  "title": "This is a document"
-}
-
-GET ecommerce2/_doc/1?routing=user1
-
-===================
 GET /_cat/indices?v
 
 #creating index with multiple shards and replicas
@@ -137,7 +130,7 @@ GET ecommerce3/_search
     }
 }
 
-POST /ecommerce3/_bulk
+PUT /ecommerce3/_bulk
 {"index": {"_id":"1002"}}
 {"name": "why ES is Awesome","price":"100.00","description":"This book is all about ES!","status":"active","quantity":12,"categories":[{"name":"Software"}],"tags":["ES","programming"]}
 {"index": {"_id":"1003"}}
@@ -169,22 +162,7 @@ PUT /ecommerce3/_bulk
 
 GET /_cluster/health/ecommerce3?level=shards
 
-#bulk multiple operations
-POST /ecommerce3/_bulk
-{"delete" : {"_id" : "71299"}}
-{"update" : {"_id" : "1310110"}}
-{"doc" : {"price" : 1020}}
-
-#looking at document wise shard allocation
-GET ecommerce3/_search
-{
-    "explain": true,
-    "query": {
-        "match_all": {}
-    }
-}
-
-#routing data into shards based on a different field (other than _id)
+#using routing to shard data on any other field(other than _id)
 PUT ecommerce3/_doc/101?routing=title&refresh=true
 {
   "title": "This is a document"

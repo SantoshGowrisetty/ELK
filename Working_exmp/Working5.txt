@@ -5,87 +5,28 @@ GET /ecommerce/_search?q=name:(cashewnuts OR peanuts)
 GET /ecommerce/_search?q=name:(cashenuts AND "why elasticsearch is Awesome")
 
 #look for score value if value was higher in any case
-GET /ecommerce/_doc/_search?q=(name:(cashewnuts OR Framework) AND status:active)
+GET /ecommerce/_search?q=(name:(cashewnuts OR Framework) AND status:active)
 
 #using boolean operators
 #prefix + (terms must be present) prefix -(terms must not be present)
-GET /ecommerce/_doc/_search?q=name:+cashewnuts -peanuts
-
-==========================
+GET /ecommerce/_search?q=name:+cashewnuts -peanuts
 
 #using phrases while querying
 14.
 #Note** remember default boolean operator is OR
-GET /ecommerce/_doc/_search?q=name:"Test Framework"
+GET /ecommerce/_search?q=name:"Test Framework"
 #order of terms does matter when searching using phrase
 
-#Analyzer examples
-POST _analyze
-{
-  "analyzer": "stop",
-  "text": "hey this is test"
-}
-
-
-PUT ecommerce4
-{
-  "settings": {
-    "analysis": {
-      "analyzer": {
-        "my_english_analyzer": {
-          "type": "standard",
-          "max_token_length": 4,
-          "stopwords": "_english_"
-        }
-      }
-    }
-  }
-}
-
-POST ecommerce4/_analyze
-{
-  "analyzer": "my_english_analyzer",
-  "text": "this is awesome playful smart and tokenization"
-}
-
-#ES analyzer is used to search for phrase 
-GET ecommerce/_analyze
-{"analyzer": "standard",
- "text": "Test Framework"}
-
-#this will show what was used by analyzer when tokenizing and list of tokens
-GET ecommerce/_analyze 
-{
-  "analyzer": "stop",
-  "text": "Test the new Framework"
-}
-
-================================
-
+-------------
 #Querying using DSL (Domain specific language)
 #using must or must_not(to exclude) which contribute to documents to relevancy scores
 15.
-GET /ecommerce/_doc/_search
+GET /ecommerce/_search
 {
   "query": {
     "bool": {
       "must": [
         {"match": {"name": "cashewnuts"}},
-        {"match": {"name": "Test Framework"}}
-        ]
-    }
-  }
-}
-
----------
-GET /ecommerce/_doc/_search
-{
-  "query": {
-    "bool": {
-      "must": [
-        {"match": {"name": "cashewnuts"}}
-        ],
-      "must_not": [
         {"match": {"name": "Test Framework"}}
         ]
     }
@@ -106,8 +47,6 @@ GET /ecommerce/_search
   }
 }
 
-
-========================================
 #using bool with should clauses(to increase relevancy scores)
 #where should clause behave like logical operators
 16.
@@ -139,3 +78,48 @@ GET /ecommerce/_search
     }
   }
 }
+
+---------
+#Analyzer examples
+POST _analyze
+{
+  "analyzer": "stop",
+  "text": "hey this is test"
+}
+
+
+PUT ecommerce4
+{
+  "settings": {
+    "analysis": {
+      "analyzer": {
+        "my_english_analyzer": {
+          "type": "standard",
+          "max_token_length": 4,
+          "stopwords": "_english_"
+        }
+      }
+    }
+  }
+}
+
+POST ecommerce4/_analyze
+{
+  "analyzer": "my_english_analyzer",
+  "text": "this is awesome playful smart and tokenization"
+}
+
+#ES analyzer is used to search for phrase 
+#this will show what was used by analyzer when tokenizing and list of tokens
+--standard analyzer
+GET ecommerce/_analyze
+{"analyzer": "standard",
+ "text": "Test Framework"}
+
+--stop analyzer
+GET ecommerce/_analyze 
+{
+  "analyzer": "stop",
+  "text": "Test the new Framework"
+}
+

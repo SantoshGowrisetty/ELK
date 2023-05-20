@@ -15,8 +15,6 @@ To change a field type, use the Elasticsearch Mapping API'
 
 Kibana > Discover > Choose index pattern from dropdown
 
-
-
 marital : married and age>= 70
 marital : married or marital : divorced
 marital.keyword :"single"  (shows all possible options)

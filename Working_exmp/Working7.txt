@@ -70,8 +70,8 @@ sql>select * from bankdata;
 
 
 #running using curl and from command line
-curl -XPOST "http://c1:9200/_sql?format=txt" -H 'Content-Type: application/json' -d'{  "query": "select * from bankdata limit 2"}'
 
+curl -XPOST "http://c1:9200/_sql?format=txt" -H 'Content-Type: application/json' -d'{  "query": "select * from bankdata limit 2"}'
 curl -XPUT "http://c1:9200/_sql?format=csv" -H 'Content-Type: application/json' -d'{  "query": "select age,y,count(*) as count from bankdata where age > ? group by age,y order by count desc",  "params": [75]  }' > bankres.csv
 
 

@@ -73,7 +73,7 @@ PUT /newproducts
          }
 }
 }}
-==============
+
 POST /newproducts/_bulk
 {"index": {"_id":"10"}}
 {"name": "why ES is Awesome","price":"100.00","description":"This book is all about the ES!","status":"active","quantity":12,"categories":[{"name":"Software","quantity":200}],"tags":["ES the search store","programming JAVA"]}
@@ -81,7 +81,9 @@ POST /newproducts/_bulk
 {"name": "why logstash","price":"100.00","description":"processing THE LOGS and sending to ES","status":"active","quantity":120,"categories":[{"name":"Book","quantity":20}],"tags":["LOG PROCESSING","BEAT PROCESSING"]}
 {"index": {"_id":"3"}}
 {"name": "why elasticsearch is Awesome","price":"100.00","description":"This book is A book which is all about elasticsearch!","status":"active","quantity":12,"categories":[{"name":"Software"}],"tags":["elasticsearch","programming","SEARCHING INdexes"]}
-==================
+
+#try adding a document with a new field which is not mentioned in mappings defined
+-----------
 
 #Test Query
 1.
@@ -174,6 +176,7 @@ POST _analyze
 }
 
 GET /german_example
+
 POST german_example/_bulk
 {"index": {"_id":"10"}}
 {"name": "ES ist neue","price":"100.00","description":"In diesem Buch dreht sich alles um ES!","status":"active","quantity":12,"categories":[{"name":"Software","quantity":200}],"tags":["ES the search store","programming JAVA"]}
@@ -182,4 +185,3 @@ POST german_example/_bulk
 {"index": {"_id":"3"}}
 {"name": "ES ist toll","price":"100.00","description":"Dieses Buch ist ein Buch, in dem sich alles um Elasticsearch drehth!","status":"active","quantity":12,"categories":[{"name":"Software"}],"tags":["elasticsearch","programming","SEARCHING INdexes"]}
 
---Test

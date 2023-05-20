@@ -1,38 +1,39 @@
 #If ES in a cluster
 #Setup NFS for your cluster to handle backup & restore
 #on node1
-apt-get install nfs-kernel-server
-apt-get install nfs-common
+sudo apt-get install nfs-kernel-server
+sudo apt-get install nfs-common
 
 #on node2
-apt-get install nfs-common
+sudo apt-get install nfs-common
 
 #on node3
-apt-get install nfs-common
+sudo apt-get install nfs-common
 
 #Now on node1
 service nfs-kernel-server start
 
 #create a directory
-mkdir /mydata
-chown -R elasticsearch:elasticsearch /mydata
+sudo mkdir /mydata
+sudo chown -R hdu:hdu /mydata
 
 #for NFS setup
 create and edit a file
-vi /etc/exports
+sudo vi /etc/exports
 /mydata      *(rw,sync,no_root_squash)
 :wq
 
 exportfs -a
 
 #on all nodes check
-showmount -e 192.168.56.104
+showmount -e 192.168.56.106
 
 #on all nodes mount ur path to this shared path
 
-Note** create directory /usr/local/mybackup on all nodes,which will be mounted and thus used to store snapshots
+Note** create directory /home/hdu/ESbckup on all nodes,which will be mounted and 
+thus used to store snapshots
 #creating mount point
-mount -t nfs 192.168.56.104:/mydata /usr/local/mybackup
+sudo mount -t nfs 192.168.56.106:/mydata /home/hdu/ESbckup
 
 #stop elasticsearch on all nodes
 systemctl stop elasticsearch.service
@@ -41,7 +42,7 @@ systemctl stop elasticsearch.service
 systemctl stop kibana.service
 
 #update or add in /etc/elasticsearch/elasticsearch.yml
-path.repo: /usr/local/mybackup
+path.repo: /home/hdu/ESbckup
 
 If path was not shared ,you may get this error
 {
@@ -67,13 +68,13 @@ PUT /_snapshot/demobackup
    "type": "fs",
    "settings": {
        "compress": true,
-       "location": "/usr/local/mybackup"
+       "location": "/home/hdu/ESbckup"
     }
 }
 
 GET _snapshot/_all
 
-POST /ecomtest/product/_bulk
+PUT /ecomtest/product/_bulk
 {"index": {"_id":"1004"}}
 {"name": "why ES is Awesome","price":"100.00","description":"This book is all about ES!","status":"active","quantity":12,"categories":[{"name":"Software"}],"tags":["ES","programming"]}
 {"index": {"_id":"1005"}}
@@ -83,14 +84,22 @@ POST /ecomtest/product/_bulk
 
 GET /ecomtest/_search
 
-PUT /_snapshot/demobackup/snaphot-one?wait_for_completion=true
+PUT /_snapshot/demobackup/snapshot-one?wait_for_completion=true
 
-get /_cat/indices
+get /_cat/indices?v
 
 DELETE /ecomtest
 
-POST /_snapshot/demobackup/snaphot-one/_restore
+POST /_snapshot/demobackup/snapshot-one/_restore
 {"indices":"ecomtest"}
+
+--create new snapshot
+PUT _snapshot/demobackup/snapshot-one2?wait_for_completion=true
+
+DELETE ecommer*
+
+POST /_snapshot/demobackup/snapshot-one2/_restore
+{"indices": ["ecommerce","ecommerce2","ecommerce3"]}
 
 #check if index is back
 
