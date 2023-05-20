@@ -17,6 +17,7 @@ $mv classified-ads-for-cars.csv cars.csv
 #when running logstash check if your logstash is in /etc/logstash or in /usr/local/logstash and
 choose the one you prefer and have configured.
 
+--if conf file not copied and building on your own
 $vi /usr/local/logstash/conf.d/logstash_cars.config
 
 #paste this content 
@@ -58,7 +59,7 @@ output {
 
 #start logstash pointing to this config file
 #change paths according to your setup
-$/usr/local/logstash/bin/logstash --path.settings /usr/local/logstash/ -f /usr/local/logstash/conf.d/logstash_cars.config
+$logstash --path.settings /usr/local/logstash/ -f /usr/local/logstash/conf.d/logstash_cars.config
 
 #testing while data is being pushed into ES
 

@@ -1,0 +1,71 @@
+#paths may have changed, read through and recheck in git 
+#conf file for this exists in 'MyConfigsLS'
+
+>>MyConfigsLS/conf.d/logstash_bankcsv.conf
+
+#using logstash to send csv file to ES and create index automatically
+--Download Bank_full.csv from https://github.com/ajaykuma/datasets_for_work
+
+#when running logstash check if your logstash is in /etc/logstash or in /usr/local/logstash and
+choose the one you prefer and have configured.
+
+--if conf file not copied and building on your own
+
+$vi /usr/local/logstash/conf.d/logstash_bankcsv.conf
+
+#paste this content 
+input {
+     file {
+      path => "<path>/cars.csv"
+      start_position => "beginning"
+      sincedb_path => "/dev/null"
+      }
+}
+
+
+filter {
+     csv {
+         separator => ","
+         columns => ["age","job","marital","education","default","balance","housing","loan","contact","day","month","duration","campaign","pdays","previous","poutcome","y"]
+     }
+     mutate {convert => ["age","integer"]}
+     mutate {convert => ["balance","float"]}
+     mutate {convert => ["duration","integer"]}
+
+}
+
+output {
+  elasticsearch {
+    hosts => ["http://c1:9200","http://c2:9200","http://c3:9200"]
+    index => "bankdata"
+  }
+
+
+      stdout {}
+}
+
+-----------
+
+#note** Make sure elasticsearch & kibana service is running already
+
+#start logstash pointing to this config file
+#change paths according to your setup
+
+
+--build index with desired shards and replicas before pushing data (or index will be created with default settings)
+PUT /bankdata
+{
+  "settings": {
+    "number_of_shards": 3
+    , "number_of_replicas": 2
+    , "auto_expand_replicas": false
+  }
+}
+
+GET /_cat/indices/bankdata?v
+
+
+$logstash --path.settings /usr/local/logstash/ -f /usr/local/logstash/conf.d/logstash_bankcsv.conf
+
+--check data
+

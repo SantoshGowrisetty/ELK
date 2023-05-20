@@ -11,6 +11,9 @@
 #when running logstash check if your logstash is in /etc/logstash or in /usr/local/logstash and
 choose the one you prefer and have configured.
 
+--if conf file not copied and building on your own
+vi /usr/local/logstash/conf.d/logstash_populcsv.conf
+
 #create a conf file
 input {
 	file {
@@ -67,7 +70,7 @@ output {
 }
 
 #start logstash pointing to conf file 
-/usr/local/logstash/bin/logstash --path.settings /usr/local/logstash -f /usr/local/logstash/conf.d/logstash_populcsv.conf
+logstash --path.settings /usr/local/logstash -f /usr/local/logstash/conf.d/logstash_populcsv.conf
 
 #login to kibana and check if index is created
 Management>Create Index pattern>population

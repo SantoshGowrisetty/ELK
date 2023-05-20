@@ -12,8 +12,9 @@ choose the one you prefer and have configured.
 refering to a specific config file which controls input-filter-output of 
 logstash pipeline
 
-#if created 'conf.d' in 'logstash path' proceed, if not, create the directory
+#if created 'conf.d' in 'logstash path' proceed, if not, create the directory & copy the logstash_simple.conf file.
 
+--if not copied and building on your own
 create a 'logstash-simple.conf' file
 vi /usr/local/logstash/conf.d/logstash-simple.conf
 
@@ -25,7 +26,6 @@ output {
         stdout {}
 }
 
-#the file can be found in 'MyConfigsLS/conf.d/'
 
 #Option1
 #run logstash from command line refering to conf file
@@ -35,10 +35,10 @@ output {
 
 #to run logstash pointing to our created *.conf file
 
-[elk@ce4 ~]$ logstash --path.settings /usr/local/logstash -f /usr/local/logstash/conf.d/logstash_simple.conf
+$ logstash --path.settings /usr/local/logstash -f /usr/local/logstash/conf.d/logstash_simple.conf
 
-##sameple output
-[hdu@c3 ~]$ logstash --path.settings /usr/local/logstash -f /usr/local/logstash/conf.d/logstash_simple.conf
+##sample output
+$ logstash --path.settings /usr/local/logstash -f /usr/local/logstash/conf.d/logstash_simple.conf
 WARNING: Could not find logstash.yml which is typically located in $LS_HOME/config or /etc/logstash. You can specify the path using --path.settings. Continuing using the defaults
 Could not find log4j2 configuration at path /usr/local/logstash/log4j2.properties. Using default config which logs errors to the console
 [WARN ] 2023-01-17 18:02:42.177 [LogStash::Runner] multilocal - Ignoring the 'pipelines.yml' file because modules or command line options are specified
@@ -91,7 +91,7 @@ hello
 #Option 2
 (notice here,all conf files in 'conf.d' will be applicable for logstash
 
-[elk@ce4 ~]$ logstash --path.settings /usr/local/logstash
+$ logstash --path.settings /usr/local/logstash
 
 #going forward we will create conf files that have input + filter (with or without plugins)+ output and run logstash pipeline 
 refering to specific file

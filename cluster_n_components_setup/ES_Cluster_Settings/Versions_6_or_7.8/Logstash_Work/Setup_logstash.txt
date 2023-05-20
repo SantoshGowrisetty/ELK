@@ -1,5 +1,7 @@
 #Logstash setup
+Note** change user 'elk' to 'hdu' or your specific user
 
+Two methods mentioned, either via RPMs or Tar (as per your method, follow the instructions)
 #Can be setup using tar or using RPM
 
 #Note
@@ -11,6 +13,7 @@ using the key will be considered trusted by your package manager.
 In this step, you will import the Elasticsearch public GPG key and add the 
 Elastic repository in order to install Elasticsearch.
 
+--if centos
 #If using RPMs
 
 #to download and install the Elasticsearch public signing key:
@@ -41,17 +44,23 @@ sudo yum install kibana
 vi /etc/kibana/config/kibana.yml 
 ------------------
 
-LOGSTASH SETUP:
-Two methods mentioned, either via RPMs or Tar (as per your method, follow the instructions)
-
---------
 #if using tar files
 --Download logstash-7.8 from elastic.co
+--Download logstash from https://opensearch.org/downloads.html
 
 $cd /usr/local
-$sudo tar -xvf /home/elk/Downloads/logstash-7.8.0.tar.gz
+$sudo tar -xvf /home/hdu/Downloads/logstash-7.8.0.tar.gz
+OR
+$sudo tar -xvf /home/hdu/Downloads/logstash-oss-with-opensearch-output-plugin-8.6.1-linux-x64.tar.gz
+
 $sudo ln -s logstash-7.8.0 logstash
+OR
+$sudo ln -s logstash-8.6.1 logstash
+
 $sudo chown -R elk:elk logstash*
+OR
+$sudo chown -R hdu:hdu logstash*
+
 $cd
 $vi .bashrc
 

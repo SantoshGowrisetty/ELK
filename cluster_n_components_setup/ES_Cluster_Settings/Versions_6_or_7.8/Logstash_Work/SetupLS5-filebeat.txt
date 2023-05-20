@@ -11,6 +11,7 @@
 #when running logstash check if your logstash is in /etc/logstash or in /usr/local/logstash and
 choose the one you prefer and have configured.
 
+--if conf file not copied and building on your own
 #Create following files inside “/usr/local/logstash/conf.d”
 
 #sudo vi fb_pipeline.conf 
