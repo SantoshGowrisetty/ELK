@@ -1,0 +1,97 @@
+#Setup & Configure filebeat (plugin) to send log lines to logstash/OS
+Filebeat_OSS setup
+
+https://www.elastic.co/downloads/past-releases/filebeat-oss-8-6-0
+>linux_x86_64
+
+hdu@a1:~$ cd /usr/local/
+hdu@a1:/usr/local$ sudo tar -xvf /home/hdu/Downloads/filebeat-oss-8.6.0-linux-x86_64.tar.gz 
+hdu@a1:/usr/local$ sudo ln -s filebeat-8.6.0-linux-x86_64 filebeat
+hdu@a1:/usr/local$ sudo chown -R hdu:hdu filebeat*
+
+--update .bashrc
+export FILEBEAT_HOME=/usr/local/filebeat
+export PATH=$PATH:$FILEBEAT_HOME/bin
+
+--refresh
+source .bashrc
+
+#without specifying index name or templates
+--copy filebeat1-3.yml and edit it(if needed)
+hdu@a1:/usr/local/filebeat$ cp /home/hdu/Downloads/filebeat1-1.yml filebeat.yml
+
+--to publish data to Opensearch
+--edit filebeat.yml, output section
+#-------------------------- Elasticsearch output ------------------------------
+output.elasticsearch:
+  # Array of hosts to connect to.
+  hosts: ["a1:9200"]
+
+hdu@a1:/usr/local/filebeat$ ./filebeat -e -c filebeat.yml -d publish
+"Failed to connect to backoff(elasticsearch(http://a1:9200)): Connection marked as failed because 
+the onConnect callback failed: 
+could not connect to a compatible version of Elasticsearch: 400 Bad Request:
+
+--to publish data to Logstash to then send data to Opensearch
+--edit filebeat.yml, output section
+#----------------------------- Logstash output --------------------------------
+output.logstash:
+  # The Logstash hosts
+  hosts: ["a3:5443"]
+
+in fb_pipeline.conf, output section looks like this:
+output {
+  stdout {codec => rubydebug}
+  opensearch {
+    hosts => ["a1:9200","a2:9200","a3:9200"]
+    manage_template => false
+ }
+
+--validate
+hdu@a3:~$ logstash --path.settings /usr/local/logstash/ -f /usr/local/logstash/conf.d/fb_pipeline.conf --config.test_and_exit
+[LogStash::Runner] runner - Using config.test_and_exit mode. Config Validation Result: OK. Exiting Logstash
+
+--run the logstash pipeline
+hdu@a3:~$ logstash --path.settings /usr/local/logstash/ -f /usr/local/logstash/conf.d/fb_pipeline.conf
+
+--on node with filebeat setup
+--run filebeat
+
+--check if index was created and count of documents
+--since no templates used to specify index name, index created is with default settings
+'ecs-logstash-2023*' 
+should show 255 documents
+since we are pushing data from /usr/local/opensearch/logs/mycluster.log
+
+hdu@a1:~$ cat /usr/local/opensearch/logs/mycluster.log | wc -l
+255
+
+-------------
+#specify index name in logstash output
+--if using same log file as before
+--clear metadata which is stored by filebeat
+##if filename is changed for new instance of filebeat and index pattern is changed, 
+then we can continue to run filebeat from same location
+OR
+##we can clear the registry and metadata entry from <filebeat_location>/data folder 
+by using command such as
+rm -rf /<filebeatpath>/data/*
+
+in filebeat.yml make following changes
+--comment out 'Elasticsearch template setting' (used when working with ES)
+output.logstash:
+  # The Logstash hosts
+  hosts: ["a3:5443"]
+
+in logstash fb_pipeline_new.conf , output section looks like this:
+output {
+  stdout {codec => rubydebug}
+  opensearch {
+    hosts => ["a1:9200","a2:9200","a3:9200"]
+    manage_template => false
+    index => "mylog-%{[@metadata][beat]}-%{+YYYY.MM.dd}"
+    #document_type => "%{[@metadata][type]}"
+ }
+========
+
+refer: https://opensearch.org/docs/2.6/tools/index/ for version details/compatibility

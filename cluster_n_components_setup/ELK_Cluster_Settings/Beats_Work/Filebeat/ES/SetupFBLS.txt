@@ -1,4 +1,4 @@
-#Configure filebeat (plugin) to send log lines to logstash
+#Setup & Configure filebeat (plugin) to send log lines to logstash/ES
 
 The Filebeat client is a lightweight, resource-friendly tool that collects logs from files on 
 the server and forwards these logs to your Logstash instance for processing.
@@ -64,6 +64,7 @@ output.elasticsearch:
 
 check if index was created..
 
+------------
 #Option 2: 
 #Modify Filebeat configurations.
 $sudo vim /etc/filebeat/filebeat.yml
@@ -78,7 +79,8 @@ paths:
   #hosts: ["elk-server:5443"]
 
 #set the index dynamically by using a format string to access any event field
-#The events are distributed to these nodes in round robin order. If one node becomes unreachable, the event is automatically sent to another node. 
+#The events are distributed to these nodes in round robin order. If one node becomes unreachable, 
+the event is automatically sent to another node. 
 #Uncomment Elasticsearch:
 output.elasticsearch:
   # Array of hosts to connect to.
@@ -145,6 +147,7 @@ output.logstash:
 #Enable filebeat on system boot OR Start filebeat service
 $sudo systemctl enable filebeat.service
 $sudo systemctl start filebeat.service
+
 --to check status
 $sudo service filebeat status
 
@@ -163,24 +166,26 @@ output {
        }
 
 #Testing newly created config
-[elk@ce4 ~]$ /usr/share/logstash/bin/logstash --path.settings /etc/logstash/ -f /etc/logstash/conf.d/fb_pipeline.conf --config.test_and_exit
+$logstash --path.settings /usr/local/logstash/ -f /usr/local/logstash/conf.d/fb_pipeline.conf --config.test_and_exit
 Sending Logstash logs to /var/log/logstash which is now configured via log4j2.properties
 [2020-11-26T22:31:44,420][WARN ][logstash.config.source.multilocal] Ignoring the 'pipelines.yml' file because modules or command line options are specified
 Configuration OK
 [2020-11-26T22:31:53,406][INFO ][logstash.runner          ] Using config.test_and_exit mode. Config Validation Result: OK. Exiting Logstash
 
-#To run logstash with above mentioned config, remember to update output location in *.conf to receive content sent by filebeat and forward it 
+#To run logstash with above mentioned config, remember to update output location in 
+*.conf to receive content sent by filebeat and forward it 
 #as per location
 
 --refer fb_pipeline.conf provided in >>>> Logstash_Work/MyConfigsLS/conf.d
 
 #now start logstash with this config
-[elk@ce4 ~]$ /usr/share/logstash/bin/logstash --path.settings /etc/logstash/ -f /etc/logstash/conf.d/fb_pipeline.conf
+$logstash --path.settings /usr/local/logstash/ -f /usr/local/logstash/conf.d/fb_pipeline.conf 
 
 ###on filebeat running node####
 #start filebeat service 
 or 
 start command to publish data 
+
 #if filebeat was installed as a tar, then run the command from appropriate location
 root@u2:/usr/share/filebeat/bin# ./filebeat -e -c /usr/share/filebeat/filebeat.yml -d publish
 
