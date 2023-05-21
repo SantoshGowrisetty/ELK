@@ -1,4 +1,4 @@
-#to send data to Opensearch change the output section as follows (as done in logstash_bankcsv.conf)
+#to send data to Opensearch change the output section as follows (as done in logstash_bankcsv.conf,fb_pipline.conf)
 
 output {
   opensearch {
