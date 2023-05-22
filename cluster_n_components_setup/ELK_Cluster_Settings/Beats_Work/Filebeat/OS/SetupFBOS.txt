@@ -18,7 +18,7 @@ source .bashrc
 
 #without specifying index name or templates
 --copy filebeat1-3.yml and edit it(if needed)
-hdu@a1:/usr/local/filebeat$ cp /home/hdu/Downloads/filebeat1-1.yml filebeat.yml
+hdu@a1:/usr/local/filebeat$ cp /home/hdu/Downloads/filebeat1-3.yml filebeat.yml
 
 --to publish data to Opensearch
 --edit filebeat.yml, output section

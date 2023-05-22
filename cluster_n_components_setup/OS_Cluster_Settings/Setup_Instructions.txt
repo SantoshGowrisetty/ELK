@@ -92,6 +92,11 @@ cat /proc/sys/vm/max_map_count
 
     port 9600
     Allows you to access Performance Analyzer on port 9600.
+
+    /etc/systemd/user.conf and
+    /etc/systemd/system.conf
+
+    DefaultLimitNOFILE=65536
 --------------------------
 Note** for system settings to take effect, reboot machine
 --------------------------
