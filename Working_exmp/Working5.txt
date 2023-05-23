@@ -35,6 +35,26 @@ nested hits: contains an array of matched documents
 _score: the score ,how well the document matched the searched query
 _source : contains the document as JSON as it was added to index
 
+GET /ecommerce/_search
+{
+  "query": {
+  "match": 
+  {"name": "cashewnuts"}
+  }
+  }
+
+#using explain API
+#Returns information about why a specific document matches (or doesn’t match) a query.
+GET /ecommerce/_explain/170
+{
+  "query": {
+  "match": 
+  {"name": "cashewnuts"}
+  }
+  }
+
+GET /ecommerce/_explain/170?q=name:cashewnuts
+
 =====================================
 
 #Embedding boolean logic in querying

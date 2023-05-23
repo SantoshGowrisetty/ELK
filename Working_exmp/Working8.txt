@@ -34,4 +34,114 @@ GET /bankdata/_search
   ]  
 }
 
+#aggregations
+#using term aggregation 
+#A multi-bucket value source based aggregation where buckets are dynamically built - one per unique value
+GET /bankdata/_search
+{
+  "aggs": {
+    "my-agg-name": {
+      "terms": {
+        "field": "balance"
+      }
+    }
+  }
+}
+
+#Aggregation results are in the response’s aggregations object
+GET /bankdata/_search
+{
+  "aggs": {
+    "my-agg-name": {
+      "terms": {
+        "field": "marital"
+      }
+    }
+  }
+}
+
+GET /bankdata/_mappings
+
+PUT /bankdata/_mapping
+{
+  "properties": {
+    "marital": {
+      "type": "keyword"
+    }
+  }
+}
+
+PUT /bankdata/_mapping
+{
+  "properties": {
+    "marital": {
+       "type": "text",
+          "fielddata": true
+    }
+  }
+}
+
+#changing the amount of data that is considered for aggregation
+GET /bankdata/_search
+{
+  "query": {
+    "range": {
+      "balance": {
+        "gte": 500,
+        "lt": "3000"
+      }
+    }
+  },
+  "aggs": {
+    "my-agg-name-new": {
+      "terms": {
+        "field": "marital"
+      }
+    }
+  }
+}
+
+#to see only aggregation result, use size paramter
+GET /bankdata/_search
+{
+  "query": {
+    "range": {
+      "balance": {
+        "gte": 500,
+        "lt": "3000"
+      }
+    }
+  },
+  "size": 0,
+  "aggs": {
+    "my-agg-name-new": {
+      "terms": {
+        "field": "marital"
+      }
+    }
+  }
+}
+
+#using sub-aggregation
+GET /bankdata/_search
+{
+  "aggs": {
+    "my-agg-name": {
+      "terms": {
+        "field": "marital"
+      },
+      "aggs": {
+        "my-sub-agg-name": {
+          "avg": {
+            "field": "balance"
+          }
+        }
+      }
+    }
+  }
+}
+
+-----
+
+
 
