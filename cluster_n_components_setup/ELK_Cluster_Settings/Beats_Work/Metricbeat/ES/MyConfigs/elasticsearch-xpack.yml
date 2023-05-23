@@ -12,4 +12,19 @@
     - node_stats
     - shard
   period: 10s
-  hosts: ["http://c1:9200"]
+  hosts: ["http://a1:9200"]
+
+#   - ccr --
+Cross-Cluster Replication Stats API endpoint to fetch metrics about cross-cluster replication 
+from the Elasticsearch clusters that are participating in cross-cluster replication.
+    - cluster_stats --
+Uses the cluster stats API (GET /_cluster/stats or GET /_cluster/stats/nodes/<node_filter>)
+    - enrich --
+Uses Enrich Stats API endpoint to fetch information about Enrich coordinator nodes 
+in the Elasticsearch cluster that are participating in ingest-time enrichment.
+    - index
+    - index_recovery
+    - index_summary
+    - ml_job
+    - node_stats
+    - shard
