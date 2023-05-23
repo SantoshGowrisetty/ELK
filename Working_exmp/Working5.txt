@@ -1,3 +1,42 @@
+#Performing searches
+#sample simple query(with query strings using _search API with q paramter)
+10.
+GET /ecommerce/_search?q=cashewnuts
+
+GET /ecommerce/_search 
+
+GET /ecommerce/_search?q=elasticsearch*
+
+GET /ecommerce/_search
+{
+  "query": {
+  "match": 
+  {"name": "cashewnuts"}
+  }
+  }
+
+try same on ecommerce3
+GET /ecommerce3/_search
+{
+  "query": {
+  "match": 
+  {"title": "cashewnuts"}
+  }
+  }
+
+#
+11.
+GET /ecommerce/_search?q=*
+
+#two main properties
+hits: total number of matched results
+max_score: highest score of all matched documents
+nested hits: contains an array of matched documents
+_score: the score ,how well the document matched the searched query
+_source : contains the document as JSON as it was added to index
+
+=====================================
+
 #Embedding boolean logic in querying
 13.
 GET /ecommerce/_search?q=name:(cashewnuts OR peanuts)

@@ -54,12 +54,11 @@ GET ecommerce
 
 GET ecommerce/_mapping
 
-DELETE ecommerce
-
-#Add Mappings to ecommerce Index
+#Adding Mappings & settings
+Create ecommerce2 Index
 #type string is removed in newer versions of ES
 
-PUT /ecommerce
+PUT /ecommerce2
 {
      "mappings": {
                 "properties": {
@@ -92,6 +91,12 @@ PUT /ecommerce
 
 }
 }
+,
+  "settings": {
+    "number_of_shards": 2
+    , "number_of_replicas": 2
+    , "auto_expand_replicas": false
+  }
 }
 
 #getting details of index
