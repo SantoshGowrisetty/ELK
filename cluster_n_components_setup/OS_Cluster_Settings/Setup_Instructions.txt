@@ -1,3 +1,4 @@
+#Ubuntu
 Opensearch setup- on ubuntu 18.04 using Opensearch 2.6
 -----------
 --Steps to be performed on each node (in our case 3 nodes: a1,a2,a3)
@@ -12,10 +13,21 @@ sudo apt install openjdk-11-jdk
 export JAVA_HOME=/usr/lib/jvm/java-11-openjdk-amd64/
 #export PATH=$PATH:$JAVA_HOME/bin
 
+Or in Centos
+
+sudo yum install java-11-openjdk-devel -y
+
+#update .bashrc
+export JAVA_HOME=/usr/lib/jvm/java-11-openjdk-11.0.19.0.7-1.el7_9.x86_64
+export PATH=$PATH:$JAVA_HOME/bin
+
+#update java path
+sudo alternatives --config java
 --refresh
 source .bashrc
 
 #Download opensearch and opensearch-dashboards tar from 
+--latest being 2.9
 https://opensearch.org/downloads.html
 
 #Setup Opensearch cluster
@@ -126,6 +138,11 @@ hdu@a1:~$ mv /usr/local/opensearch/plugins/opensearch-security /home/hdu/Downloa
 
 #Start cluster
 on each node
+sudo systemctl status firewalld
+sudo systemctl stop firewalld
+sudo systemctl disable firewalld
+
+--start opensearch
 hdu@a1:~$opensearch
 hdu@a2:~$opensearch
 hdu@a3:~$opensearch

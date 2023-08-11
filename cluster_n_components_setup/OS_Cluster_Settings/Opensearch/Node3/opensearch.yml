@@ -63,7 +63,7 @@ bootstrap.memory_lock: true
 #http.port: 9200
 #
 # For more information, consult the network module documentation.
-network.host: a3
+network.host: os3
 http.port: 9200
 transport.port: 9300
 node.roles: [master,data]
@@ -80,7 +80,7 @@ node.roles: [master,data]
 #cluster.initial_cluster_manager_nodes: ["node-1", "node-2"]
 #
 # For more information, consult the discovery and cluster formation module documentation.
-discovery.seed_hosts: ["a1"]
+discovery.seed_hosts: ["os1"]
 cluster.initial_master_nodes:
   - Node1
 #
