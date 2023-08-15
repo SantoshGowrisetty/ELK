@@ -1,4 +1,14 @@
+
 #Performing operations in Batches
+Doing an explain:
+GET ecommerce2/_search
+{
+    "explain": true, 
+    "query": {
+        "match_all": {}
+    }
+}
+
 #Using _bulk API expects a single line with action ie create,update or delete
 #It uses '/n' for new lines
 

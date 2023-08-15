@@ -251,3 +251,5 @@ PUT /ecommerce/_doc/1004
     "tags": ["metricbeat","logstash","filebeat"]
 }
 
+
+
