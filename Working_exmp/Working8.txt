@@ -142,6 +142,99 @@ GET /bankdata/_search
 }
 
 -----
+#Managing state using policy
+PUT /_plugins/_ism/policies/mgmt_policy?pretty
+{
+  "policy": {
+    "description": "hot warm delete workflow",
+    "default_state": "hot",
+    "schema_version": 1,
+    "states": [
+      {
+        "name": "hot",
+        "actions": [
+          {
+            "rollover": {
+              "min_index_age": "1d",
+              "min_primary_shard_size": "30gb"
+            }
+          }
+        ],
+        "transitions": [
+          {
+            "state_name": "warm"
+          }
+        ]
+      },
+      {
+        "name": "warm",
+        "actions": [
+          {
+            "replica_count": {
+              "number_of_replicas": 5
+            }
+          }
+        ],
+        "transitions": [
+          {
+            "state_name": "delete",
+            "conditions": {
+              "min_index_age": "1h"
+            }
+          }
+        ]
+      },
+      {
+        "name": "delete",
+        "actions": [
+          {
+            "delete": {}
+          }
+        ]
+      }
+    ],
+    "ism_template": {
+      "index_patterns": ["testlog*"],
+      "priority": 100
+    }
+  }
+}
+
+PUT _index_template/testlog
+{
+  "index_patterns": [
+    "testlog*"
+  ],
+  "template": {
+    "aliases": {
+      "mylogs": {}
+    },
+    "settings": {
+      "number_of_shards": 2,
+      "number_of_replicas": 2
+    },
+    "mappings": {
+      "properties": {
+        "timestamp": {
+          "type": "date",
+          "format": "yyyy-MM-dd HH:mm:ss||yyyy-MM-dd||epoch_millis"
+        },
+        "value": {
+          "type": "double"
+        }
+      }
+    }
+  }
+}
+
+PUT testlog
+
+GET _cat/indices/testlog?v
+
+GET _plugins/_ism/explain/testlog?pretty
+
+GET testlog/_stats
+
 
 
 
