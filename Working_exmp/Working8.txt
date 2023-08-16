@@ -155,8 +155,9 @@ PUT /_plugins/_ism/policies/mgmt_policy?pretty
         "actions": [
           {
             "rollover": {
-              "min_index_age": "1d",
-              "min_primary_shard_size": "30gb"
+              "min_index_age": "1m",
+              "min_primary_shard_size": "3mb",
+              "min_doc_count": 1500
             }
           }
         ],
@@ -179,7 +180,7 @@ PUT /_plugins/_ism/policies/mgmt_policy?pretty
           {
             "state_name": "delete",
             "conditions": {
-              "min_index_age": "1h"
+              "min_index_age": "10m"
             }
           }
         ]
@@ -194,46 +195,58 @@ PUT /_plugins/_ism/policies/mgmt_policy?pretty
       }
     ],
     "ism_template": {
-      "index_patterns": ["testlog*"],
-      "priority": 100
+      "index_patterns": ["newtestlog*"],
+      "priority": 500
     }
   }
 }
 
-PUT _index_template/testlog
+PUT _index_template/newtestlog
 {
   "index_patterns": [
-    "testlog*"
+    "newtestlog*"
   ],
   "template": {
     "aliases": {
-      "mylogs": {}
+      "newmylogs": {}
     },
     "settings": {
-      "number_of_shards": 2,
-      "number_of_replicas": 2
-    },
-    "mappings": {
-      "properties": {
-        "timestamp": {
-          "type": "date",
-          "format": "yyyy-MM-dd HH:mm:ss||yyyy-MM-dd||epoch_millis"
-        },
-        "value": {
-          "type": "double"
-        }
-      }
+      "number_of_shards": 3,
+      "number_of_replicas": 2,
+      "plugins.index_state_management.rollover_alias": "newlogs"
     }
   }
 }
 
-PUT testlog
 
-GET _cat/indices/testlog?v
+--after index creation
 
-GET _plugins/_ism/explain/testlog?pretty
+POST _aliases
+{
+  "actions": [
+    {
+      "add": {
+        "index": "newtestlog-1608",
+        "alias": "newmylogs"
+      }
+    }
+  ]
+}
 
-GET testlog/_stats
+GET newtestlog-1608
+
+GET _cat/indices/newtestlog-1608?v
+
+GET _plugins/_ism/explain/newtestlog*?pretty
+
+GET newtestlog-1608/_count
+{
+    "query": {
+        "match_all": {}
+    }
+}
+
+GET newtestlog-1608/_stats
 
 
 
