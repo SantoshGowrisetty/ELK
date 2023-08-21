@@ -1,0 +1,18 @@
+pip install jina
+
+--check
+jina
+
+--jina cloud login 
+--use the link to login into Jina cloud
+Successfully logged in to Jina AI as aj1711singh (username: aj1711singh)!
+
+--to test creating and executor
+jina hub new and follow instructions
+
+#to Test Locally
+jina executor --uses /home/hdu/MyExecutor31/config.yml --quiet-error
+
+
+or we can upload folder on Jina cloud web UI..
+
