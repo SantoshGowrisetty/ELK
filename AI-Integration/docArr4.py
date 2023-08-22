@@ -38,6 +38,9 @@ print(d.non_empty_fields)
 print(d.chunks)
 print(d.chunks.texts)
 
+d.summary()
+
+
 #using content setter and getter
 d1 = Document(content='hello')
 print(d1)
@@ -51,11 +54,13 @@ print(d1.content)
 
 #Load content from uri
 d1 = Document(uri='/home/hdu/Downloads/apple2.png').load_uri_to_image_tensor()
-print(d1.content_type, d1.content)
+#print(d1.content_type, d1.content)
 print(d1.non_empty_fields)
 
 d2 = Document(uri='https://www.gutenberg.org/files/1342/1342-0.txt').load_uri_to_text()
-print(d2.content_type, d2.content)
+#print(d2.content_type, d2.content)
+
+
 
 
 

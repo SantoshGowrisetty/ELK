@@ -3,6 +3,7 @@ import numpy
 
 #construct an empty document
 d = Document()
+print(d.id)
 
 #Each Document has a unique random id to identify it. It can be used to access the Document inside a DocumentArray.
 #The random id is the hex value of UUID1. To convert it into the a UUID string
@@ -32,10 +33,14 @@ print(d1.tags)
 print(d1.id)
 print(d1.embedding)
 
+
 print('d2 is    :', d2)
 print(d2.blob)
+print(d2.non_empty_fields)
 
 print('d3 is    :', d3)
+print(d3.content)
+print(d3.embedding)
 print('d4 is    :', d4,d4.tags)
 
 #wrap keyword arguments into a dict
@@ -71,7 +76,7 @@ print(d5.is_multimodal)
 
 print('d6 is    :', d6)
 print('d7 is    :', d7)
-print(d7.to_json(protocol='protobuf'))
+print(d7.to_json(protocol="protobuf"))
 print(d7.non_empty_fields)
 print(d7.uri)
 print(d7.summary())

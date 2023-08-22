@@ -1,4 +1,6 @@
 import docarray
+#BaseDoc and DocLIst is replaced in newer version by Document and DocumentArray
+#Here we are using docarray=0.21, change the version of docarray to latest to use this..
 from docarray import BaseDoc, DocList
 import numpy as np
 from docarray.index import ElasticDocIndex  # or ElasticV7DocIndex

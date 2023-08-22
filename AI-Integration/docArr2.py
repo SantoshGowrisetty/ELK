@@ -15,11 +15,13 @@ print(d)
 print(d.summary())
 print(d.granularity)
 print(d.chunks)
+print(d.chunks)
 
 #giving an unknown attribute
 #If you give an unknown attribute (i.e. not one of the built-in Document attributes), it is automatically “caught” into the .tags attribute
 d = Document(hello='world')
 print(d, d.tags)
+print(d.id)
 
 #esolve external fields into built-in attributes by specifying a mapping in field_resolver.
 d = Document(hello='world', field_resolver={'hello': 'id'})
@@ -40,4 +42,5 @@ d2 = Document(text='world')
 print(id(d1))
 d1.copy_from(d2)
 print(d1.text)
-print(id(d1))
+print(d1.id)
+print(d2.id)

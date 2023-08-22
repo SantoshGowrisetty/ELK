@@ -1,6 +1,9 @@
+#BaseDoc and DocLIst is replaced in newer version by Document and DocumentArray
+#Here we are using docarray=0.21, change the version of docarray to latest to use this..
 import docarray
 from docarray import BaseDoc, DocList
 import numpy as np
+import elasticsearch7
 from docarray.index import ElasticDocIndex  # or ElasticV7DocIndex
 import numpy
 
