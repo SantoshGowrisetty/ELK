@@ -12,7 +12,7 @@ Download > create workspace > OpenAI Vector Database
 Create a POST request and get link from 'embeddings' : https://api.openai.com/v1/embeddings
 Authorization > get your API Key for OpenAI
 > create secret key:
-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
+-----key-----
 Then Body > raw Text > Json
 {
 "model": "text-embedding-ada-002",
