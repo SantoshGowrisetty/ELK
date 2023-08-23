@@ -10,6 +10,7 @@ Note** we can also  specify configurations such as 'es_config': {'ca_certs': '/U
 
 #Setup:
 #Python3.7 setup
+yum install zlib-devel
 sudo wget https://www.python.org/ftp/python/3.7.11/Python-3.7.11.tgz
 sudo tar xzf Python-3.7.11.tgz 
 cd Python-3.7.11/
