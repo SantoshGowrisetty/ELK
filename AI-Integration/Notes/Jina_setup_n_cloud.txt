@@ -16,3 +16,79 @@ jina executor --uses /home/hdu/MyExecutor31/config.yml --quiet-error
 
 or we can upload folder on Jina cloud web UI..
 
+on Node: for example
+jina hub new
+--create executor as SentenceEncoder
+cd SentenceEncoder
+update requirements.txt
+sentence-transformers==2.0.0
+pip install -r requirements.txt
+
+GPU-enabled version of PyTorch, is the default version when installing from PyPI
+To get cpu based
+we could change the requirements.txt file to install a CPU-only version of PyTorch like this
+-f https://download.pytorch.org/whl/torch_stable.html sentence-transformers torch==1.9.0+cpu
+
+create executor.py as given in SentenceEncoder FOLDER
+create a main with this or add it to executor
+from docarray import Document
+from jina import Flow
+
+from executor import SentenceEncoder
+
+
+def generate_docs():
+    for _ in range(10_000):
+        yield Document(
+            text='Using a GPU allows you to significantly speed up encoding.'
+        )
+
+
+f = Flow().add(uses=SentenceEncoder, uses_with={'device': 'cpu'})
+with f:
+    f.post(on='/encode', inputs=generate_docs, show_progress=True, request_size=32)
+
+'''Optional and can be used to build docker
+f = Flow().add(
+    uses='docker://sentence-encoder', uses_with={'device': 'cuda'}, gpus='all'
+)'''
+
+'''
+add above line to main and then run
+docker build 
+
+
+
+Other options:
+https://tfhub.dev/google/collections/bert/1
+
+
+From jupyter or your setup
+import tensorflow_hub as hub
+import tensorflow_text as text
+
+#we can download models or use links
+preprocess_url = 'https://tfhub.dev/tensorflow/bert_en_uncased_preprocess/3'
+encoder_url = 'https://tfhub.dev/tensorflow/bert_en_uncased_L-12_H-768_A-12/4'
+
+bert_preprocess_model = hub.KerasLayer(preprocess_url)
+
+text_test = ['nide movie indeed', ' I love python programming']
+text_preprocessed = bert_preprocess_model(text_test)
+text_preprocessed.keys()
+
+text_preprocessed['input_mask']
+
+#CLS nice movie indeed SEP
+
+text_preprocessed['input_type_ids']
+text_preprocessed['input_word_ids']
+
+bert_model = hub.KerasLayer(encoder_url)
+bert_results = bert_model(text_preprocessed)
+bert_results.keys()
+
+
+
+
+
