@@ -1,3 +1,363 @@
+TensorFlow - is a machine learning framework is famous for powering DNN with high level code.
+It is a library to work with Linear algebra and statictics.
+Tensor describes a multi linear relationship between sets of algebraic objects within a vector space(multi-dimensional array).
+It has collection of APIs for
+-data processing
+-visualization
+-model evaluation
+-deployment
+
+It is extremely portable 
+TensorFlow Lite- can run on tiny mobile CPUs or microcontrollers with TF Lite
+TensorFlow JS - can run in browser 
+Core library can scale up to multiple GPUs (CUDA) or TPUs (Tensor Processing Units)
+
+Used in Medicine- for object detection (medical imaging)
+Used by Twitter - Predictive analytics
+Used by Spotigy - recommendation engines
+Used by Paypal - fraud detection
+
+Used in Self driving cars, NLP.
+
+Example:
+--create a py file : test.py
+import tensorflow as tf
+import numpy as np
+print(tf.__version__)
+
+<code>
+
+Keraslayer:
+TensorFlow Hub (tfhub) is a repository of pre-trained TensorFlow models that can be reused across various AI projects. One of the key components of tfhub is hub.KerasLayer, which allows you to seamlessly integrate these pre-trained models into your Keras applications. 
+
+hub.KerasLayer is a wrapper that allows you to use a TensorFlow Hub model as a Keras layer. This means you can incorporate pre-trained models into your Keras applications with just a few lines of code. This can significantly speed up your model development process and improve the performance of your models.
+
+Why Use hub.KerasLayer?
+There are several reasons why you might want to use hub.KerasLayer:
+
+Efficiency: You can leverage pre-trained models, which saves time and computational resources.
+Performance: Pre-trained models have been trained on large datasets and can often outperform models trained from scratch.
+Flexibility: hub.KerasLayer can be used with any TensorFlow Hub model, giving you a wide range of models to choose from.
+
+How to Use hub.KerasLayer 
+!pip install tensorflow tensorflow_hub
+import tensorflow as tf
+import tensorflow_hub as hub
+
+we can use hub.KerasLayer to incorporate a pre-trained model into our Keras application. For example 
+we can use the Inception V3 model, which is a popular model for image classification.
+
+model_url = "https://tfhub.dev/google/imagenet/inception_v3/feature_vector/4"
+hub_layer = hub.KerasLayer(model_url, trainable=False)
+
+model_url is the URL of the pre-trained model on TensorFlow Hub. 
+The trainable parameter is set to False to freeze the weights of the pre-trained model. 
+If you want to fine-tune the pre-trained model, you can set trainable to True.
+
+create a Keras model and add the hub.KerasLayer as the first layer.
+model = tf.keras.Sequential([
+    hub_layer,
+    tf.keras.layers.Dense(1000, activation='relu'),
+    tf.keras.layers.Dense(10, activation='softmax')
+])
+
+In this model, the hub.KerasLayer extracts features from the input images, and the subsequent dense layers perform classification based on these features.
+
+compile and train the model
+model.compile(optimizer='adam',
+              loss=tf.keras.losses.SparseCategoricalCrossentropy(),
+              metrics=['accuracy'])
+
+model.fit(train_data, train_labels, epochs=5)
+
+--Now we can use this model.
+----------------------------
+Bert Usage & understanding:
+
+Other options:
+https://tfhub.dev/google/collections/bert/1
+
+From jupyter or your setup
+#Setup
+pip install "tensorflow>=2.0.0"
+pip install tensorflow-text
+
+--------------------------------------------------------------------
+#Example1
+import tensorflow_hub as hub
+import tensorflow_text as text
+
+#we can download models or use links
+preprocess_url = 'https://tfhub.dev/tensorflow/bert_en_uncased_preprocess/3'
+encoder_url = 'https://tfhub.dev/tensorflow/bert_en_uncased_L-12_H-768_A-12/4'
+
+bert_preprocess_model = hub.KerasLayer(preprocess_url)
+
+text_test = ['nide movie indeed', ' I love python programming']
+text_preprocessed = bert_preprocess_model(text_test)
+text_preprocessed.keys()
+
+text_preprocessed['input_mask']
+
+#CLS nice movie indeed SEP
+
+text_preprocessed['input_type_ids']
+text_preprocessed['input_word_ids']
+
+bert_model = hub.KerasLayer(encoder_url)
+bert_results = bert_model(text_preprocessed)
+bert_results.keys()
+---------------------------------------------------
+
+#Classify email as spam or not spam
+
+Six chances to win CASH! From 100 to 20,000 pounds txt (spam)
+John , can we postpone our meeting to next Monday, please?(not spam)
+
+Bert converts email content to an embedding vector.
+This can be fed into a neural network and do the training.
+[A vector is generated of 768 length.]
+
+Within BERT we have two components
+--preprocess
+--encode
+
+------------------------------
+import tensorflow as tf
+import tensorflow_hub as hub
+import tensorflow_text as text
+
+import pandas as pd
+from keras.backend import shape
+
+df = pd.read_csv("/home/hdu/Downloads/spamtrain.csv")
+df.head(5)
+
+#basic analysis
+df.groupby('label').describe()
+#should show you count of type of emails
+#we need to handle inbalancing of dataset
+
+#Let's use technique for 'down sampling '
+df['label'].value_counts()
+
+#check for percentage of emails in data
+
+#discard some emails to have equal number of spam and ham emails
+#we can also do oversampling of smaller data as other option
+
+df_spam = df[df['label'] == 'spam']
+df_spam.shape
+df_spam.head()
+df_ham = df[df['label'] == 'ham']
+df_ham.shape
+df_ham.head()
+
+df_ham_downsampled = df_ham.sample(df_spam.shape[0])
+df_ham_downsampled.shape
+
+#concat both
+df_balanced = pd.concat([df_spam, df_ham_downsampled])
+df_balanced.columns
+df_balanced['label'].value_counts()
+#should show equal number of spam and ham emails
+
+df_balanced.sample(5)
+
+df_balanced['spam'] = df_balanced['label'].apply(lambda x: 1 if x == 'spam' else 0)
+df_balanced.columns
+from sklearn.model_selection import train_test_split
+
+X_train, X_test, y_train, y_test = train_test_split(df_balanced['label'], df_balanced['spam'],
+                                                    stratify=df_balanced['spam'])
+#Note** use startify so that in train and test sample, the distribution of categories is equal.
+
+X_train.head
+df_balanced.head()
+preprocess_url = 'https://tfhub.dev/tensorflow/bert_en_uncased_preprocess/3'
+encoder_url = 'https://tfhub.dev/tensorflow/bert_en_uncased_L-12_H-768_A-12/4'
+
+bert_preprocess_model = hub.KerasLayer(preprocess_url)
+bert_encoder = hub.KerasLayer(encoder_url)
+
+#let's write a function to get embedding for a sentence
+
+def get_sentence_embedding(sentences):
+    preprocessed_text = bert_preprocess_model(sentences)
+    return bert_encoder(preprocessed_text)['pooled_output']
+
+get_sentence_embedding([
+    "100$ discount, hurry up",
+    "peter, are you available for a discussion tomorrow"])
+
+#test bert encoder to get embeddings for some random words
+e = get_sentence_embedding([
+    "banana",
+    "grapes",
+    "mango",
+    "jeff bezos",
+    "elon musk",
+    "bill gates"
+])
+
+from sklearn.metrics.pairwise import cosine_similarity
+
+# we use consine similarity to see how similar two vectors are,
+# if cosine simlarity is close to 1 that means vectors are similar
+
+cosine_similarity([e[0]], [e[1]])
+
+#similarly
+cosine_similarity([e[0]], [e[3]])
+
+# we can create sequential or functional model in Keras
+
+# Bert layers
+# create input layer
+text_input = tf.keras.layers.Input(shape=(),dtype=tf.string, name="label")
+preprocessed_text = bert_preprocess_model(text_input)
+outputs = bert_encoder(preprocessed_text)
+
+# Neural network layers
+# dropout layer : refers to dropping out the nodes (input and hidden layer) in a neural network
+l = tf.keras.layers.Dropout(0.1, name='dropout')(outputs['pooled_output'])
+l = tf.keras.layers.Dense(1, activation='sigmoid', name='output')(l)
+#Note ** if more than 0.5 sigmoid = spam or not
+
+# construct final model
+model = tf.keras.Model(inputs=[text_input], outputs=[l])
+
+model.summary()
+
+#should show you 'Trainable params': 769(input: 768 + 1)
+#remaining params come from BERT which are not trainable
+
+METRICS = [
+    tf.keras.metrics.BinaryAccuracy(name='accuracy'),
+    tf.keras.metrics.Precision(name='precision'),
+    tf.keras.metrics.Recall(name='recall')]
+
+model.compile(optimizer='adam',
+              loss='binary_crossentropy',
+                metrics = METRICS)
+
+model.fit(X_train, y_train, epochs=10)
+# The number of epochs is a hyperparameter that defines the number times that the learning algorithm will work through the entire training dataset.
+
+model.evaluate(X_test, y_test)
+
+y_predicted = model.predict(X_test)
+y_predicted = y_predicted.flatten()
+
+import numpy as np
+
+y_predicted = np.where(y_predicted > 0.5, 1, 0)
+y_predicted
+
+from sklearn.metrics import confusion_matrix, classification_report
+
+cm = confusion_matrix(y_test, y_predicted)
+cm
+
+from matplotlib import pyplot as plt
+import seaborn as sn
+
+sn.heatmap(cm, annot=True, fmt='d')
+plt.xlabel('Predicted')
+plt.ylabel('Truth')
+
+print(classification_report(y_test, y_predicted))
+#should show good precision, recall and fl_score
+
+reviews = [
+    'Enter  a chance to win $5000, hurry up, offer valid until march 31,2011',
+    'You are awarded a SiPix Digital Camera! call 00191928267 from landline. Delivery within 27days.',
+    'it is 80488. Your 500 free text messages are valid until 31 December 2005',
+    'Hey peter, are you coming to office today',
+    "why don't you wait for 1 week to check your salary"]
+
+model.predict(reviews)
+# Look at values and see if its more than 0.5 to be categorized as SPAM.
+
+-------------------------------
+Fine Tuning:
+import pandas as pd
+df = pd.read_csv('/home/hdu/Downloads/spamtrain.csv')
+df.head()
+df.columns
+
+#independent features
+X = list(df['text'])
+X
+#dependent features
+y = list(df['label'])
+y
+
+y = list(pd.get_dummies(y,drop_first=True)['spam'])
+y
+
+from sklearn.model_selection import train_test_split
+X_train,X_test, y_train,y_test = train_test_split(X,y,test_size=0.20, random_state=0)
+
+#pip install transformers
+#call the pretrained model > call the tokenizer >
+from transformers import DistilBertTokenizerFast
+tokenizer = DistilBertTokenizerFast.from_pretrained('distilbert-base-uncased')
+
+#padding to make all sentences of same size
+#truncation to remove white spaces
+train_encodings = tokenizer(X_train, truncation=True, padding=True)
+test_encodings = tokenizer(X_test, truncation=True, padding=True)
+
+train_encodings
+test_encodings
+
+#convert encodings into dataset objects
+import tensorflow as tf
+train_dataset = tf.data.Dataset.from_tensor_slices((dict(train_encodings),y_train))
+test_dataset = tf.data.Dataset.from_tensor_slices((dict(test_encodings),y_test))
+
+from transformers import TFDistilBertForSequenceClassification, TFTrainer, TFTrainingArguments
+
+training_args = TFTrainingArguments(
+    output_dir = '/home/hdu/results',   #output dir
+    num_train_epochs=2,        #total number of training epochs
+    per_device_train_batch_size=8, #batch size per device during training
+    per_device_eval_batch_size=16,  #batch size for evaluation
+    warmup_steps=500,                #number of warmup steps for learning rate scheduler
+    weight_decay=0.01,               #strength of weight decay
+    logging_dir='/home/hdu/logs',           #dirctory for storing logs
+    logging_steps=10,
+)
+
+with training_args.strategy.scope():
+    model = TFDistilBertForSequenceClassification.from_pretrained("distilbert-base-uncased")
+
+trainer = TFTrainer(
+    model=model,         #the instantiated transformers model to be trained
+    args=training_args,     #training arguments defined above
+    train_dataset=train_dataset,                 #training_dataset
+    eval_dataset=test_dataset,                   #evaluation dataset
+)
+
+trainer.train()
+
+trainer.evaluate(test_dataset)
+
+trainer.evaluate(test_dataset)
+trainer.predict(test_dataset)
+trainer.predict(test_dataset)[1].shape
+
+output = trainer.evaluate(test_dataset)[1]
+
+from sklearn.metrics import confusion_matrix
+cm = confusion_matrix(y_test,output)
+
+cm
+
+trainer.save_model('senti_model')
+
+-------------------------------
 NLP
 
 --Automatic article summarization
@@ -131,4 +491,6 @@ If we used [MASK] 100% of the time the model wouldn’t necessarily produce good
 If we used [MASK] 90% of the time and random words 10% of the time, this would teach the model that the observed word is never correct.
 If we used [MASK] 90% of the time and kept the same word 10% of the time, then the model could just trivially copy the non-contextual embedding.
 
+===============
+Examples:
 

@@ -59,36 +59,5 @@ docker build
 
 
 
-Other options:
-https://tfhub.dev/google/collections/bert/1
-
-
-From jupyter or your setup
-import tensorflow_hub as hub
-import tensorflow_text as text
-
-#we can download models or use links
-preprocess_url = 'https://tfhub.dev/tensorflow/bert_en_uncased_preprocess/3'
-encoder_url = 'https://tfhub.dev/tensorflow/bert_en_uncased_L-12_H-768_A-12/4'
-
-bert_preprocess_model = hub.KerasLayer(preprocess_url)
-
-text_test = ['nide movie indeed', ' I love python programming']
-text_preprocessed = bert_preprocess_model(text_test)
-text_preprocessed.keys()
-
-text_preprocessed['input_mask']
-
-#CLS nice movie indeed SEP
-
-text_preprocessed['input_type_ids']
-text_preprocessed['input_word_ids']
-
-bert_model = hub.KerasLayer(encoder_url)
-bert_results = bert_model(text_preprocessed)
-bert_results.keys()
-
-
-
 
 
