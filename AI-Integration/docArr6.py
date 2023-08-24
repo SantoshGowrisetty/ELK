@@ -25,7 +25,7 @@ print(type(d.matches))
 
 #Visualize documents
 import numpy as np
-from docarray import Document
+from docarray import Document,DocumentArray
 
 d0 = Document(id='🐲', embedding=np.array([0, 0]))
 d1 = Document(id='🐦', embedding=np.array([1, 0]))
@@ -33,9 +33,25 @@ d2 = Document(id='🐢', embedding=np.array([0, 1]))
 d3 = Document(id='🐯', embedding=np.array([1, 1]))
 
 d0.chunks.append(d1)
+d0
+d0.chunks
 d0.chunks[0].chunks.append(d2)
 d0.matches.append(d3)
 print(d0.summary())
+
+d0 = Document(text="world")
+d1 = Document(text="country")
+d2 = Document(text="city1")
+d3 = Document(text="berlin")
+d0.chunks.append(d1)
+d0.chunks[0].chunks.append(d2)
+d0.matches.append(d3)
+da1 = DocumentArray([d0])
+da1.summary()
+da = DocumentArray([d0],
+                   storage='elasticsearch',
+                   config={'hosts': 'http://os1:9200', 'index_name': 'chunk_data','n_dim': 10},
+                   )
 
 #Using Fluent interface
 #process (often preprocess) a Document object by chaining methods.

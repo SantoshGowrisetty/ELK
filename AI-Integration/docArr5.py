@@ -62,13 +62,19 @@ d3 = q3.embed(model)
 
 from docarray import DocumentArray
 da = DocumentArray([d1,d2,d3])
-#print(da.contents)
+print(da)
+print(da.contents)
 print(da.embeddings.shape)
+print(da.summary)
+da.
 #print(da.embeddings)
 d1.match(da)
 d2.match(da)
 d3.match(da)
 da.count(d1)
+
+for doc in da:
+    print(da.index(doc),doc.id)
 
 #we create ten Documents and put them into a DocumentArray, and then use another Document to search against them.
 da = DocumentArray.empty(10)
@@ -81,7 +87,7 @@ q.match(da)
 q.summary()
 
 ################
-#using feature hasing for embedding and distance metric is 'jaccard distance'
+#using feature hashing for embedding and distance metric is 'jaccard distance'
 #--https://en.wikipedia.org/wiki/Feature_hashing
 #--https://en.wikipedia.org/wiki/Jaccard_index
 #searching for top 5 similar sentences
@@ -92,7 +98,7 @@ da = DocumentArray(Document(text=s.strip()) for s in d.text.split('\n') if s.str
 da.apply(Document.embed_feature_hashing, backend='process')
 
 q = (
-    Document(text='such manners')
+    Document(text='she is')
     .embed_feature_hashing()
     .match(da, metric='jaccard', use_scipy=True)
 )

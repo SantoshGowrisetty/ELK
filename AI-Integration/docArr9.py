@@ -53,7 +53,10 @@ pprint.pprint(res)
 #searching for tags
 r = da.find({'tags__h': {'$gt': 10}})
 print(r.contents)
+
 res = r.to_json(protocol="protobuf")
+for i in res.split(","):
+    print(i)
 print(res)
 
 #Using substitution with field
